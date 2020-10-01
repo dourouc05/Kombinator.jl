@@ -8,9 +8,11 @@ module Kombinator
   # TODO: how to add a link to functions like budgeted_msets_lp_select, budgeted_msets_lp_all? They can be quite useful (but do not bring much in terms of performance)
 
   using DataStructures
+  using Hungarian
+  using JuMP
   using LinearAlgebra
   using LightGraphs
-  using JuMP
+  using Munkres
 
   import Base: values
   import LightGraphs: src, dst

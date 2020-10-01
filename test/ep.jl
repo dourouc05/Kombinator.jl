@@ -1,5 +1,3 @@
-using Test
-
 @testset "Elementary paths" begin
   @testset "Interface" begin
     @testset "Positive-reward cycle" begin
@@ -82,13 +80,13 @@ end
     @test d.path == [Edge(1, 3)]
 
     warn_msg = "The asked maximum budget 5 is higher than the instance budget 4. Therefore, some values have not been computed and are unavailable."
-    @test_logs (:warn, warn_msg) CombinatorialBandits.paths_all_budgets_as_tuples(d, 5)
+    @test_logs (:warn, warn_msg) Kombinator.paths_all_budgets_as_tuples(d, 5)
     sol = Dict(0 => [(1, 2), (2, 3)], 1 => [(1, 2), (2, 3)], 2 => [(1, 2), (2, 3)], 3 => [(1, 3)], 4 => [(1, 3)])
-    @test CombinatorialBandits.paths_all_budgets_as_tuples(d, 4) == sol
+    @test Kombinator.paths_all_budgets_as_tuples(d, 4) == sol
 
-    @test_logs (:warn, warn_msg) CombinatorialBandits.paths_all_budgets(d, 5)
+    @test_logs (:warn, warn_msg) Kombinator.paths_all_budgets(d, 5)
     sol = Dict(0 => [Edge(1, 2), Edge(2, 3)], 1 => [Edge(1, 2), Edge(2, 3)], 2 => [Edge(1, 2), Edge(2, 3)], 3 => [Edge(1, 3)], 4 => [Edge(1, 3)])
-    @test CombinatorialBandits.paths_all_budgets(d, 4) == sol
+    @test Kombinator.paths_all_budgets(d, 4) == sol
   end
 
   @testset "Conformity" begin

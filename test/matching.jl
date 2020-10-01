@@ -1,5 +1,3 @@
-using Test
-
 @testset "Maximum bipartite matching" begin
   @testset "Interface" begin
     n = 5
@@ -186,12 +184,12 @@ end
   end
 
   @testset "Helpers" begin
-    @test CombinatorialBandits._edge_any_end_match(Edge(1, 2), Edge(1, 2))
-    @test CombinatorialBandits._edge_any_end_match(Edge(1, 2), Edge(1, 3))
-    @test CombinatorialBandits._edge_any_end_match(Edge(1, 2), Edge(4, 2))
-    @test CombinatorialBandits._edge_any_end_match(Edge(1, 3), Edge(1, 2))
-    @test CombinatorialBandits._edge_any_end_match(Edge(4, 2), Edge(1, 2))
-    @test ! CombinatorialBandits._edge_any_end_match(Edge(1, 2), Edge(3, 4))
+    @test Kombinator._edge_any_end_match(Edge(1, 2), Edge(1, 2))
+    @test Kombinator._edge_any_end_match(Edge(1, 2), Edge(1, 3))
+    @test Kombinator._edge_any_end_match(Edge(1, 2), Edge(4, 2))
+    @test Kombinator._edge_any_end_match(Edge(1, 3), Edge(1, 2))
+    @test Kombinator._edge_any_end_match(Edge(4, 2), Edge(1, 2))
+    @test ! Kombinator._edge_any_end_match(Edge(1, 2), Edge(3, 4))
   end
 
   @testset "Basic: 2×2" begin
@@ -220,8 +218,8 @@ end
         @test length(s.solution) == 2
         @test Edge(1, 3) in s.solution
         @test Edge(2, 4) in s.solution
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 2.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 2.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 0.0 atol=ε
       end
     end
 
@@ -241,8 +239,8 @@ end
         @test length(s.solution) == 2
         @test Edge(1, 4) in s.solution
         @test Edge(2, 3) in s.solution
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 2.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 2.0 atol=ε
       end
     end
 
@@ -262,8 +260,8 @@ end
         @test length(s.solution) == 2
         @test Edge(1, 4) in s.solution
         @test Edge(2, 3) in s.solution
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 2.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 2.0 atol=ε
       end
     end
 
@@ -326,8 +324,8 @@ end
         @test Edge(1, 4) in s.solution
         @test Edge(2, 5) in s.solution
         @test Edge(3, 6) in s.solution
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 3.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 3.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 0.0 atol=ε
       end
     end
 
@@ -348,8 +346,8 @@ end
         @test ! (Edge(1, 4) in s.solution)
         @test ! (Edge(2, 5) in s.solution)
         @test ! (Edge(3, 6) in s.solution)
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 3.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 3.0 atol=ε
       end
     end
   end
@@ -391,8 +389,8 @@ end
           @test e in s.solution
         end
 
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 5.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 5.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 0.0 atol=ε
       end
     end
 
@@ -412,8 +410,8 @@ end
         n_max_reward_edges = sum(e in s.solution for e in max_reward_edges)
         @test n_max_reward_edges <= 4
 
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 3.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 2.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 3.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 2.0 atol=ε
       end
     end
 
@@ -434,8 +432,8 @@ end
           @test ! (e in s.solution)
         end
 
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
-        @test CombinatorialBandits._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 5.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_value(i, s.solution) ≈ 0.0 atol=ε
+        @test Kombinator._budgeted_bipartite_matching_compute_weight(i, s.solution) ≈ 5.0 atol=ε
       end
     end
 

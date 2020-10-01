@@ -1,5 +1,3 @@
-using Test
-
 @testset "m-sets" begin
   @testset "Interface" begin
     @test_throws ErrorException MSetInstance(Float64[5, 4, 3], -1)

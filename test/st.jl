@@ -1,5 +1,3 @@
-using Test
-
 @testset "Maximum spanning tree" begin
   @testset "Basic" begin
     graph = complete_graph(5)
@@ -59,38 +57,38 @@ end
     if Edge(1, 3) in lagrangian.tree # Strictly feasible solution.
       @test Edge(1, 3) in lagrangian.tree
       @test Edge(2, 3) in lagrangian.tree
-      @test _budgeted_spanning_tree_compute_weight(i, lagrangian.tree) > budget
+      @test Kombinator._budgeted_spanning_tree_compute_weight(i, lagrangian.tree) > budget
     else # Infeasible solution.
       @test Edge(1, 2) in lagrangian.tree
       @test Edge(2, 3) in lagrangian.tree
-      @test _budgeted_spanning_tree_compute_weight(i, lagrangian.tree) < budget
+      @test Kombinator._budgeted_spanning_tree_compute_weight(i, lagrangian.tree) < budget
     end
 
     # Helpers.
     a = [Edge(1, 2), Edge(1, 3)]
     b = [Edge(1, 3), Edge(1, 4)]
-    @test _solution_symmetric_difference_size(a, b) == 2
-    res_a, res_b = _solution_symmetric_difference(a, b)
+    @test Kombinator._solution_symmetric_difference_size(a, b) == 2
+    res_a, res_b = Kombinator._solution_symmetric_difference(a, b)
     @test res_a == [Edge(1, 2)] # Elements that are in a but not in b
     @test res_b == [Edge(1, 4)] # Elements that are in b but not in a
 
     # Additive approximation algorithm.
     sol = st_prim_budgeted_lagrangian_refinement(i)
-    @assert sol != nothing
+    @assert sol !== nothing
     @test sol.instance == i
     s = sol.tree
     @test length(s) == 2
     @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
-    @test _budgeted_spanning_tree_compute_weight(i, s) >= budget
+    @test Kombinator._budgeted_spanning_tree_compute_weight(i, s) >= budget
 
     # Multiplicative approximation algorithm.
     sol = st_prim_budgeted_lagrangian_approx_half(i)
-    @assert sol != nothing
+    @assert sol !== nothing
     @test sol.instance == i
     s = sol.tree
     @test length(s) == 2
     @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
-    @test _budgeted_spanning_tree_compute_weight(i, s) >= budget
+    @test Kombinator._budgeted_spanning_tree_compute_weight(i, s) >= budget
   end
 
   @testset "Conformity" begin
@@ -102,20 +100,20 @@ end
     w = Dict(Edge(1, 2) => 5)
     i = BudgetedSpanningTreeInstance(graph, r, w, 0)
     s = st_prim_budgeted_lagrangian_refinement(i)
-    @assert s != nothing
+    @assert s !== nothing
     @assert s.tree == [Edge(1, 2)]
 
     s = st_prim_budgeted_lagrangian_approx_half(i)
-    @assert s != nothing
+    @assert s !== nothing
     @assert s.tree == [Edge(1, 2)]
 
     i = BudgetedSpanningTreeInstance(graph, r, w, 20)
     s = st_prim_budgeted_lagrangian_refinement(i)
-    @assert s != nothing
+    @assert s !== nothing
     @assert s.tree == Edge{Int}[]
 
     s = st_prim_budgeted_lagrangian_approx_half(i)
-    @assert s != nothing
+    @assert s !== nothing
     @assert s.tree == Edge{Int}[]
   end
 end
