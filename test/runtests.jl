@@ -1,4 +1,5 @@
 using Hungarian
+using JuMP
 using Kombinator
 using LightGraphs
 using Munkres
@@ -19,8 +20,8 @@ if ! is_travis
 end
 
 @testset "Kombinator.jl" begin
-#   include("ep.jl")
-  include("matching.jl")
-#   include("msets.jl")
-#   include("st.jl")
+  include("ep.jl")
+#   include("matching.jl")
+  include("msets.jl")
+  include("st.jl")
 end
