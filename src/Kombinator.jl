@@ -7,6 +7,7 @@ module Kombinator
   # TODO: add a link to other packages like LightGraph for the corresponding algorithms, so that they seamlessly integrate with the others?
   # TODO: how to add a link to functions like budgeted_msets_lp_select, budgeted_msets_lp_all? They can be quite useful (but do not bring much in terms of performance)
 
+  using DataStructures
   using LinearAlgebra
   using LightGraphs
   using JuMP

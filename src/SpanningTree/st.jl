@@ -1,6 +1,3 @@
-using LightGraphs
-using DataStructures
-
 struct SpanningTreeInstance{T} <: CombinatorialInstance
   graph::AbstractGraph{T}
   rewards::Dict{Edge{T}, Float64}
