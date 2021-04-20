@@ -25,7 +25,7 @@ struct UniformMatroidInstance{T <: Real} <: CombinatorialInstance
     end
 
     # Return a new instance.
-    return new(values, m)
+    return new{T}(values, m)
   end
 end
 

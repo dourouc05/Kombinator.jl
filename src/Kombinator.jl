@@ -37,14 +37,6 @@ module Kombinator
   include("ElementaryPath/ep_budgeted.jl")
   include("ElementaryPath/ep_budgeted_dp.jl")
 
-  include("MSet/mset.jl")
-  include("MSet/mset_greedy.jl")
-  include("MSet/mset_dp.jl")
-  include("MSet/mset_lp.jl")
-  include("MSet/mset_budgeted.jl")
-  include("MSet/mset_budgeted_dp.jl")
-  include("MSet/mset_budgeted_lp.jl")
-
   include("SpanningTree/st.jl")
   include("SpanningTree/st_prim.jl")
   include("SpanningTree/st_budgeted.jl")
@@ -63,4 +55,7 @@ module Kombinator
     end
     @eval export $sym
   end
+
+  # Include internal extensions.
+  include("UniformMatroid/UniformMatroid.jl")
 end
