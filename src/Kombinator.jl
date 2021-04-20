@@ -21,7 +21,8 @@ module Kombinator
   include("helpers.jl")
 
   include("interface/instance.jl")
-  include("interface/algorithms.jl")
+  include("interface/objective.jl")
+  include("interface/algorithm.jl")
   include("interface/variants.jl")
 
   include("BipartiteMatching/matching.jl")

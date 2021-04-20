@@ -1,6 +1,14 @@
-# Standard variations on the base combinatorial set.
-struct MinimumBudget <: CombinatorialVariation
+"""
+
+"""
+struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <: CombinatorialVariation
+    instance::CI
+    weights::Vector{T}
+    min_budget::T
 end
 
-struct MaximumBudget <: CombinatorialVariation
+struct MaximumBudget{CI <: CombinatorialInstance, T <: Real} <: CombinatorialVariation
+    instance::CI
+    weights::Vector{T}
+    min_budget::T
 end
