@@ -1,0 +1,5 @@
+abstract type CombinatorialInstance end
+abstract type CombinatorialSolution end
+abstract type CombinatorialAlgorithm end
+abstract type CombinatorialLinearFormulation end
+abstract type CombinatorialVariation end
