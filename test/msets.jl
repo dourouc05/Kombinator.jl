@@ -1,12 +1,12 @@
 @testset "m-sets" begin
   @testset "Interface" begin
-    @test_throws ErrorException MSetInstance(Float64[5, 4, 3], -1)
-    @test_throws ErrorException MSetInstance(Float64[5, 4, 3], 0)
+    @test_throws ErrorException UniformMatroidInstance(Float64[5, 4, 3], -1)
+    @test_throws ErrorException UniformMatroidInstance(Float64[5, 4, 3], 0)
   end
 
   @testset "Basic" begin
     m = 2
-    i = MSetInstance(Float64[5, 4, 3], m)
+    i = UniformMatroidInstance(Float64[5, 4, 3], m)
     g = msets_greedy(i)
     d = msets_dp(i)
     l = ! is_travis && msets_lp(i, solver=Gurobi.Optimizer)
@@ -30,21 +30,21 @@ end
 
 @testset "Budgeted m-sets" begin
   @testset "Interface" begin
-    @test_throws ErrorException BudgetedMSetInstance(Float64[5, 4, 3], Int[1, 1, 1], -1)
-    @test_throws ErrorException BudgetedMSetInstance(Float64[5, 4, 3], Int[1, 1, 1], 0)
-    @test_throws ErrorException BudgetedMSetInstance(Float64[5, 4, 3], Int[1, 1, 1], 2, budget=-1)
-    @test_throws ErrorException BudgetedMSetInstance(Float64[5, 4, 3], Int[1, -1, 1], 2)
-    @test_throws ErrorException BudgetedMSetInstance(Float64[5, 4, 3], Int[1, 1], 0)
-    @test_throws ErrorException BudgetedMSetInstance(Float64[5, 4], Int[1, 1, 1], 0)
+    @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], -1)
+    @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], 0)
+    @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], 2, budget=-1)
+    @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, -1, 1], 2)
+    @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1], 0)
+    @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4], Int[1, 1, 1], 0)
   end
 
-  function test_solution_at(s::BudgetedMSetSolution, kv::Dict{Int, Float64})
+  function test_solution_at(s::BudgetedUniformMatroidSolution, kv::Dict{Int, Float64})
     for (k, v) in kv
       @test value(s, k) ≈ v
     end
   end
 
-  function test_items_at(s::BudgetedMSetSolution, kv::Dict{Int, Vector{Int}})
+  function test_items_at(s::BudgetedUniformMatroidSolution, kv::Dict{Int, Vector{Int}})
     for (k, v) in kv
       @test items(s, k) == v
     end
@@ -52,7 +52,7 @@ end
 
   @testset "Basic" begin
     m = 2
-    i = BudgetedMSetInstance(Float64[5, 4, 3], Int[1, 1, 1], m)
+    i = BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], m)
     d = budgeted_msets_dp(i)
     l = ! is_travis && budgeted_msets_lp_all(i, solver=Gurobi.Optimizer)
 
@@ -96,7 +96,7 @@ end
     w = Int[32, 32, 32, 32, 0, 32, 32, 32, 0, 32]
     m = 3
 
-    i = BudgetedMSetInstance(v, w, m)
+    i = BudgetedUniformMatroidInstance(v, w, m)
     d = budgeted_msets_dp(i)
     # TODO: stop the algorithm in this case? Don't waste too much time on this part of the table.
     l = ! is_travis && budgeted_msets_lp_select(i, [0, 96, 97, 320], solver=Gurobi.Optimizer)
@@ -109,7 +109,7 @@ end
     w = [16, 32, 16, 24, 16, 16, 0, 16, 0, 32]
     m = 3
 
-    i = BudgetedMSetInstance(v, w, m)
+    i = BudgetedUniformMatroidInstance(v, w, m)
     d = budgeted_msets_dp(i)
     l = ! is_travis && budgeted_msets_lp_select(i, [0, 4, 20, 24, 25, 32, 33, 40, 41, 48, 49, 72, 73, 96, 97, 280, 319, 320], solver=Gurobi.Optimizer)
 

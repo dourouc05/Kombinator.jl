@@ -1,6 +1,6 @@
-solve(i::MSetInstance, ::DynamicProgramming; kwargs...) = msets_dp(i; kwargs...)
+solve(i::UniformMatroidInstance, ::DynamicProgramming; kwargs...) = msets_dp(i; kwargs...)
 
-function msets_dp(i::MSetInstance)
+function msets_dp(i::UniformMatroidInstance)
   # V[µ, δ]: µ items, up to δ.
   V = Matrix{Float64}(undef, m(i), dimension(i))
   S = Dict{Tuple{Int, Int}, Vector{Int}}()
@@ -37,5 +37,5 @@ function msets_dp(i::MSetInstance)
     end
   end
 
-  return MSetSolution(i, S[m(i), 1] .+ 1)
+  return UniformMatroidSolution(i, S[m(i), 1] .+ 1)
 end

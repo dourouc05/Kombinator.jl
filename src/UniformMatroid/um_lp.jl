@@ -1,6 +1,6 @@
-solve(i::MSetInstance, ::LinearProgramming; kwargs...) = msets_lp(i; kwargs...)
+solve(i::UniformMatroidInstance, ::LinearProgramming; kwargs...) = msets_lp(i; kwargs...)
 
-function msets_lp(i::MSetInstance; solver=nothing)
+function msets_lp(i::UniformMatroidInstance; solver=nothing)
   model = Model(solver)
   @variable(model, x[1:length(values(i))], Bin)
   @objective(model, Max, dot(x, values(i)))
@@ -9,5 +9,5 @@ function msets_lp(i::MSetInstance; solver=nothing)
   set_silent(model)
   optimize!(model)
 
-  return MSetSolution(i, findall(JuMP.value.(x) .>= 0.5))
+  return UniformMatroidSolution(i, findall(JuMP.value.(x) .>= 0.5))
 end

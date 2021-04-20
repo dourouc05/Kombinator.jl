@@ -1,6 +1,6 @@
-solve(i::BudgetedMSetInstance, ::DynamicProgramming; kwargs...) = budgeted_msets_dp(i; kwargs...)
+solve(i::BudgetedUniformMatroidInstance, ::DynamicProgramming; kwargs...) = budgeted_msets_dp(i; kwargs...)
 
-function budgeted_msets_dp(i::BudgetedMSetInstance)
+function budgeted_msets_dp(i::BudgetedUniformMatroidInstance)
   # Consider items above δ.
   # Recurrence relation:
   #  V[m, t, δ] = max { V[m, t, δ + 1],  v_δ + V[m - 1, t - w_δ, δ + 1] }
@@ -86,5 +86,5 @@ function budgeted_msets_dp(i::BudgetedMSetInstance)
     end
   end
 
-  return BudgetedMSetSolution(i, S[m(i), 0, budget(i)], V, S)
+  return BudgetedUniformMatroidSolution(i, S[m(i), 0, budget(i)], V, S)
 end

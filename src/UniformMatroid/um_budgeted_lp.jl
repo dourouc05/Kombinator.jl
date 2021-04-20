@@ -1,6 +1,6 @@
-solve(i::BudgetedMSetInstance, ::LinearProgramming; kwargs...) = budgeted_msets_lp(i; kwargs...)
+solve(i::BudgetedUniformMatroidInstance, ::LinearProgramming; kwargs...) = budgeted_msets_lp(i; kwargs...)
 
-function _budgeted_msets_lp_sub(i::BudgetedMSetInstance, solver)
+function _budgeted_msets_lp_sub(i::BudgetedUniformMatroidInstance, solver)
   model = Model(solver)
   @variable(model, x[1:length(values(i))], Bin)
   @objective(model, Max, dot(x, values(i)))
@@ -12,7 +12,7 @@ function _budgeted_msets_lp_sub(i::BudgetedMSetInstance, solver)
   return model, x, c
 end
 
-function budgeted_msets_lp(i::BudgetedMSetInstance; solver=nothing, β::Int=budget(i))
+function budgeted_msets_lp(i::BudgetedUniformMatroidInstance; solver=nothing, β::Int=budget(i))
   # Solve for all budgets at once, even though it is not really more efficient than looping outside this function.
   model, x, c = _budgeted_msets_lp_sub(i, solver)
   set_normalized_rhs(c, β)
@@ -30,10 +30,10 @@ function budgeted_msets_lp(i::BudgetedMSetInstance; solver=nothing, β::Int=budg
     S[m(i), 0, β] = Int[-1]
   end
 
-  return BudgetedMSetSolution(i, S[m(i), 0, β], V, S)
+  return BudgetedUniformMatroidSolution(i, S[m(i), 0, β], V, S)
 end
 
-function budgeted_msets_lp_select(i::BudgetedMSetInstance, budgets; solver=nothing)
+function budgeted_msets_lp_select(i::BudgetedUniformMatroidInstance, budgets; solver=nothing)
   model, x, c = _budgeted_msets_lp_sub(i, solver)
 
   V = Array{Float64, 3}(undef, m(i), dimension(i) + 1, budget(i) + 1)
@@ -52,10 +52,10 @@ function budgeted_msets_lp_select(i::BudgetedMSetInstance, budgets; solver=nothi
     end
   end
 
-  return BudgetedMSetSolution(i, S[m(i), 0, maximum(budgets)], V, S)
+  return BudgetedUniformMatroidSolution(i, S[m(i), 0, maximum(budgets)], V, S)
 end
 
-function budgeted_msets_lp_all(i::BudgetedMSetInstance; solver=nothing, max_budget::Int=budget(i))
+function budgeted_msets_lp_all(i::BudgetedUniformMatroidInstance; solver=nothing, max_budget::Int=budget(i))
   # Solve for all budgets at once, even though it is not really more efficient than looping outside this function.
   return budgeted_msets_lp_select(i, 0:max_budget, solver=solver)
 end
