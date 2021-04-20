@@ -3,7 +3,7 @@ module Kombinator
   # TODO: document the generic functions.
   # TODO: refactor the package further to remove the old st_prim()-like names? Only solve(::CombinatorialInstance, ::CombinatorialAlgorithm)::CombinatorialSolution should be used. At least, don't export all these names.
   # TODO: rename matching to "perfect matching" and introduce "imperfect matching".
-  # TODO: add a note to rather use LightGraph's algorithms instead of these in this package for anything series. 
+  # TODO: add a note to rather use LightGraph's algorithms instead of these in this package for anything serious. 
   # TODO: add a link to other packages like LightGraph for the corresponding algorithms, so that they seamlessly integrate with the others?
   # TODO: how to add a link to functions like budgeted_msets_lp_select, budgeted_msets_lp_all? They can be quite useful (but do not bring much in terms of performance)
 
@@ -21,6 +21,7 @@ module Kombinator
   abstract type CombinatorialInstance end
   abstract type CombinatorialSolution end
   abstract type CombinatorialAlgorithm end
+  abstract type CombinatorialLinearFormulation end
   
   # Define the algorithm types here, at the global level: some names might be shared by several algorithms. 
   # This is also the reason why there is no supplementary abstraction layer (e.g. a base type for all 
@@ -36,11 +37,10 @@ module Kombinator
   struct HungarianAlgorithm <: CombinatorialAlgorithm; end
   struct PrimAlgorithm <: CombinatorialAlgorithm; end
 
+  struct DefaultLinearFormulation <: CombinatorialLinearFormulation; end
+
   # The case of linear programming is usually a bit more complex: in some cases, there may be several formulations. 
-  # In that case, don't use the generic object here, but rather a problem-specific object that can specify the 
-  # formulation to use. 
-  abstract type AbstractLinearProgramming <: CombinatorialAlgorithm; end
-  struct LinearProgramming <: AbstractLinearProgramming; end
+  struct LinearProgramming{T <: CombinatorialLinearFormulation} <: CombinatorialAlgorithm; end
 
   """
       approximation_ratio(::CombinatorialInstance, ::CombinatorialAlgorithm)
@@ -92,6 +92,15 @@ module Kombinator
   """
   function approximation_term(::CombinatorialInstance, ::CombinatorialAlgorithm)
     return 0.0
+  end
+
+  """
+      linear_formulation(::CombinatorialInstance)
+
+  Returns the default linear formulation for this combinatorial problem.
+  """
+  function linear_formulation(::CombinatorialInstance)
+    return DefaultLinearFormulation()
   end
 
   # Include the actual contents of the package.
