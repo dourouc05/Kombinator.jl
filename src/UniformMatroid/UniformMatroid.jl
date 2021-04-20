@@ -1,6 +1,7 @@
 module UniformMatroid
 
 using Kombinator
+using JuMP
 
 include("um.jl")
 
