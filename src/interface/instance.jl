@@ -15,7 +15,9 @@ objective is to either minimise or maximise the natural objective function,
 but more specific objectives can be provided with other subtypes.
 
 Objects of type `CombinatorialObjective` are supposed to be given as arguments
-when building a `CombinatorialInstance`.
+when building a `CombinatorialInstance`. In any case, 
+`objective(::CombinatorialInstance)` can be used to retrieve the objective of 
+an instance.
 """
 abstract type CombinatorialObjective end
 
@@ -56,3 +58,15 @@ A variation is an object that is built on top of a combinatorial instance
 that contains all the required information for the supplementary constraints
 """
 abstract type CombinatorialVariation end
+
+"""
+    function objective(i::CombinatorialInstance)
+
+Returns the objective associated with this instance. 
+
+By default, instances are supposed to provide an `objective` member, but this
+function can be overridden otherwise (for instance, when only one objective
+is supported).
+"""
+function objective(i::CombinatorialInstance)
+end

@@ -10,11 +10,12 @@ It can be formalised as follows:
 ``\\max \\sum_i \\mathrm{values}_i x_i``
 ``\\mathrm{s.t.} \\sum_i x_i \\leq m, \\quad x \\in \\{0, 1\\}^d``
 """
-struct UniformMatroidInstance{T <: Real} <: CombinatorialInstance
+struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: CombinatorialInstance
   values::Vector{T}
   m::Int
+  objective::CombinatorialObjective
 
-  function UniformMatroidInstance(values::Vector{T}, m::Int) where {T <: Real}
+  function UniformMatroidInstance(values::Vector{T}, m::Int, objective::O=Maximise) where {T <: Real, O <: CombinatorialObjective}
     # Error checking.
     if m < 0
       error("m is less than zero: there is no solution.")
@@ -25,7 +26,7 @@ struct UniformMatroidInstance{T <: Real} <: CombinatorialInstance
     end
 
     # Return a new instance.
-    return new{T}(values, m)
+    return new{T, O}(values, m, objective)
   end
 end
 
