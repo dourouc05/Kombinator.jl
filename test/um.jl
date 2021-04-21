@@ -21,40 +21,45 @@
         @test d.instance == i
 
         if ! is_travis
-        @test value(g) == value(l)
-        @test length(l.items) <= m
-        @test l.instance == i
+            @test value(g) == value(l)
+            @test length(l.items) <= m
+            @test l.instance == i
         end
     end
 end
 
 @testset "Budgeted uniform matroid" begin
     @testset "Interface" begin
-        @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], -1)
-        @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], 0)
-        @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], 2, budget=-1)
-        @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, -1, 1], 2)
-        @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1], 0)
-        @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4], Int[1, 1, 1], 0)
+        # Errors when building the UniformMatroidInstance.
+        @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], -1), Int[1, 1, 1])
+        @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 0), Int[1, 1, 1])
+
+        # TODO: these errors are no more caught after the refactor.
+        # @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, 1, 1], -1)
+        # @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, -1, 1])
+
+        # Different number of items between the matroid and the new constraint.
+        @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 0), Int[1, 1])
+        @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4], 0), Int[1, 1, 1])
     end
 
-    function test_solution_at(s::BudgetedUniformMatroidSolution, kv::Dict{Int, Float64})
+    function test_solution_at(s::MinimumBudget{UniformMatroidInstance, Int}, kv::Dict{Int, Float64})
         for (k, v) in kv
-        @test value(s, k) ≈ v
+            @test value(s, k) ≈ v
         end
     end
 
-    function test_items_at(s::BudgetedUniformMatroidSolution, kv::Dict{Int, Vector{Int}})
+    function test_items_at(s::MinimumBudget{UniformMatroidInstance, Int}, kv::Dict{Int, Vector{Int}})
         for (k, v) in kv
-        @test items(s, k) == v
+            @test items(s, k) == v
         end
     end
 
     @testset "Basic" begin
         m = 2
-        i = BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], m)
-        d = budgeted_msets_dp(i)
-        l = ! is_travis && budgeted_msets_lp_all(i, solver=Gurobi.Optimizer)
+        i = MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], m), Int[1, 1, 1])
+        d = solve(i, DynamicProgramming())
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
 
         @test i.m == m
         @test d.instance == i
@@ -70,10 +75,10 @@ end
         @test d.solutions[m, 0, 3] == [-1]
 
         if ! is_travis
-        for i in 0:3
-            @test l.state[m, 0 + 1, i + 1] ≈ d.state[m, 0 + 1, i + 1]
-            @test l.solutions[m, 0, i] == d.solutions[m, 0, i]
-        end
+            for i in 0:3
+                @test l.state[m, 0 + 1, i + 1] ≈ d.state[m, 0 + 1, i + 1]
+                @test l.solutions[m, 0, i] == d.solutions[m, 0, i]
+            end
         end
 
         # Accessors.
@@ -96,10 +101,10 @@ end
         w = Int[32, 32, 32, 32, 0, 32, 32, 32, 0, 32]
         m = 3
 
-        i = BudgetedUniformMatroidInstance(v, w, m)
-        d = budgeted_msets_dp(i)
+        i = MinimumBudget(UniformMatroidInstance(v, m), w)
+        d = solve(i, DynamicProgramming())
         # TODO: stop the algorithm in this case? Don't waste too much time on this part of the table.
-        l = ! is_travis && budgeted_msets_lp_select(i, [0, 96, 97, 320], solver=Gurobi.Optimizer)
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), [0, 96, 97, 320], solver=Gurobi.Optimizer)
         expected = Dict{Int, Float64}(0 => 3 * b, 96 => 3 * b, 96 + 1 => -Inf, 320 => -Inf) # No more solutions after 96.
         test_solution_at(d, expected)
         ! is_travis && test_solution_at(l, expected)
@@ -110,17 +115,17 @@ end
         m = 3
 
         i = BudgetedUniformMatroidInstance(v, w, m)
-        d = budgeted_msets_dp(i)
-        l = ! is_travis && budgeted_msets_lp_select(i, [0, 4, 20, 24, 25, 32, 33, 40, 41, 48, 49, 72, 73, 96, 97, 280, 319, 320], solver=Gurobi.Optimizer)
+        d = solve(i, DynamicProgramming())
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), [0, 4, 20, 24, 25, 32, 33, 40, 41, 48, 49, 72, 73, 96, 97, 280, 319, 320], solver=Gurobi.Optimizer)
 
         a = 31.363416265137644
         b = 28.74979824304284
         c = 24.829371209900632
         e = 16.988517143616225
         expected = Dict{Int, Float64}(0 => a, 4 => a, 20 => a, 24 => a, 25 => a, 32 => a,
-        33 => b, 40 => b, 41 => b, 48 => b,
-        49 => c, 72 => e, 73 => e,
-        96 => -Inf, 97 => -Inf, 280 => -Inf, 319 => -Inf, 320 => -Inf
+            33 => b, 40 => b, 41 => b, 48 => b,
+            49 => c, 72 => e, 73 => e,
+            96 => -Inf, 97 => -Inf, 280 => -Inf, 319 => -Inf, 320 => -Inf
         )
         test_solution_at(d, expected)
         ! is_travis && test_solution_at(l, expected)

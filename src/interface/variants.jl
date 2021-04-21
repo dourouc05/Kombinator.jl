@@ -13,7 +13,7 @@ struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <: CombinatorialVar
     compute_all_values::Bool
 end
 
-function MinimumBudget(i::CI, weights::Vector{T}, min_budget::T; compute_all_values::Bool=false) where {CI, T}
+function MinimumBudget(i::CI, weights::Vector{T}, min_budget::T=zero(T); compute_all_values::Bool=false) where {CI, T}
     return MinimumBudget(i, weights, min_budget, compute_all_values)
 end
 
