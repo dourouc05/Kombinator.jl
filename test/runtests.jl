@@ -20,8 +20,8 @@ if ! is_travis
 end
 
 @testset "Kombinator.jl" begin
+  include("um.jl")
   include("ep.jl")
 #   include("matching.jl")
-  include("msets.jl")
   include("st.jl")
 end

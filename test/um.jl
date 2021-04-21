@@ -1,4 +1,4 @@
-@testset "m-sets" begin
+@testset "Uniform matroid" begin
   @testset "Interface" begin
     @test_throws ErrorException UniformMatroidInstance(Float64[5, 4, 3], -1)
     @test_throws ErrorException UniformMatroidInstance(Float64[5, 4, 3], 0)
@@ -7,8 +7,8 @@
   @testset "Basic" begin
     m = 2
     i = UniformMatroidInstance(Float64[5, 4, 3], m)
-    g = msets_greedy(i)
-    d = msets_dp(i)
+    g = solve(i, GreedyAlgorithm())
+    d = solve(i, DynamicProgramming())
     l = ! is_travis && msets_lp(i, solver=Gurobi.Optimizer)
 
     @test i.m == m
@@ -28,7 +28,7 @@
   end
 end
 
-@testset "Budgeted m-sets" begin
+@testset "Budgeted uniform matroid" begin
   @testset "Interface" begin
     @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], -1)
     @test_throws ErrorException BudgetedUniformMatroidInstance(Float64[5, 4, 3], Int[1, 1, 1], 0)
