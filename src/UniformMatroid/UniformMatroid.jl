@@ -3,6 +3,10 @@ module UniformMatroid
 using Kombinator
 using JuMP
 
+import Kombinator: solve
+
+export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution
+
 include("um.jl")
 
 include("um_dp.jl")
