@@ -15,7 +15,7 @@ struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: Combina
     m::Int
     objective::CombinatorialObjective
 
-    function UniformMatroidInstance(values::Vector{T}, m::Int, objective::O=Maximise) where {T <: Real, O <: CombinatorialObjective}
+    function UniformMatroidInstance(values::Vector{T}, m::Int, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
         # Error checking.
         if m < 0
           error("m is less than zero: there is no solution.")

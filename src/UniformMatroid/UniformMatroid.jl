@@ -3,9 +3,9 @@ module UniformMatroid
 using Kombinator
 using JuMP
 
-import Kombinator: solve
+import Kombinator: solve, dimension, value, values
 
-export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution
+export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution, m, items, items_all_budgets
 
 include("um.jl")
 

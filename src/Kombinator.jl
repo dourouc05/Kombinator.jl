@@ -17,7 +17,7 @@ using Reexport
 
 import Base: values
 import LightGraphs: src, dst
-import JuMP: value
+import JuMP: value, solve
 
 include("helpers.jl")
 

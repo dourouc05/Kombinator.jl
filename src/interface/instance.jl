@@ -69,4 +69,15 @@ function can be overridden otherwise (for instance, when only one objective
 is supported).
 """
 function objective(i::CombinatorialInstance)
+    return i.objective
+end
+
+"""
+    function dimension(i::CombinatorialInstance)
+
+Returns the dimension of this instance. 
+
+All instances should implement this method.
+"""
+function objective(::CombinatorialInstance)
 end
