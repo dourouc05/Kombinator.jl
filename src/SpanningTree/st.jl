@@ -21,19 +21,19 @@ struct SpanningTreeSolution{T, O} <: CombinatorialSolution
 end
 
 abstract type BudgetedSpanningTreeSolution{T, U} <: CombinatorialSolution
-    # instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
+    # instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     # tree::Vector{Edge{T}}
 end
 
 struct SimpleBudgetedSpanningTreeSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
-    instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
+    instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     tree::Vector{Edge{T}}
 
-    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
+    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
         return new{T, U}(instance, tree)
     end
 
-    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}) where {T, U}
+    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}) where {T, U}
         # No feasible solution.
         return new{T, U}(instance, edgetype(instance.graph)[])
     end
@@ -41,7 +41,7 @@ end
 
 struct BudgetedSpanningTreeLagrangianSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
     # Used to store important temporary results from solving the Lagrangian dual.
-    instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
+    instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     tree::Vector{Edge{T}}
     λ::Float64 # Optimum dual multiplier.
     value::Float64 # Optimum value of the dual problem (i.e. with penalised constraint).

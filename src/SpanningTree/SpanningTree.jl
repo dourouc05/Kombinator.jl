@@ -2,6 +2,7 @@ module SpanningTree
 
 using Kombinator
 
+using DataStructures
 using JuMP
 using LightGraphs
 

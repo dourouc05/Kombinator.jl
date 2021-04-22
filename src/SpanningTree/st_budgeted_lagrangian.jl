@@ -1,18 +1,18 @@
-approximation_term(::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
-approximation_ratio(::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
+approximation_term(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
+approximation_ratio(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
 
-function _budgeted_spanning_tree_compute_weight(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
+function _budgeted_spanning_tree_compute_weight(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
     return sum(i.weights[(e in keys(i.weights)) ? e : reverse(e)] for e in tree)
 end
 
 function _budgeted_spanning_tree_compute_value(i::SpanningTreeInstance{T}, tree::Vector{Edge{T}}) where {T, U}
     return sum(i.rewards[(e in keys(i.rewards)) ? e : reverse(e)] for e in tree)
 end
-function _budgeted_spanning_tree_compute_value(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
+function _budgeted_spanning_tree_compute_value(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
     return sum(i.instance.rewards[(e in keys(i.instance.rewards)) ? e : reverse(e)] for e in tree)
 end
 
-function _st_prim_budgeted_lagrangian(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, λ::Float64) where {T, U}
+function _st_prim_budgeted_lagrangian(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, λ::Float64) where {T, U}
     # Solve the subproblem for one value of the dual multiplier λ:
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
     sti_rewards = Dict{Edge{T}, Float64}(e => i.instance.rewards[e] + λ * i.weights[e] for e in keys(i.rewards))
@@ -21,7 +21,7 @@ function _st_prim_budgeted_lagrangian(i::MinimumBudget{UniformMatroidInstance{T,
     return _budgeted_spanning_tree_compute_value(sti, sti_sol.tree) - λ * i.budget, sti_sol.tree
 end
 
-function solve(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianAlgorithm; ε::Float64) where {T, U}
+function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm; ε::Float64) where {T, U}
     # Approximately solve the problem \min_{l ≥ 0} l(λ), where
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
     # This problem is the Lagrangian dual of the budgeted maximum spanning-tree problem:

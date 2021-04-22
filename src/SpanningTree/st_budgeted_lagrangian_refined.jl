@@ -1,7 +1,7 @@
-approximation_term(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = maximum(values(i.rewards))
-approximation_ratio(::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = NaN
+approximation_term(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = maximum(values(i.rewards))
+approximation_ratio(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = NaN
 
-function solve(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm;
+function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm;
                ε::Float64=1.0e-3, ζ⁻::Float64=0.2, ζ⁺::Float64=5.0, stalling⁻::Float64=1.0e-5) where {T, U}
     # Approximately solve the following problem:
     #     \max_{x spanning tree} rewards x  s.t.  weights x >= budget
