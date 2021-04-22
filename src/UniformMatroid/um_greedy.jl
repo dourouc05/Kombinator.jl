@@ -1,4 +1,4 @@
-function solve(instance::UniformMatroidInstance, ::GreedyAlgorithm)
+function solve(instance::UniformMatroidInstance{Float64, Maximise}, ::GreedyAlgorithm)
     # Algorithm: sort the weights, take the m largest ones, this is the 
     # optimum solution.
     # Implementation: no need for sorting, partialsortperm returns the 

@@ -1,4 +1,4 @@
-function _budgeted_um_lp_model(i::MinimumBudget{UniformMatroidInstance, Int}, solver)
+function _budgeted_um_lp_model(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int}, solver)
     model = Model(solver)
     @variable(model, x[1:length(values(i))], Bin)
     @objective(model, Max, dot(x, values(i)))
@@ -10,7 +10,7 @@ function _budgeted_um_lp_model(i::MinimumBudget{UniformMatroidInstance, Int}, so
     return model, x, c
 end
 
-function solve(i::MinimumBudget{UniformMatroidInstance, Int}, ::DefaultLinearFormulation; solver=nothing)
+function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int}, ::DefaultLinearFormulation; solver=nothing)
     model, x, c = _budgeted_msets_lp_sub(i, solver)
 
     budgets = if i.compute_all_values == false

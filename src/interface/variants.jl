@@ -17,6 +17,14 @@ function MinimumBudget(i::CI, weights::Vector{T}, min_budget::T=zero(T); compute
     return MinimumBudget(i, weights, min_budget, compute_all_values)
 end
 
+function weights(i::MinimumBudget) # TODO: remove me?
+    return i.weights
+end
+
+function budget(i::MinimumBudget) # TODO: remove me?
+    return i.min_budget
+end
+
 """
     struct MaximumBudget{CI <: CombinatorialInstance, T <: Real}
 
@@ -34,4 +42,12 @@ end
 
 function MaximumBudget(i::CI, weights::Vector{T}, max_budget::T; compute_all_values::Bool=false) where {CI, T}
     return MaximumBudget(i, weights, max_budget, compute_all_values)
+end
+
+function weights(i::MaximumBudget) # TODO: remove me?
+    return i.weights
+end
+
+function budget(i::MaximumBudget) # TODO: remove me?
+    return i.max_budget
 end

@@ -1,4 +1,4 @@
-function solve(i::UniformMatroidInstance, ::DefaultLinearFormulation; solver=nothing)
+function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLinearFormulation; solver=nothing)
     model = Model(solver)
     
     @variable(model, x[1:length(values(i))], Bin)

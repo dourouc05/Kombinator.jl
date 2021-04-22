@@ -30,12 +30,12 @@ struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: Combina
     end
 end
 
-values(i::UniformMatroidInstance{T}) where {T} = i.values
-m(i::UniformMatroidInstance) = i.m
-dimension(i::UniformMatroidInstance) = length(values(i))
+values(i::UniformMatroidInstance{T}) where {T} = i.values # TODO: remove me?
+m(i::UniformMatroidInstance) = i.m # TODO: remove me?
+dimension(i::UniformMatroidInstance) = length(i.values)
 
-value(i::UniformMatroidInstance{T}, o::Int) where {T} = values(i)[o]
-values(i::UniformMatroidInstance{T}, o) where {T} = values(i)[o]
+value(i::UniformMatroidInstance{T}, o::Int) where {T} = values(i)[o] # TODO: remove me?
+values(i::UniformMatroidInstance{T}, o) where {T} = values(i)[o] # TODO: remove me?
 
 # Solution.
 
@@ -50,34 +50,34 @@ end
 
 # Solution for min-budgeted problems.
 
-struct MinBudgetedUniformMatroidSolution{T <: Real} <: CombinatorialSolution
-    instance::MinimumBudget{UniformMatroidInstance, T}
-    items::Vector{Int} # Indices to the chosen items.
+struct MinBudgetedUniformMatroidSolution{T <: Real, U <: Real} <: CombinatorialSolution
+    instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
+    items::Vector{Int} # Indices to the chosen items for the min_budget.
     state::Array{Float64, 3} # Data structure built by the dynamic-programming recursion.
     solutions::Dict{Tuple{Int, Int, Int}, Vector{Int}} # From the indices of state to the corresponding solution.
 end
 
-function value(s::MinimumBudget{UniformMatroidInstance, T}) where {T}
+function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
     return sum(s.instance.instance.values[i] for i in s.items)
 end
 
-function items(s::MinimumBudget{UniformMatroidInstance, Int}, budget::Int)
+function items(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T, U}
     return s.solutions[s.instance.instance.m, 0, budget]
 end
 
-function items_all_budgets(s::MinimumBudget{UniformMatroidInstance, Int}, max_budget::Int)
+function items_all_budgets(s::MinBudgetedUniformMatroidSolution{T, U}, max_budget::Int) where {T, U}
     sol = Dict{Int, Vector{Int}}()
-    m = s.instance.m
+    m = s.instance.instance.m
     for budget in 0:max_budget
         sol[budget] = s.solutions[m, 0, budget]
     end
     return sol
 end
   
-function value(s::MinimumBudget{UniformMatroidInstance, Int}, budget::Int)
+function value(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T, U}
     its = items(s, budget)
     if -1 in its
         return -Inf
     end
-    return sum(s.instance.values[i] for i in its)
+    return sum(s.instance.instance.values[i] for i in its)
 end

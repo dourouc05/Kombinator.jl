@@ -1,29 +1,29 @@
-function solve(i::MinimumBudget{UniformMatroidInstance, Int}, ::DynamicProgramming)
+function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int}, ::DynamicProgramming)
     # Consider items above δ.
     # Recurrence relation:
     #  V[m, t, δ] = max { V[m, t, δ + 1],  v_δ + V[m - 1, t - w_δ, δ + 1] }
     #                     \_ no item δ _/ \________ take item δ ________/
-    V = Array{Float64, 3}(undef, m(i), dimension(i) + 1, budget(i) + 1)
+    V = Array{Float64, 3}(undef, i.instance.m, dimension(i) + 1, i.min_budget + 1)
     S = Dict{Tuple{Int, Int, Int}, Vector{Int}}()
 
     # Initialise: µ == 1, just take the best element among [δ+1, d], as long as
     # the budget constraint is satisfied; δ == d, take nothing, whatever the
     # budget; β == 0, a simple m-set problem.
-    for µ in 1:m(i) # β == 0
+    for µ in 1:i.instance.m # β == 0
         for δ in (dimension(i) - 1):-1:0 # δ < d
             # Due to δ, there may be too few items (with respect to µ).
             # i.e., there are d - δ items to consider.
             m_ = min(dimension(i) - δ, µ)
 
-            items = collect(partialsortperm(values(i, (δ + 1):dimension(i)), 1:m_, rev=true)) .+ δ
-            V[µ, δ + 1, 0 + 1] = sum(value(i, o) for o in items)
+            items = collect(partialsortperm(i.instance.values[(δ + 1):dimension(i)], 1:m_, rev=true)) .+ δ
+            V[µ, δ + 1, 0 + 1] = sum(i.instance.values[o] for o in items)
             S[µ, δ, 0] = items
         end
     end
 
-    for β in 0:budget(i)
+    for β in 0:i.min_budget
         # δ == d
-        for µ in 1:m(i)
+        for µ in 1:i.instance.m
             if β == 0
                 # Optimum solution: take no object.
                 V[µ, dimension(i) + 1, β + 1] = 0.0
@@ -52,7 +52,7 @@ function solve(i::MinimumBudget{UniformMatroidInstance, Int}, ::DynamicProgrammi
             end
 
             # Take the best one available object.
-            v, x = findmax(collect(value(i, t) for t in all_objects))
+            v, x = findmax(collect(i.instance.values[t] for t in all_objects))
             x = all_objects[x]
 
             V[1, δ + 1, β + 1] = v
@@ -62,10 +62,10 @@ function solve(i::MinimumBudget{UniformMatroidInstance, Int}, ::DynamicProgrammi
 
     # Dynamic part.
     for β in 1:budget(i)
-        for µ in 2:m(i)
+        for µ in 2:m(i.instance)
             for δ in (dimension(i) - 1):-1:0
                 remaining_budget_with_δ = max(0, β - weights(i)[δ + 1])
-                take_δ = value(i, δ + 1) + V[µ - 1, δ + 1 + 1, remaining_budget_with_δ + 1]
+                take_δ = i.instance.values[δ + 1] + V[µ - 1, δ + 1 + 1, remaining_budget_with_δ + 1]
                 dont_take_δ = V[µ, δ + 1 + 1, β + 1]
 
                 both_subproblems_infeasible = -Inf == take_δ && -Inf == dont_take_δ
@@ -84,5 +84,5 @@ function solve(i::MinimumBudget{UniformMatroidInstance, Int}, ::DynamicProgrammi
         end
     end
 
-    return BudgetedUniformMatroidSolution(i, S[m(i), 0, budget(i)], V, S)
+    return MinBudgetedUniformMatroidSolution(i, S[m(i.instance), 0, budget(i)], V, S)
 end

@@ -57,7 +57,7 @@ Variations of the base combinatorial set, e.g. to include other constraints.
 A variation is an object that is built on top of a combinatorial instance
 that contains all the required information for the supplementary constraints
 """
-abstract type CombinatorialVariation end
+abstract type CombinatorialVariation <: CombinatorialInstance end
 
 """
     function objective(i::CombinatorialInstance)
@@ -72,6 +72,10 @@ function objective(i::CombinatorialInstance)
     return i.objective
 end
 
+function objective(i::CombinatorialVariation)
+    return objective(i.instance)
+end
+
 """
     function dimension(i::CombinatorialInstance)
 
@@ -79,5 +83,9 @@ Returns the dimension of this instance.
 
 All instances should implement this method.
 """
-function objective(::CombinatorialInstance)
+function dimension(::CombinatorialInstance)
+end
+
+function dimension(i::CombinatorialVariation)
+    return dimension(i.instance)
 end

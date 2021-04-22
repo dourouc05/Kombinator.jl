@@ -1,4 +1,4 @@
-function solve(i::UniformMatroidInstance, ::DynamicProgramming)
+function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgramming)
     # V[µ, δ]: µ items, up to δ.
     V = Matrix{Float64}(undef, m(i), dimension(i))
     S = Dict{Tuple{Int, Int}, Vector{Int}}()
