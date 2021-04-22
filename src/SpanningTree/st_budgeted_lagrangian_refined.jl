@@ -19,23 +19,23 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
     end
 
     # Ensure the problem is feasible by only considering the budget constraint.
-    feasible_rewards = Dict{Edge{T}, Float64}(e => i.weights[e] for e in keys(i.rewards))
-    feasible_instance = SpanningTreeInstance(i.graph, feasible_rewards)
-    feasible_solution = st_prim(feasible_instance)
+    feasible_rewards = Dict{Edge{T}, Float64}(e => i.weights[e] for e in keys(i.instance.rewards))
+    feasible_instance = SpanningTreeInstance(i.instance.graph, feasible_rewards)
+    feasible_solution = solve(feasible_instance, PrimAlgorithm())
 
-    if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.tree) < i.budget
+    if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.tree) < i.min_budget
         # By maximising the left-hand side of the budget constraint, impossible to reach the target budget. No solution!
         return SimpleBudgetedSpanningTreeSolution(i)
     end
 
     # Solve the Lagrangian relaxation to optimality.
-    lagrangian = _st_prim_budgeted_lagrangian_search(i, ε)
+    lagrangian = solve(i, LagrangianAlgorithm(), ε=ε)
     λ0, v0, st0 = lagrangian.λ, lagrangian.value, lagrangian.tree
     λmax = lagrangian.λmax
     b0 = _budgeted_spanning_tree_compute_weight(i, st0) # Budget consumption of this first solution.
 
     # If already respecting the budget constraint exactly, done!
-    if b0 == i.budget
+    if b0 == i.min_budget
         return SimpleBudgetedSpanningTreeSolution(i, st0)
     end
 
@@ -43,16 +43,16 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
     x⁺, x⁻ = nothing, nothing
 
     λi = λ0
-    if b0 > i.budget
+    if b0 > i.min_budget
         x⁺ = st0
-        @assert _budgeted_spanning_tree_compute_weight(i, x⁺) > i.budget
+        @assert _budgeted_spanning_tree_compute_weight(i, x⁺) > i.min_budget
 
         stalling = false
         while true
             # Penalise less the constraint: it should no more be satisfied.
             λi *= ζ⁻
             _, sti = _st_prim_budgeted_lagrangian(i, λi)
-            if _budgeted_spanning_tree_compute_weight(i, sti) < i.budget
+            if _budgeted_spanning_tree_compute_weight(i, sti) < i.min_budget
                 x⁻ = sti
                 break
             end
@@ -68,7 +68,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
         if stalling # First test: don't penalise the constraint at all.
             _, sti = _st_prim_budgeted_lagrangian(i, 0.0)
             new_budget = _budgeted_spanning_tree_compute_weight(i, sti)
-            if new_budget < i.budget
+            if new_budget < i.min_budget
                 x⁻ = sti
                 stalling = false
             end
@@ -77,9 +77,9 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
         if stalling # Second test: minimise the left-hand side of the budget constraint, in hope of finding a feasible solution.
             # This process is highly similar to the computation of feasible_solution, but with a reverse objective function.
             infeasible_rewards = Dict{Edge{T}, Float64}(e => - i.weights[e] for e in keys(i.weights))
-            infeasible_solution = st_prim(SpanningTreeInstance(i.graph, infeasible_rewards)).tree
+            infeasible_solution = st_prim(SpanningTreeInstance(i.instance.graph, infeasible_rewards)).tree
 
-            if _budgeted_spanning_tree_compute_weight(i, infeasible_solution) < i.budget
+            if _budgeted_spanning_tree_compute_weight(i, infeasible_solution) < i.min_budget
                 x⁻ = infeasible_solution
                 stalling = false
             end
@@ -91,13 +91,13 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
         end
     else
         x⁻ = st0
-        @assert _budgeted_spanning_tree_compute_weight(i, x⁻) < i.budget
+        @assert _budgeted_spanning_tree_compute_weight(i, x⁻) < i.min_budget
 
         while true
             # Penalise more the constraint: it should become satisfied at some point.
             λi *= ζ⁺
             _, sti = _st_prim_budgeted_lagrangian(i, λi)
-            if _budgeted_spanning_tree_compute_weight(i, sti) >= i.budget
+            if _budgeted_spanning_tree_compute_weight(i, sti) >= i.min_budget
                 x⁺ = sti
                 break
             end
@@ -117,12 +117,12 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
     x⁻ = [sort_edge(e) for e in x⁻]
 
     # Iterative refinement. Stop as soon as there is a difference of at most one edge between the two solutions.
-    while _solution_symmetric_difference_size(x⁺, x⁻) > 2
+    while Kombinator._solution_symmetric_difference_size(x⁺, x⁻) > 2
         # Enforce the loop invariant.
         @assert x⁺ !== nothing
         @assert x⁻ !== nothing
-        @assert _budgeted_spanning_tree_compute_weight(i, x⁺) >= i.budget # Feasible.
-        @assert _budgeted_spanning_tree_compute_weight(i, x⁻) < i.budget # Infeasible.
+        @assert _budgeted_spanning_tree_compute_weight(i, x⁺) >= i.min_budget # Feasible.
+        @assert _budgeted_spanning_tree_compute_weight(i, x⁻) < i.min_budget # Infeasible.
 
         # Switch elements from one solution to another.
         only_in_x⁺, only_in_x⁻ = _solution_symmetric_difference(x⁺, x⁻)
@@ -135,7 +135,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
         push!(new_x, e2)
 
         # Replace one of the two solutions, depending on whether this solution is feasible (x⁺) or not (x⁻).
-        if _budgeted_spanning_tree_compute_weight(i, new_x) >= i.budget
+        if _budgeted_spanning_tree_compute_weight(i, new_x) >= i.min_budget
             x⁺ = new_x
         else
             x⁻ = new_x

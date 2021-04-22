@@ -12,25 +12,26 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
     # Based on the same ideas as https://doi.org/10.1007/s10107-009-0307-4
 
     # If there are too few edges, not much to do.
-    if ne(i.graph) <= 2
-        return _st_prim_budgeted_lagrangian_refinement(i; kwargs...)
+    if ne(i.instance.graph) <= 2
+        return solve(i, LagrangianRefinementAlgorithm(); kwargs...)
     end
 
     # For each pair of edges, force these two edges to be part of the solution and discard all edges with a higher value.
     best_sol = nothing
-    for e1 in edges(i.graph)
-        for e2 in edges(i.graph)
+    best_sol_value = -Inf
+    for e1 in edges(i.instance.graph)
+        for e2 in edges(i.instance.graph)
             # (e1, e2) must be a pair of distinct edges.
             if (src(e1) == src(e2) && dst(e1) == dst(e2)) || (src(e1) == dst(e2) && src(e1) == dst(e2))
                 continue
             end
 
             # Filter out the edges that have a higher value than any of these two edges. Give a very large reward to them both.
-            cutoff = min(i.rewards[e1], i.rewards[e2])
-            rewards = filter(kv -> kv[2] < cutoff, i.rewards)
+            cutoff = min(i.instance.rewards[e1], i.instance.rewards[e2])
+            rewards = filter(kv -> kv[2] < cutoff, i.instance.rewards)
             rewards[e1] = rewards[e2] = prevfloat(Inf)
 
-            graph = SimpleGraph(nv(i.graph))
+            graph = SimpleGraph(nv(i.instance.graph))
             for e in keys(rewards)
                 add_edge!(graph, e)
             end
@@ -43,8 +44,8 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
             # As e1 and e2 have the best reward (as they are really bumped), they must be in any optimum solution.
 
             # Solve this subproblem.
-            bsti = BudgetedSpanningTreeInstance(graph, rewards, weights, i.budget)
-            sol = _st_prim_budgeted_lagrangian_refinement(bsti; kwargs...)
+            bsti = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, i.min_budget)
+            sol = solve(bsti, LagrangianRefinementAlgorithm())
 
             # This subproblem is infeasible. Maybe it's because the overall problem is infeasible or just because too many
             # edges were removed.
@@ -60,9 +61,11 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
             end
 
             # Only keep the best solution.
-            if best_sol === nothing || sol.value > best_sol.value
+            sol_value = _budgeted_spanning_tree_compute_value(i, sol.tree)
+            if sol_value > best_sol_value
                 # sol's instance is the one used internally for the subproblems.
                 best_sol = SimpleBudgetedSpanningTreeSolution(i, sol.tree)
+                best_sol_value = sol_value
             end
         end
     end

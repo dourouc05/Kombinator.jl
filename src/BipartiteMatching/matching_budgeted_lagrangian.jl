@@ -210,7 +210,7 @@ function matching_hungarian_budgeted_lagrangian_refinement(i::BudgetedBipartiteM
   push!(already_seen_solutions, Set(x⁻))
 
   # Iterative refinement. Stop as soon as there is a difference of at most one edge between the two solutions.
-  while _solution_symmetric_difference_size(x⁺, x⁻) > 4
+  while Kombinator._solution_symmetric_difference_size(x⁺, x⁻) > 4
     # Enforce the loop invariant.
     @assert x⁺ !== nothing
     @assert x⁻ !== nothing

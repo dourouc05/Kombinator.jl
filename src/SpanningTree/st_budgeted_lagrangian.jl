@@ -15,10 +15,10 @@ end
 function _st_prim_budgeted_lagrangian(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, λ::Float64) where {T, U}
     # Solve the subproblem for one value of the dual multiplier λ:
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
-    sti_rewards = Dict{Edge{T}, Float64}(e => i.instance.rewards[e] + λ * i.weights[e] for e in keys(i.rewards))
-    sti = SpanningTreeInstance(i.graph, sti_rewards)
+    sti_rewards = Dict{Edge{T}, Float64}(e => i.instance.rewards[e] + λ * i.weights[e] for e in keys(i.instance.rewards))
+    sti = SpanningTreeInstance(i.instance.graph, sti_rewards)
     sti_sol = solve(sti, PrimAlgorithm())
-    return _budgeted_spanning_tree_compute_value(sti, sti_sol.tree) - λ * i.budget, sti_sol.tree
+    return _budgeted_spanning_tree_compute_value(sti, sti_sol.tree) - λ * i.min_budget, sti_sol.tree
 end
 
 function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm; ε::Float64) where {T, U}
@@ -30,7 +30,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
 
     # Initial set of values for λ. The optimum is guaranteed to be contained in this interval.
     weights_norm_inf = maximum(values(i.weights)) # Maximum weight.
-    m = nv(i.graph) - 1 # Maximum number of items in a solution. Easy to compute for a spanning tree!
+    m = nv(i.instance.graph) - 1 # Maximum number of items in a solution. Easy to compute for a spanning tree!
     λmax = Float64(weights_norm_inf * m + 1)
 
     λlow = 0.0
