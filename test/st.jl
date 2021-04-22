@@ -4,13 +4,17 @@
         rewards = Dict(Edge(1, 2) => 121.0, Edge(1, 3) => 10.0, Edge(1, 4) => 10.0, Edge(1, 5) => 10.0, Edge(2, 3) => 121.0, Edge(2, 4) => 10.0, Edge(2, 5) => 10.0, Edge(3, 4) => 121.0, Edge(3, 5) => 10.0, Edge(4, 5) => 121.0)
 
         i = SpanningTreeInstance(graph, rewards)
-        s = solve(i, PrimAlgorithm())
-        @test s.instance == i
-        @test length(s.tree) == 4
-        @test Edge(1, 2) in s.tree
-        @test Edge(2, 3) in s.tree
-        @test Edge(3, 4) in s.tree
-        @test Edge(4, 5) in s.tree
+        p = solve(i, PrimAlgorithm())
+        d = solve(i, DynamicProgramming())
+
+        for s in [p, d]
+            @test s.instance == i
+            @test length(s.tree) == 4
+            @test Edge(1, 2) in s.tree
+            @test Edge(2, 3) in s.tree
+            @test Edge(3, 4) in s.tree
+            @test Edge(4, 5) in s.tree
+        end
     end
 
     @testset "Conformity" begin
@@ -18,11 +22,15 @@
         rewards = Dict(Edge(2, 5) => 0.0, Edge(3, 5) => 0.0, Edge(4, 5) => 1.0, Edge(1, 2) => 0.0, Edge(2, 3) => 0.0, Edge(1, 4) => 0.0, Edge(2, 4) => 0.0, Edge(1, 5) => 0.0, Edge(1, 3) => 0.0, Edge(3, 4) => 0.0)
 
         i = SpanningTreeInstance(graph, rewards)
-        s = solve(i, PrimAlgorithm())
-        @test s.instance == i
-        @test length(s.tree) == 4
-        @test length(unique(s.tree)) == 4 # Only unique edges.
-        @test Edge(4, 5) in s.tree # Only edge with nonzero cost.
+        p = solve(i, PrimAlgorithm())
+        d = solve(i, DynamicProgramming())
+
+        for s in [p, d]
+            @test s.instance == i
+            @test length(s.tree) == 4 # Five nodes in the graph.
+            @test length(unique(s.tree)) == 4 # Only unique edges.
+            @test Edge(4, 5) in s.tree # Only edge with nonzero cost.
+        end
     end
 end
 

@@ -1,8 +1,8 @@
-function solve(i::SpanningTreeInstance{T}, ::GreedyAlgorithm) where T
+function solve(i::SpanningTreeInstance{T, Maximise}, ::GreedyAlgorithm) where T
     return solve(i, PrimAlgorithm())
 end
 
-function solve(i::SpanningTreeInstance{T}, ::PrimAlgorithm) where T
+function solve(i::SpanningTreeInstance{T, Maximise}, ::PrimAlgorithm) where T
     remaining_edges = PriorityQueue{Edge{T}, Float64}(Base.Reverse) # Easy retrieval of highest-reward edge.
     node_done = falses(nv(i.graph))
 
