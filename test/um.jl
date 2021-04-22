@@ -9,7 +9,7 @@
         i = UniformMatroidInstance(Float64[5, 4, 3], m)
         g = solve(i, GreedyAlgorithm())
         d = solve(i, DynamicProgramming())
-        l = ! is_travis && msets_lp(i, solver=Gurobi.Optimizer)
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
 
         @test i.m == m
 

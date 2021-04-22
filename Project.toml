@@ -24,5 +24,8 @@ julia = "1"
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+# To be disabled for online CI.
+Gurobi = "2e9cd046-0924-5485-92f1-d5272153d98b"
+
 [targets]
-test = ["Test"]
+test = ["Test", "Gurobi"]

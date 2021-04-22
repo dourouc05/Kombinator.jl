@@ -62,7 +62,7 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
 
     # Dynamic part.
     for β in 1:budget(i)
-        for µ in 2:m(i.instance)
+        for µ in 2:i.instance.m
             for δ in (dimension(i) - 1):-1:0
                 remaining_budget_with_δ = max(0, β - weights(i)[δ + 1])
                 take_δ = i.instance.values[δ + 1] + V[µ - 1, δ + 1 + 1, remaining_budget_with_δ + 1]
@@ -84,5 +84,5 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         end
     end
 
-    return MinBudgetedUniformMatroidSolution(i, S[m(i.instance), 0, budget(i)], V, S)
+    return MinBudgetedUniformMatroidSolution(i, S[i.instance.m, 0, budget(i)], V, S)
 end
