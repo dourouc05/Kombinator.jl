@@ -13,7 +13,7 @@ It can be formalised as follows:
 struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: CombinatorialInstance
     values::Vector{T}
     m::Int
-    objective::CombinatorialObjective
+    objective::O
 
     function UniformMatroidInstance(values::Vector{T}, m::Int, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
         # Error checking.

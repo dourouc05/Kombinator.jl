@@ -1,7 +1,7 @@
-approximation_term(i::BudgetedSpanningTreeInstance{T}, ::LagrangianRefinementAlgorithm) where T = maximum(values(i.rewards))
-approximation_ratio(::BudgetedSpanningTreeInstance{T}, ::LagrangianRefinementAlgorithm) where T = NaN
+approximation_term(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = maximum(values(i.rewards))
+approximation_ratio(::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = NaN
 
-function solve(i::BudgetedSpanningTreeInstance{T, U}, ::LagrangianRefinementAlgorithm;
+function solve(i::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm;
                ε::Float64=1.0e-3, ζ⁻::Float64=0.2, ζ⁺::Float64=5.0, stalling⁻::Float64=1.0e-5) where {T, U}
     # Approximately solve the following problem:
     #     \max_{x spanning tree} rewards x  s.t.  weights x >= budget
@@ -22,7 +22,7 @@ function solve(i::BudgetedSpanningTreeInstance{T, U}, ::LagrangianRefinementAlgo
     feasible_rewards = Dict{Edge{T}, Float64}(e => i.weights[e] for e in keys(i.rewards))
     feasible_instance = SpanningTreeInstance(i.graph, feasible_rewards)
     feasible_solution = st_prim(feasible_instance)
-    
+
     if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.tree) < i.budget
         # By maximising the left-hand side of the budget constraint, impossible to reach the target budget. No solution!
         return SimpleBudgetedSpanningTreeSolution(i)

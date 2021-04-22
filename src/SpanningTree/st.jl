@@ -1,7 +1,7 @@
-struct SpanningTreeInstance{T} <: CombinatorialInstance
+struct SpanningTreeInstance{T <: Real, O <: CombinatorialObjective} <: CombinatorialInstance
     graph::AbstractGraph{T}
     rewards::Dict{Edge{T}, Float64}
-    objective::CombinatorialObjective
+    objective::O
 
     function SpanningTreeInstance(graph::AbstractGraph{T}, rewards::Dict{Edge{T}, Float64}, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
         return new{T, O}(graph, rewards, objective)
@@ -21,19 +21,19 @@ struct SpanningTreeSolution{T, O} <: CombinatorialSolution
 end
 
 abstract type BudgetedSpanningTreeSolution{T, U} <: CombinatorialSolution
-    # instance::BudgetedSpanningTreeInstance{T, U}
+    # instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
     # tree::Vector{Edge{T}}
 end
 
 struct SimpleBudgetedSpanningTreeSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
-    instance::BudgetedSpanningTreeInstance{T, U}
+    instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
     tree::Vector{Edge{T}}
 
-    function SimpleBudgetedSpanningTreeSolution(instance::BudgetedSpanningTreeInstance{T, U}, tree::Vector{Edge{T}}) where {T, U}
+    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
         return new{T, U}(instance, tree)
     end
 
-    function SimpleBudgetedSpanningTreeSolution(instance::BudgetedSpanningTreeInstance{T, U}) where {T, U}
+    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}) where {T, U}
         # No feasible solution.
         return new{T, U}(instance, edgetype(instance.graph)[])
     end
@@ -41,7 +41,7 @@ end
 
 struct BudgetedSpanningTreeLagrangianSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
     # Used to store important temporary results from solving the Lagrangian dual.
-    instance::BudgetedSpanningTreeInstance{T, U}
+    instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
     tree::Vector{Edge{T}}
     λ::Float64 # Optimum dual multiplier.
     value::Float64 # Optimum value of the dual problem (i.e. with penalised constraint).
