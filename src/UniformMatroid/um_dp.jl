@@ -1,6 +1,6 @@
 function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgramming)
     # V[µ, δ]: µ items, up to δ.
-    V = Matrix{Float64}(undef, m(i), dimension(i))
+    V = Matrix{Float64}(undef, i.m, dimension(i))
     S = Dict{Tuple{Int, Int}, Vector{Int}}()
 
     # Initialise: µ == 1, just take the best element among [δ+1, d]; δ == d, take nothing.
@@ -8,21 +8,21 @@ function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgrammin
     S[1, dimension(i)] = Int[]
 
     for δ in (dimension(i) - 1):-1:1
-        v, x = findmax(values(i, (δ + 1):dimension(i)))
+        v, x = findmax(i.values[δ + 1:dimension(i)])
         V[1, δ] = v
         S[1, δ] = [x]
     end
 
-    for µ in 2:m(i)
+    for µ in 2:i.m
         V[µ, dimension(i)] = 0.0
         S[µ, dimension(i)] = Int[]
     end
 
     # Dynamic part.
-    for µ in 2:m(i)
+    for µ in 2:i.m
         for δ in (dimension(i) - 1):-1:0
             obj_idx = δ + 1
-            take_δ = value(i, obj_idx) + V[µ - 1, δ + 1]
+            take_δ = i.values[obj_idx] + V[µ - 1, δ + 1]
             dont_take_δ = V[µ, δ + 1]
 
             if take_δ > dont_take_δ
@@ -35,5 +35,5 @@ function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgrammin
         end
     end
 
-    return UniformMatroidSolution(i, S[m(i), 1] .+ 1)
+    return UniformMatroidSolution(i, S[i.m, 1] .+ 1)
 end

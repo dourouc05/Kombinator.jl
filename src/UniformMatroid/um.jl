@@ -30,12 +30,7 @@ struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: Combina
     end
 end
 
-values(i::UniformMatroidInstance{T}) where {T} = i.values # TODO: remove me?
-m(i::UniformMatroidInstance) = i.m # TODO: remove me?
 dimension(i::UniformMatroidInstance) = length(i.values)
-
-value(i::UniformMatroidInstance{T}, o::Int) where {T} = values(i)[o] # TODO: remove me?
-values(i::UniformMatroidInstance{T}, o) where {T} = values(i)[o] # TODO: remove me?
 
 # Solution.
 
