@@ -38,11 +38,6 @@ include("ElementaryPath/ep_dp.jl")
 include("ElementaryPath/ep_budgeted.jl")
 include("ElementaryPath/ep_budgeted_dp.jl")
 
-include("SpanningTree/st.jl")
-include("SpanningTree/st_prim.jl")
-include("SpanningTree/st_budgeted.jl")
-include("SpanningTree/st_budgeted_lagrangian.jl")
-
 # Export all symbols. Code copied from JuMP.
 symbols_to_exlude = [Symbol(@__MODULE__), :eval, :include]
 
@@ -60,5 +55,7 @@ end
 # Include internal extensions.
 include("UniformMatroid/UniformMatroid.jl")
 @reexport using .UniformMatroid
+include("SpanningTree/SpanningTree.jl")
+@reexport using .SpanningTree
 
 end

@@ -5,7 +5,7 @@ using JuMP
 
 import Kombinator: solve, dimension, value, values
 
-export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution, m, items, items_all_budgets
+export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution, items, items_all_budgets
 
 include("um.jl")
 
