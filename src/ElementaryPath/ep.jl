@@ -30,7 +30,7 @@ function paths_all_budgets(s::BudgetedElementaryPathSolution{T}, max_budget::Int
 
     mb = min(max_budget, budget(s.instance))
     return Dict{Int, Vector{Edge{T}}}(
-        budget => s.solutions[s.instance.dst, budget] for budget in 0:mb)
+        budget => s.solutions[s.instance.instance.dst, budget] for budget in 0:mb)
 end
 
 function paths_all_budgets_as_tuples(s::BudgetedElementaryPathSolution{T}, max_budget::Int) where T
@@ -40,6 +40,6 @@ function paths_all_budgets_as_tuples(s::BudgetedElementaryPathSolution{T}, max_b
 
     mb = min(max_budget, budget(s.instance))
     return Dict{Int, Vector{Tuple{T, T}}}(
-        budget => [(src(e), dst(e)) for e in s.solutions[s.instance.dst, budget]]
+        budget => [(src(e), dst(e)) for e in s.solutions[s.instance.instance.dst, budget]]
         for budget in 0:mb)
 end

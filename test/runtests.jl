@@ -21,7 +21,7 @@ end
 
 @testset "Kombinator.jl" begin
   include("um.jl")
+  include("st.jl")
   include("ep.jl")
 #   include("matching.jl")
-  include("st.jl")
 end
