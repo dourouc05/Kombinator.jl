@@ -1,3 +1,7 @@
+function solve(i::ElementaryPathInstance{T}, ::DynamicProgramming) where T 
+    return solve(i, BellmanFordAlgorithm())
+end
+
 function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T 
     # Assumption: no positive-cost cycle in the graph.
     V = Dict{T, Float64}()

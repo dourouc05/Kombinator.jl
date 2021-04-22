@@ -1,3 +1,7 @@
+function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::DynamicProgramming) where T 
+    return solve(i, BellmanFordAlgorithm())
+end
+
 function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::BellmanFordAlgorithm) where T
     V = Dict{Tuple{T, Int}, Float64}()
     S = Dict{Tuple{T, Int}, Vector{Edge{T}}}()
