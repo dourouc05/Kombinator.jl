@@ -22,6 +22,7 @@ function solve(i::BudgetedSpanningTreeInstance{T, U}, ::LagrangianRefinementAlgo
     feasible_rewards = Dict{Edge{T}, Float64}(e => i.weights[e] for e in keys(i.rewards))
     feasible_instance = SpanningTreeInstance(i.graph, feasible_rewards)
     feasible_solution = st_prim(feasible_instance)
+    
     if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.tree) < i.budget
         # By maximising the left-hand side of the budget constraint, impossible to reach the target budget. No solution!
         return SimpleBudgetedSpanningTreeSolution(i)

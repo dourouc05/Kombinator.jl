@@ -1,6 +1,11 @@
 struct SpanningTreeInstance{T} <: CombinatorialInstance
     graph::AbstractGraph{T}
     rewards::Dict{Edge{T}, Float64}
+    objective::CombinatorialObjective
+
+    function SpanningTreeInstance(graph::AbstractGraph{T}, rewards::Dict{Edge{T}, Float64}, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
+        return new{T, O}(graph, rewards, objective)
+    end
 end
 
 function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where T
@@ -10,8 +15,8 @@ function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where T
     return i.rewards[reverse(e)]
 end
 
-struct SpanningTreeSolution{T} <: CombinatorialSolution
-    instance::SpanningTreeInstance{T}
+struct SpanningTreeSolution{T, O} <: CombinatorialSolution
+    instance::SpanningTreeInstance{T, O}
     tree::Vector{Edge{T}}
 end
 
