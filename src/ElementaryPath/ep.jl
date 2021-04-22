@@ -1,20 +1,45 @@
 struct ElementaryPathInstance{T} <: CombinatorialInstance
-  graph::AbstractGraph{T}
-  costs::Dict{Edge{T}, Float64}
-  src::T
-  dst::T
+    graph::AbstractGraph{T}
+    costs::Dict{Edge{T}, Float64}
+    src::T
+    dst::T
 end
 
-graph(i::ElementaryPathInstance{T}) where T = i.graph
-src(i::ElementaryPathInstance{T}) where T = i.src
-dst(i::ElementaryPathInstance{T}) where T = i.dst
-
-# dimension(i::ElementaryPathInstance{T}) where T = ne(graph(i))
-cost(i::ElementaryPathInstance{T}, u::T, v::T) where T = i.costs[Edge(u, v)]
+dimension(i::ElementaryPathInstance{T}) where T = ne(graph(i))
 
 struct ElementaryPathSolution{T} <: CombinatorialInstance
-  instance::ElementaryPathInstance{T}
-  path::Vector{Edge{T}}
-  states::Dict{T, Float64}
-  solutions::Dict{T, Vector{Edge{T}}}
+    instance::ElementaryPathInstance{T}
+    path::Vector{Edge{T}}
+    states::Dict{T, Float64}
+    solutions::Dict{T, Vector{Edge{T}}}
+end
+
+# Budgeted
+
+struct BudgetedElementaryPathSolution{T} <: CombinatorialSolution
+    instance::BudgetedElementaryPathInstance{T}
+    path::Vector{Edge{T}}
+    states::Dict{Tuple{T, Int}, Float64}
+    solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
+end
+
+function paths_all_budgets(s::BudgetedElementaryPathSolution{T}, max_budget::Int) where T
+    if max_budget > budget(s.instance)
+        @warn "The asked maximum budget $max_budget is higher than the instance budget $(budget(s.instance)). Therefore, some values have not been computed and are unavailable."
+    end
+
+    mb = min(max_budget, budget(s.instance))
+    return Dict{Int, Vector{Edge{T}}}(
+        budget => s.solutions[s.instance.dst, budget] for budget in 0:mb)
+end
+
+function paths_all_budgets_as_tuples(s::BudgetedElementaryPathSolution{T}, max_budget::Int) where T
+    if max_budget > budget(s.instance)
+        @warn "The asked maximum budget $max_budget is higher than the instance budget $(budget(s.instance)). Therefore, some values have not been computed and are unavailable."
+    end
+
+    mb = min(max_budget, budget(s.instance))
+    return Dict{Int, Vector{Tuple{T, T}}}(
+        budget => [(src(e), dst(e)) for e in s.solutions[s.instance.dst, budget]]
+        for budget in 0:mb)
 end

@@ -3,12 +3,11 @@ module SpanningTree
 using Kombinator
 
 using DataStructures
-using JuMP
 using LightGraphs
 
 import Kombinator: solve, dimension, approximation_ratio, approximation_term
 
-export SpanningTreeInstance, SpanningTreeSolution, MinBudgetedUniformMatroidSolution, BudgetedSpanningTreeSolution, SimpleBudgetedSpanningTreeSolution, BudgetedSpanningTreeLagrangianSolution
+export SpanningTreeInstance, SpanningTreeSolution, BudgetedSpanningTreeSolution, SimpleBudgetedSpanningTreeSolution, BudgetedSpanningTreeLagrangianSolution
 
 include("st.jl")
 include("st_prim.jl")

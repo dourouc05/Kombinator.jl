@@ -57,5 +57,7 @@ include("UniformMatroid/UniformMatroid.jl")
 @reexport using .UniformMatroid
 include("SpanningTree/SpanningTree.jl")
 @reexport using .SpanningTree
+include("ElementaryPath/ElementaryPath.jl")
+@reexport using .ElementaryPath
 
 end
