@@ -1,7 +1,3 @@
-solve(i::BudgetedSpanningTreeInstance{T}, ::LagrangianAlgorithm, ε; kwargs...) where T = st_prim_budgeted_lagrangian_search(i, ε; kwargs...)
-solve(i::BudgetedSpanningTreeInstance{T}, ::LagrangianRefinementAlgorithm; kwargs...) where T = st_prim_budgeted_lagrangian_refinement(i; kwargs...)
-solve(i::BudgetedSpanningTreeInstance{T}, ::IteratedLagrangianRefinementAlgorithm; kwargs...) where T = st_prim_budgeted_lagrangian_approx_half(i; kwargs...)
-
 approximation_term(::BudgetedSpanningTreeInstance{T}, ::LagrangianAlgorithm) where T = NaN
 approximation_ratio(::BudgetedSpanningTreeInstance{T}, ::LagrangianAlgorithm) where T = NaN
 
@@ -15,7 +11,11 @@ function _budgeted_spanning_tree_compute_weight(i::BudgetedSpanningTreeInstance{
     return sum(i.weights[(e in keys(i.weights)) ? e : reverse(e)] for e in tree)
 end
 
-function st_prim_budgeted_lagrangian(i::BudgetedSpanningTreeInstance{T, U}, λ::Float64) where {T, U}
+function _budgeted_spanning_tree_compute_value(i::Union{SpanningTreeInstance{T}, BudgetedSpanningTreeInstance{T, U}}, tree::Vector{Edge{T}}) where {T, U}
+    return sum(i.rewards[(e in keys(i.rewards)) ? e : reverse(e)] for e in tree)
+end
+
+function _st_prim_budgeted_lagrangian(i::BudgetedSpanningTreeInstance{T, U}, λ::Float64) where {T, U}
     # Solve the subproblem for one value of the dual multiplier λ:
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
     sti_rewards = Dict{Edge{T}, Float64}(e => i.rewards[e] + λ * i.weights[e] for e in keys(i.rewards))
@@ -24,7 +24,7 @@ function st_prim_budgeted_lagrangian(i::BudgetedSpanningTreeInstance{T, U}, λ::
     return _budgeted_spanning_tree_compute_value(sti, sti_sol.tree) - λ * i.budget, sti_sol.tree
 end
 
-function st_prim_budgeted_lagrangian_search(i::BudgetedSpanningTreeInstance{T, U}, ε::Float64) where {T, U}
+function solve(i::BudgetedSpanningTreeInstance{T, U}, ::LagrangianAlgorithm; ε::Float64) where {T, U}
     # Approximately solve the problem \min_{l ≥ 0} l(λ), where
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
     # This problem is the Lagrangian dual of the budgeted maximum spanning-tree problem:
@@ -43,8 +43,8 @@ function st_prim_budgeted_lagrangian_search(i::BudgetedSpanningTreeInstance{T, U
     while (λhigh - λlow) > ε
         λmidlow = λhigh - (λhigh - λlow) / MathConstants.φ
         λmidhigh = λlow + (λhigh - λlow) / MathConstants.φ
-        vmidlow, _ = st_prim_budgeted_lagrangian(i, λmidlow)
-        vmidhigh, _ = st_prim_budgeted_lagrangian(i, λmidhigh)
+        vmidlow, _ = _st_prim_budgeted_lagrangian(i, λmidlow)
+        vmidhigh, _ = _st_prim_budgeted_lagrangian(i, λmidhigh)
 
         if vmidlow < vmidhigh
             λhigh = λmidhigh
@@ -55,8 +55,8 @@ function st_prim_budgeted_lagrangian_search(i::BudgetedSpanningTreeInstance{T, U
         end
     end
 
-    vlow, stlow = st_prim_budgeted_lagrangian(i, λlow)
-    vhigh, sthigh = st_prim_budgeted_lagrangian(i, λhigh)
+    vlow, stlow = _st_prim_budgeted_lagrangian(i, λlow)
+    vhigh, sthigh = _st_prim_budgeted_lagrangian(i, λhigh)
     if vlow < vhigh
         return BudgetedSpanningTreeLagrangianSolution(i, stlow, λlow, vlow, λmax)
     else
@@ -64,9 +64,8 @@ function st_prim_budgeted_lagrangian_search(i::BudgetedSpanningTreeInstance{T, U
     end
 end
 
-function st_prim_budgeted_lagrangian_refinement(i::BudgetedSpanningTreeInstance{T, U};
-                                                ε::Float64=1.0e-3, ζ⁻::Float64=0.2, ζ⁺::Float64=5.0,
-                                                stalling⁻::Float64=1.0e-5) where {T, U}
+function solve(i::BudgetedSpanningTreeInstance{T, U}, ::LagrangianRefinementAlgorithm;
+               ε::Float64=1.0e-3, ζ⁻::Float64=0.2, ζ⁺::Float64=5.0, stalling⁻::Float64=1.0e-5) where {T, U}
     # Approximately solve the following problem:
     #     \max_{x spanning tree} rewards x  s.t.  weights x >= budget
     # This algorithm provides an additive approximation to this problem. If x* is the optimum solution and x~ the one
@@ -92,7 +91,7 @@ function st_prim_budgeted_lagrangian_refinement(i::BudgetedSpanningTreeInstance{
     end
 
     # Solve the Lagrangian relaxation to optimality.
-    lagrangian = st_prim_budgeted_lagrangian_search(i, ε)
+    lagrangian = _st_prim_budgeted_lagrangian_search(i, ε)
     λ0, v0, st0 = lagrangian.λ, lagrangian.value, lagrangian.tree
     λmax = lagrangian.λmax
     b0 = _budgeted_spanning_tree_compute_weight(i, st0) # Budget consumption of this first solution.
@@ -114,7 +113,7 @@ function st_prim_budgeted_lagrangian_refinement(i::BudgetedSpanningTreeInstance{
         while true
             # Penalise less the constraint: it should no more be satisfied.
             λi *= ζ⁻
-            _, sti = st_prim_budgeted_lagrangian(i, λi)
+            _, sti = _st_prim_budgeted_lagrangian(i, λi)
             if _budgeted_spanning_tree_compute_weight(i, sti) < i.budget
                 x⁻ = sti
                 break
@@ -129,7 +128,7 @@ function st_prim_budgeted_lagrangian_refinement(i::BudgetedSpanningTreeInstance{
 
         # Specific handling of stallings.
         if stalling # First test: don't penalise the constraint at all.
-            _, sti = st_prim_budgeted_lagrangian(i, 0.0)
+            _, sti = _st_prim_budgeted_lagrangian(i, 0.0)
             new_budget = _budgeted_spanning_tree_compute_weight(i, sti)
             if new_budget < i.budget
                 x⁻ = sti
@@ -159,7 +158,7 @@ function st_prim_budgeted_lagrangian_refinement(i::BudgetedSpanningTreeInstance{
         while true
             # Penalise more the constraint: it should become satisfied at some point.
             λi *= ζ⁺
-            _, sti = st_prim_budgeted_lagrangian(i, λi)
+            _, sti = _st_prim_budgeted_lagrangian(i, λi)
             if _budgeted_spanning_tree_compute_weight(i, sti) >= i.budget
                 x⁺ = sti
                 break
@@ -209,7 +208,7 @@ function st_prim_budgeted_lagrangian_refinement(i::BudgetedSpanningTreeInstance{
     return SimpleBudgetedSpanningTreeSolution(i, x⁺)
 end
 
-function st_prim_budgeted_lagrangian_approx_half(i::BudgetedSpanningTreeInstance{T, U}; kwargs...) where {T, U}
+function solve(i::BudgetedSpanningTreeInstance{T, U}, ::IteratedLagrangianRefinementAlgorithm) where {T, U}
     # Approximately solve the following problem:
     #     \max_{x spanning tree} rewards x  s.t.  weights x >= budget
     # This algorithm provides a multiplicative approximation to this problem. If x* is the optimum solution and x~ the one
@@ -221,7 +220,7 @@ function st_prim_budgeted_lagrangian_approx_half(i::BudgetedSpanningTreeInstance
 
     # If there are too few edges, not much to do.
     if ne(i.graph) <= 2
-        return st_prim_budgeted_lagrangian_refinement(i; kwargs...)
+        return _st_prim_budgeted_lagrangian_refinement(i; kwargs...)
     end
 
     # For each pair of edges, force these two edges to be part of the solution and discard all edges with a higher value.
@@ -252,7 +251,7 @@ function st_prim_budgeted_lagrangian_approx_half(i::BudgetedSpanningTreeInstance
 
             # Solve this subproblem.
             bsti = BudgetedSpanningTreeInstance(graph, rewards, weights, i.budget)
-            sol = st_prim_budgeted_lagrangian_refinement(bsti; kwargs...)
+            sol = _st_prim_budgeted_lagrangian_refinement(bsti; kwargs...)
 
             # This subproblem is infeasible. Maybe it's because the overall problem is infeasible or just because too many
             # edges were removed.
