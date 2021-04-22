@@ -1,6 +1,7 @@
 module UniformMatroid
 
 using Kombinator
+
 using JuMP
 
 import Kombinator: solve, dimension, value, values
