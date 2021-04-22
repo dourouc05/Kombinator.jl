@@ -6,14 +6,14 @@ that must be used.
 
 ``\\sum_i x_i \\times \\mathtt{weights}_i \\geq \\mathtt{min\\_budget}``
 """
-struct MinimumBudget{CI <: CombinatorialInstance, T <: Real, U} <: CombinatorialVariation
+struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <: CombinatorialVariation
     instance::CI
-    weights::Union{Vector{T}, Dict{U, T}}
+    weights::Union{Vector{T}, Dict{<: Any, T}}
     min_budget::T
     compute_all_values::Bool
 end
 
-function MinimumBudget(i::CI, weights::Union{Vector{T}, Dict{U, T}}, min_budget::T=zero(T); compute_all_values::Bool=false) where {CI, T, U}
+function MinimumBudget(i::CI, weights::Union{Vector{T}, Dict{<: Any, T}}, min_budget::T=zero(T); compute_all_values::Bool=false) where {CI, T}
     return MinimumBudget(i, weights, min_budget, compute_all_values)
 end
 
@@ -33,14 +33,14 @@ that can be used.
 
 ``\\sum_i x_i \\times \\mathtt{weights}_i \\leq \\mathtt{max\\_budget}``
 """
-struct MaximumBudget{CI <: CombinatorialInstance, T <: Real, U} <: CombinatorialVariation
+struct MaximumBudget{CI <: CombinatorialInstance, T <: Real} <: CombinatorialVariation
     instance::CI
-    weights::Union{Vector{T}, Dict{U, T}}
+    weights::Union{Vector{T}, Dict{<: Any, T}}
     max_budget::T
     compute_all_values::Bool
 end
 
-function MaximumBudget(i::CI, weights::Union{Vector{T}, Dict{U, T}}, max_budget::T; compute_all_values::Bool=false) where {CI, T, U}
+function MaximumBudget(i::CI, weights::Union{Vector{T}, Dict{<: Any, T}}, max_budget::T; compute_all_values::Bool=false) where {CI, T}
     return MaximumBudget(i, weights, max_budget, compute_all_values)
 end
 
