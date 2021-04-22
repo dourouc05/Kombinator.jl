@@ -33,11 +33,6 @@ include("BipartiteMatching/matching_budgeted.jl")
 include("BipartiteMatching/matching_budgeted_dp.jl")
 include("BipartiteMatching/matching_budgeted_lagrangian.jl")
 
-include("ElementaryPath/ep.jl")
-include("ElementaryPath/ep_dp.jl")
-include("ElementaryPath/ep_budgeted.jl")
-include("ElementaryPath/ep_budgeted_dp.jl")
-
 # Export all symbols. Code copied from JuMP.
 symbols_to_exlude = [Symbol(@__MODULE__), :eval, :include]
 

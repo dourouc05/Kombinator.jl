@@ -4,19 +4,19 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
     S = Dict{T, Vector{Edge{T}}}()
 
     # Initialise.
-    for v in vertices(graph(i))
+    for v in vertices(i.graph)
         V[v] = -Inf
         S[v] = Edge{T}[]
     end
-    V[src(i)] = 0.0
+    V[i.src] = 0.0
 
     # Dynamic part.
-    for _ in 1:ne(graph(i))
+    for _ in 1:ne(i.graph)
         changes = false # Stop the algorithm as soon as it no more makes progress.
 
-        for e in edges(graph(i))
+        for e in edges(i.graph)
             u, v = src(e), dst(e)
-            w = cost(i, u, v)
+            w = i.costs[Edge(u, v)]
 
             # If using the solution to the currently explored subproblem would
             # lead to a cycle, skip it.
@@ -39,14 +39,14 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
     end
 
     # Checking existence of negative-cost cycle.
-    for e in edges(graph(i))
+    for e in edges(i.graph)
         u, v = src(e), dst(e)
-        w = cost(i, u, v)
+        w = i.costs[Edge(u, v)]
 
         if V[u] + w > V[v]
             @warn("The graph contains a positive-cost cycle around edge $(u) -> $(v).")
         end
     end
 
-    return ElementaryPathSolution(i, S[dst(i)], V, S)
+    return ElementaryPathSolution(i, S[i.dst], V, S)
 end

@@ -1,33 +1,33 @@
-function solve(i::BudgetedElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
+function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::BellmanFordAlgorithm) where T
     V = Dict{Tuple{T, Int}, Float64}()
     S = Dict{Tuple{T, Int}, Vector{Edge{T}}}()
 
     # Initialise. For β = 0, this is exactly Bellman-Ford algorithm with costs
     # (instead of rewards). Otherwise, use the same initialisation as
     # Bellman-Ford.
-    β0 = lp_dp(ElementaryPathInstance(graph(i), rewards(i), src(i), dst(i)))
-    for v in vertices(graph(i))
+    β0 = lp_dp(ElementaryPathInstance(i.graph, i.instance.rewards, i.src, i.dst))
+    for v in vertices(i.graph)
         S[v, 0] = β0.solutions[v]
-        V[v, 0] = length(S[v, 0]) == 0 ? 0 : sum(rewards(i)[e] for e in S[v, 0])
+        V[v, 0] = length(S[v, 0]) == 0 ? 0 : sum(i.instance.rewards[e] for e in S[v, 0])
     end
 
-    for β in 1:budget(i)
-        for v in vertices(graph(i))
+    for β in 1:min_budget
+        for v in vertices(i.graph)
             V[v, β] = -Inf
             S[v, β] = Edge{T}[]
         end
 
-        V[src(i), β] = 0.0
+        V[i.src, β] = 0.0
     end
 
     # Dynamic part.
-    for β in 1:budget(i)
+    for β in 1:i.min_budget
         # Loop needed when at least a weight is equal to zero. TODO: remove it when all weights are nonzero?
         while true
             changed = false
 
-            for v in vertices(graph(i))
-                for w in inneighbors(graph(i), v)
+            for v in vertices(i.graph)
+                for w in inneighbors(i.graph, v)
                     # Compute the remaining part of the budget still to use.
                     remaining_budget = max(0, β - weight(i, w, v))
 
@@ -67,5 +67,5 @@ function solve(i::BudgetedElementaryPathInstance{T}, ::BellmanFordAlgorithm) whe
         end
     end
 
-    return BudgetedElementaryPathSolution(i, S[dst(i), budget(i)], V, S)
+    return BudgetedElementaryPathSolution(i, S[i.dst, budget(i)], V, S)
 end

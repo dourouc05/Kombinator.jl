@@ -5,7 +5,7 @@ struct ElementaryPathInstance{T} <: CombinatorialInstance
     dst::T
 end
 
-dimension(i::ElementaryPathInstance{T}) where T = ne(graph(i))
+dimension(i::ElementaryPathInstance{T}) where T = ne(i.graph)
 
 struct ElementaryPathSolution{T} <: CombinatorialInstance
     instance::ElementaryPathInstance{T}
@@ -17,7 +17,7 @@ end
 # Budgeted
 
 struct BudgetedElementaryPathSolution{T} <: CombinatorialSolution
-    instance::BudgetedElementaryPathInstance{T}
+    instance::MinimumBudget{ElementaryPathInstance{T}, T}
     path::Vector{Edge{T}}
     states::Dict{Tuple{T, Int}, Float64}
     solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
