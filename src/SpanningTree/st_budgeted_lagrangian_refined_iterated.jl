@@ -13,7 +13,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
 
     # If there are too few edges, not much to do.
     if ne(i.instance.graph) <= 2
-        return solve(i, LagrangianRefinementAlgorithm(); kwargs...)
+        return solve(i, LagrangianRefinementAlgorithm())
     end
 
     # For each pair of edges, force these two edges to be part of the solution and discard all edges with a higher value.

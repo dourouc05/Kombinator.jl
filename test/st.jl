@@ -91,29 +91,29 @@ end
         @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
     end
 
-    # @testset "Conformity" begin
-    #     # More advanced tests to ensure the algorithm works as expected.
+    @testset "Conformity" begin
+        # More advanced tests to ensure the algorithm works as expected.
 
-    #     # 1.
-    #     graph = complete_graph(2)
-    #     r = Dict(Edge(1, 2) => 0.0)
-    #     w = Dict(Edge(1, 2) => 5)
-    #     i = MinimumBudget(SpanningTreeInstance(graph, r), w, 0)
-    #     s = solve(i, LagrangianRefinementAlgorithm())
-    #     @assert s !== nothing
-    #     @assert s.tree == [Edge(1, 2)]
+        # 1.
+        graph = complete_graph(2)
+        r = Dict(Edge(1, 2) => 0.0)
+        w = Dict(Edge(1, 2) => 5)
+        i = MinimumBudget(SpanningTreeInstance(graph, r), w, 0)
+        s = solve(i, LagrangianRefinementAlgorithm())
+        @assert s !== nothing
+        @assert s.tree == [Edge(1, 2)]
 
-    #     s = solve(i, IteratedLagrangianRefinementAlgorithm())
-    #     @assert s !== nothing
-    #     @assert s.tree == [Edge(1, 2)]
+        s = solve(i, IteratedLagrangianRefinementAlgorithm())
+        @assert s !== nothing
+        @assert s.tree == [Edge(1, 2)]
 
-    #     i = MinimumBudget(SpanningTreeInstance(graph, r), w, 20)
-    #     s = solve(i, LagrangianRefinementAlgorithm())
-    #     @assert s !== nothing
-    #     @assert s.tree == Edge{Int}[]
+        i = MinimumBudget(SpanningTreeInstance(graph, r), w, 20)
+        s = solve(i, LagrangianRefinementAlgorithm())
+        @assert s !== nothing
+        @assert s.tree == Edge{Int}[]
 
-    #     s = solve(i, IteratedLagrangianRefinementAlgorithm())
-    #     @assert s !== nothing
-    #     @assert s.tree == Edge{Int}[]
-    # end
+        s = solve(i, IteratedLagrangianRefinementAlgorithm())
+        @assert s !== nothing
+        @assert s.tree == Edge{Int}[]
+    end
 end

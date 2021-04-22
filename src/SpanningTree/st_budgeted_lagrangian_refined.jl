@@ -77,7 +77,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
         if stalling # Second test: minimise the left-hand side of the budget constraint, in hope of finding a feasible solution.
             # This process is highly similar to the computation of feasible_solution, but with a reverse objective function.
             infeasible_rewards = Dict{Edge{T}, Float64}(e => - i.weights[e] for e in keys(i.weights))
-            infeasible_solution = st_prim(SpanningTreeInstance(i.instance.graph, infeasible_rewards)).tree
+            infeasible_solution = solve(SpanningTreeInstance(i.instance.graph, infeasible_rewards), PrimAlgorithm()).tree
 
             if _budgeted_spanning_tree_compute_weight(i, infeasible_solution) < i.min_budget
                 x⁻ = infeasible_solution

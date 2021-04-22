@@ -35,7 +35,7 @@ struct SimpleBudgetedSpanningTreeSolution{T, U} <: BudgetedSpanningTreeSolution{
 
     function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}) where {T, U}
         # No feasible solution.
-        return new{T, U}(instance, edgetype(instance.graph)[])
+        return new{T, U}(instance, edgetype(instance.instance.graph)[])
     end
 end
 
