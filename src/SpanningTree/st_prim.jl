@@ -1,6 +1,4 @@
-solve(i::SpanningTreeInstance{T}, ::PrimAlgorithm; kwargs...) where T = st_prim(i; kwargs...)
-
-function st_prim(i::SpanningTreeInstance{T}) where T
+function solve(i::SpanningTreeInstance{T}, ::PrimAlgorithm) where T
     remaining_edges = PriorityQueue{Edge{T}, Float64}(Base.Reverse) # Easy retrieval of highest-reward edge.
     node_done = falses(nv(i.graph))
 
