@@ -53,6 +53,7 @@ end
         graph = complete_graph(3)
         rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
         weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
+        # weights = Dict(Edge(1, 2) => 1, Edge(1, 3) => 2, Edge(2, 3) => 1)
 
         ε = 0.0001
         budget = 1
@@ -84,7 +85,7 @@ end
 
         # Additive approximation algorithm.
         sol = solve(i, LagrangianRefinementAlgorithm())
-        @assert sol !== nothing
+        @test sol !== nothing
         @test sol.instance == i
         s = sol.tree
         @test length(s) == 2
@@ -93,7 +94,16 @@ end
 
         # Multiplicative approximation algorithm.
         sol = solve(i, IteratedLagrangianRefinementAlgorithm())
-        @assert sol !== nothing
+        @test sol !== nothing
+        @test sol.instance == i
+        s = sol.tree
+        @test length(s) == 2
+        @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
+        @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
+
+        # DP algorithm, mostly like the multiplicate approximation algorithm.
+        sol = solve(i, DynamicProgramming())
+        @test sol !== nothing
         @test sol.instance == i
         s = sol.tree
         @test length(s) == 2
@@ -110,20 +120,24 @@ end
         w = Dict(Edge(1, 2) => 5)
         i = MinimumBudget(SpanningTreeInstance(graph, r), w, 0)
         s = solve(i, LagrangianRefinementAlgorithm())
-        @assert s !== nothing
-        @assert s.tree == [Edge(1, 2)]
+        @test s !== nothing
+        @test s.tree == [Edge(1, 2)]
 
         s = solve(i, IteratedLagrangianRefinementAlgorithm())
-        @assert s !== nothing
-        @assert s.tree == [Edge(1, 2)]
+        @test s !== nothing
+        @test s.tree == [Edge(1, 2)]
 
         i = MinimumBudget(SpanningTreeInstance(graph, r), w, 20)
         s = solve(i, LagrangianRefinementAlgorithm())
-        @assert s !== nothing
-        @assert s.tree == Edge{Int}[]
+        @test s !== nothing
+        @test s.tree == Edge{Int}[]
 
         s = solve(i, IteratedLagrangianRefinementAlgorithm())
-        @assert s !== nothing
-        @assert s.tree == Edge{Int}[]
+        @test s !== nothing
+        @test s.tree == Edge{Int}[]
+
+        s = solve(i, DynamicProgramming())
+        @test s !== nothing
+        @test s.tree == Edge{Int}[]
     end
 end
