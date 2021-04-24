@@ -47,15 +47,8 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
         end
     end
 
-    println("=============== INIT")
-    @show S
-    println("===============")
-
     # Dynamic part.
-    println("=============== DYNAMIC")
     for β in 1:instance.min_budget
-        println("=-=-=-=-=-=-=-= $(β)")
-
         # First edge (base case).
         if first_edge_weight >= β
             # The first edge is allowable on its own: take it.
@@ -70,11 +63,6 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
             S[β, 1] = Edge{T}[]
         end
 
-        println("First edge $first_edge: ")
-        @show V[β, 1]
-        @show S[β, 1]
-        @show LD[β, 1].node_done
-
         # Other edges (recursive cases).
         for i in 2:ne(instance.instance.graph)
             # Can edges_sorted[i] be taken?
@@ -85,17 +73,11 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                 remaining_budget = 0
             end
 
-            println("Edge $i == $edge")
-            @show LD[remaining_budget, i - 1].node_done
-            @show LD[β, i - 1].node_done
-            @show remaining_budget
-
             if V[remaining_budget, i - 1] == -1
                 # Are the previous solutions infeasible (recursive call)? If so, 
                 # don't consider using it.
                 V[β, i] = V[β, i - 1]
                 S[β, i] = S[β, i - 1]
-                println("  Not taken: prev infeasible remaining_budget")
             elseif edge_would_create_loop(LD[remaining_budget, i - 1], edge) 
                 # Don't take i with that previous solution, it would create a 
                 # loop.
@@ -128,12 +110,10 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                 t_no_dst = [unmap_edge(e) for e in s_no_dst.tree]
                 v_no_dst = _budgeted_spanning_tree_compute_value(instance, t_no_dst)
 
-                println("  Loop!")
                 if length(t_no_src) == 0 && length(t_no_dst) == 0
                     V[β, i] = V[β, i - 1]
                     S[β, i] = S[β, i - 1]
                     copy!(LD[β, i], LD[β, i - 1])
-                    println("  Not taken: infeasible subproblems")
                 elseif length(t_no_src) == 0 || (length(t_no_src) > 0 && v_no_dst > v_no_src)
                     V[β, i] = v_no_dst + edge_value
                     S[β, i] = t_no_dst
@@ -144,8 +124,6 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                     for e in S[β, i]
                         visit_edge(LD[β, i], e)
                     end
-
-                    println("  Taken: subproblem dst")
                 elseif length(t_no_dst) == 0 || (length(t_no_dst) > 0 && v_no_src > v_no_dst)
                     V[β, i] = v_no_src + edge_value
                     S[β, i] = t_no_src
@@ -156,46 +134,20 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                     for e in S[β, i]
                         visit_edge(LD[β, i], e)
                     end
-                    
-                    println("  Taken: subproblem src")
                 else
-                    println("WHAT THE FUCK?")
-                    @show g_no_src
-                    @show t_no_src
-                    @show v_no_src
-                    @show g_no_dst
-                    @show t_no_dst
-                    @show v_no_dst
+                    error("Assertion failed")
                 end
             else 
                 # Take i, there is no chance of it adding a loop.
                 V[β, i] = V[remaining_budget, i - 1] + edge_value
                 S[β, i] = copy(S[remaining_budget, i - 1])
                 push!(S[β, i], edge)
-                println("  Taken")
             
                 copy!(LD[β, i], LD[remaining_budget, i - 1])
                 visit_edge(LD[β, i], edge)
-
-                @show S[remaining_budget, i - 1]
-                @show LD[β, i].node_done
             end
-                
-            @show V[β, i]
-            @show S[β, i]
-
-            if length(S[β, i]) > 0
-                @show sum(instance.weights[e] for e in S[β, i])
-                @show β
-            end
-
-            println("----------")
         end
     end
-    println("===============")
-
-    @show S
-    @show S[instance.min_budget, ne(instance.instance.graph)]
 
     # TODO: return all the available information.
     # return SpanningTreeSolution(instance.instance, S[instance.min_budget, ne(instance.instance.graph)])
