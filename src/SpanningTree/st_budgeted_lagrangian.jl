@@ -1,26 +1,6 @@
 approximation_term(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
 approximation_ratio(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
 
-function _budgeted_spanning_tree_compute_weight(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
-    if length(tree) == 0
-        return 0
-    end
-    return sum(i.weights[(e in keys(i.weights)) ? e : reverse(e)] for e in tree)
-end
-
-function _budgeted_spanning_tree_compute_value(i::SpanningTreeInstance{T}, tree::Vector{Edge{T}}) where {T, U}
-    if length(tree) == 0
-        return 0
-    end
-    return sum(i.rewards[(e in keys(i.rewards)) ? e : reverse(e)] for e in tree)
-end
-function _budgeted_spanning_tree_compute_value(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
-    if length(tree) == 0
-        return 0
-    end
-    return sum(i.instance.rewards[(e in keys(i.instance.rewards)) ? e : reverse(e)] for e in tree)
-end
-
 function _st_prim_budgeted_lagrangian(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, λ::Float64) where {T, U}
     # Solve the subproblem for one value of the dual multiplier λ:
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.

@@ -11,6 +11,8 @@ export SpanningTreeInstance, SpanningTreeSolution, BudgetedSpanningTreeSolution,
 
 include("st.jl")
 
+include("helpers.jl")
+
 include("st_prim.jl")
 include("st_dp.jl")
 
