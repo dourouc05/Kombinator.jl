@@ -14,8 +14,8 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     V = Vector{Float64}(undef, ne(i.graph))
     S = Vector{Vector{Edge{T}}}(undef, ne(i.graph))
 
-    first_edge = sorted_edges[1][1]
-    V[1] = sorted_edges[1][2]
+    first_edge, first_edge_value = sorted_edges[1]
+    V[1] = first_edge_value
     S[1] = Edge{T}[first_edge]
     
     ld = LoopDetector(nv(i.graph))
@@ -24,13 +24,13 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     # Dynamic part.
     for i in 2:ne(i.graph)
         # Can edges_sorted[i] be taken?
-        edge = sorted_edges[i][1]
+        edge, edge_value = sorted_edges[i]
 
         if edge_would_create_loop(ld, src(edge), dst(edge)) # Don't take i.
             V[i] = V[i - 1]
             S[i] = S[i - 1]
         else # Take i.
-            V[i] = V[i - 1] + sorted_edges[i][2]
+            V[i] = V[i - 1] + edge_value
             S[i] = copy(S[i - 1])
             push!(S[i], edge)
 
