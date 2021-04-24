@@ -17,23 +17,16 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     first_edge = sorted_edges[1][1]
     V[1] = sorted_edges[1][2]
     S[1] = Edge{T}[first_edge]
-
-    # How to ensure that adding an edge will not create loops? 
-    # Partition the graph into components, based on the already added edges. 
-    # All the nodes with the same component ID are reachable one from the 
-    # other: adding an edge within that component would create a loop.
-    # Use -1 for nodes that are currently in no component.
-    node_done = [-1 for _ in 1:nv(i.graph)]
-    node_done[src(first_edge)] = 1
-    node_done[dst(first_edge)] = 1
+    
+    ld = LoopDetector(nv(i.graph))
+    visit_edge(ld, src(first_edge), dst(first_edge))
 
     # Dynamic part.
     for i in 2:ne(i.graph)
         # Can edges_sorted[i] be taken?
         edge = sorted_edges[i][1]
-        i_would_create_loop = node_done[src(edge)] == node_done[dst(edge)]
 
-        if i_would_create_loop # Don't take i.
+        if edge_would_create_loop(ld, src(edge), dst(edge)) # Don't take i.
             V[i] = V[i - 1]
             S[i] = S[i - 1]
         else # Take i.
@@ -41,24 +34,7 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
             S[i] = copy(S[i - 1])
             push!(S[i], edge)
 
-            # Update data structure for loop detection.
-            if node_done[src(edge)] == -1
-                # Put the source (no currently assigned component) into the 
-                # same component as the destination.
-                node_done[src(edge)] = node_done[dst(edge)]
-            elseif node_done[dst(edge)] == -1
-                # Put the destination (no currently assigned component) into 
-                # the same component as the source.
-                node_done[dst(edge)] = node_done[src(edge)]
-            else
-                # Merge components so that they have the lowest component ID of 
-                # the two components.
-                if node_done[dst(edge)] < node_done[src(edge)]
-                    node_done[node_done .== node_done[src(edge)]] = node_done[dst(edge)]
-                else
-                    node_done[node_done .== node_done[dst(edge)]] = node_done[src(edge)]
-                end
-            end
+            visit_edge(ld, src(edge), dst(edge))
         end
     end
 
