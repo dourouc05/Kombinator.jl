@@ -149,7 +149,5 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
         end
     end
 
-    # TODO: return all the available information.
-    # return SpanningTreeSolution(instance.instance, S[instance.min_budget, ne(instance.instance.graph)])
-    return SimpleBudgetedSpanningTreeSolution(instance, S[instance.min_budget, ne(instance.instance.graph)])
+    return BudgetedSpanningTreeDynamicProgrammingSolution(instance, S[instance.min_budget, ne(instance.instance.graph)], V, S)
 end
