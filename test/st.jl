@@ -36,15 +36,17 @@ end
 
 @testset "Budgeted maximum spanning tree" begin
     @testset "Interface" begin
-        graph = complete_graph(3)
-        rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-        weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
-        i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+        @testset "Approximation: Lagrangian refinement" begin
+            graph = complete_graph(3)
+            rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+            weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
+            i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
 
-        @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁻=1.0)
-        @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁻=2.0)
-        @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁺=1.0)
-        @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁺=0.2)
+            @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁻=1.0)
+            @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁻=2.0)
+            @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁺=1.0)
+            @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁺=0.2)
+        end
     end
 
     @testset "Basic" begin
