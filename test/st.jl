@@ -5,9 +5,10 @@
 
         i = SpanningTreeInstance(graph, rewards)
         p = solve(i, PrimAlgorithm())
+        g = solve(i, GreedyAlgorithm()) # Same as Prim.
         d = solve(i, DynamicProgramming())
 
-        for s in [p, d]
+        for s in [p, g, d]
             @test s.instance == i
             @test length(s.tree) == 4
             @test Edge(1, 2) in s.tree
@@ -23,9 +24,10 @@
 
         i = SpanningTreeInstance(graph, rewards)
         p = solve(i, PrimAlgorithm())
+        g = solve(i, GreedyAlgorithm()) # Same as Prim.
         d = solve(i, DynamicProgramming())
 
-        for s in [p, d]
+        for s in [p, g, d]
             @test s.instance == i
             @test length(s.tree) == 4 # Five nodes in the graph.
             @test length(unique(s.tree)) == 4 # Only unique edges.
