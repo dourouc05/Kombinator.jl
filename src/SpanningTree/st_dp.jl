@@ -18,6 +18,7 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     V[1] = sorted_edges[1][2]
     S[1] = Edge{T}[first_edge]
 
+    # How to ensure that adding an edge will not create loops? 
     # Partition the graph into components, based on the already added edges. 
     # All the nodes with the same component ID are reachable one from the 
     # other: adding an edge within that component would create a loop.
@@ -26,6 +27,7 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     node_done[src(first_edge)] = 1
     node_done[dst(first_edge)] = 1
 
+    # Dynamic part.
     for i in 2:ne(i.graph)
         # Can edges_sorted[i] be taken?
         edge = sorted_edges[i][1]
