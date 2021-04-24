@@ -33,6 +33,10 @@ mutable struct LoopDetector
     end
 end
 
+function visit_edge(ld::LoopDetector, e::Edge{Int})
+    return visit_edge(ld, src(e), dst(e))
+end
+
 function visit_edge(ld::LoopDetector, s::Int, t::Int)
     if ld.node_done[s] == -1
         # Put the source (no currently assigned component) into the 
@@ -59,6 +63,11 @@ function visit_edge(ld::LoopDetector, s::Int, t::Int)
             ld.node_done[ld.node_done .== ld.node_done[t]] .= ld.node_done[s]
         end
     end
+    return 
+end
+
+function edge_would_create_loop(ld::LoopDetector, e::Edge{Int})
+    return edge_would_create_loop(ld, src(e), dst(e))
 end
 
 function edge_would_create_loop(ld::LoopDetector, s::Int, t::Int)
@@ -75,9 +84,11 @@ end
 function reset!(ld::LoopDetector)
     ld.node_done .= -1
     ld.next_value = 1
+    return
 end
 
 function Base.copy!(dst::LoopDetector, src::LoopDetector)
     dst.node_done .= src.node_done
     dst.next_value = src.next_value
+    return
 end
