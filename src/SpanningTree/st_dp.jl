@@ -41,6 +41,7 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
             S[i] = copy(S[i - 1])
             push!(S[i], edge)
 
+            # Update data structure for loop detection.
             if node_done[src(edge)] == -1
                 # Put the source (no currently assigned component) into the 
                 # same component as the destination.
