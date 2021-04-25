@@ -25,6 +25,7 @@ include("interface/instance.jl")
 include("interface/objective.jl")
 include("interface/algorithm.jl")
 include("interface/variants.jl")
+include("interface/nonlinear.jl")
 
 include("BipartiteMatching/matching.jl")
 include("BipartiteMatching/matching_hungarian.jl")
@@ -54,5 +55,7 @@ include("SpanningTree/SpanningTree.jl")
 @reexport using .SpanningTree
 include("ElementaryPath/ElementaryPath.jl")
 @reexport using .ElementaryPath
+include("NLCOP/NLCOP.jl")
+@reexport using .NLCOP
 
 end
