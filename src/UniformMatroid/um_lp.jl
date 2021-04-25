@@ -2,7 +2,7 @@ function formulation(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLine
     dim = dimension(i)
 
     model = Model(solver)
-    @variable(model, x[1:dim], Bin)
+    x = @variable(model, [1:dim], Bin)
     @objective(model, Max, sum(x[j] * i.values[j] for j in 1:dim))
     @constraint(model, sum(x) <= i.m)
 
