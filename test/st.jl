@@ -7,8 +7,9 @@
         p = solve(i, PrimAlgorithm())
         g = solve(i, GreedyAlgorithm()) # Same as Prim.
         d = solve(i, DynamicProgramming())
+        l = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
 
-        for s in [p, g, d]
+        for s in [p, g, d, l]
             @test s.instance == i
             @test length(s.tree) == 4
             @test Edge(1, 2) in s.tree
@@ -26,8 +27,9 @@
         p = solve(i, PrimAlgorithm())
         g = solve(i, GreedyAlgorithm()) # Same as Prim.
         d = solve(i, DynamicProgramming())
+        l = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
 
-        for s in [p, g, d]
+        for s in [p, g, d, l]
             @test s.instance == i
             @test length(s.tree) == 4 # Five nodes in the graph.
             @test length(unique(s.tree)) == 4 # Only unique edges.

@@ -8,11 +8,11 @@ function formulation(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLine
 
     set_silent(model)
 
-    return m, x
+    return model, x
 end
 
 function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLinearFormulation; solver=nothing)
     m, x = formulation(i, DefaultLinearFormulation(), solver=solver)
-    optimize!(model)
+    optimize!(m)
     return UniformMatroidSolution(i, findall(JuMP.value.(x) .>= 0.5))
 end

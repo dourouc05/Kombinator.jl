@@ -1,3 +1,4 @@
+using Cbc
 using Hungarian
 using JuMP
 using Kombinator

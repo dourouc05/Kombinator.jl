@@ -3,6 +3,7 @@ module SpanningTree
 using Kombinator
 
 using DataStructures
+using JuMP
 using LightGraphs
 
 import Kombinator: solve, dimension, approximation_ratio, approximation_term
@@ -15,6 +16,7 @@ include("helpers.jl")
 
 include("st_prim.jl")
 include("st_dp.jl")
+include("st_lp.jl")
 
 include("st_budgeted_lagrangian.jl")
 include("st_budgeted_lagrangian_refined.jl")
