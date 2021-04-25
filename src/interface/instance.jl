@@ -60,7 +60,7 @@ that contains all the required information for the supplementary constraints
 abstract type CombinatorialVariation <: CombinatorialInstance end
 
 """
-    function objective(i::CombinatorialInstance)
+    objective(i::CombinatorialInstance)
 
 Returns the objective associated with this instance. 
 
@@ -77,7 +77,7 @@ function objective(i::CombinatorialVariation)
 end
 
 """
-    function dimension(i::CombinatorialInstance)
+    dimension(i::CombinatorialInstance)
 
 Returns the dimension of this instance. 
 
@@ -88,4 +88,20 @@ end
 
 function dimension(i::CombinatorialVariation)
     return dimension(i.instance)
+end
+
+"""
+    formulation(i::CombinatorialInstance, f::CombinatorialLinearFormulation)
+
+Returns the LP formulation `f` for this combinatorial instance. It returns 
+two arguments: 
+
+- the JuMP model
+- the decision variables
+
+For `CombinatorialVariation`, it also returns a third argument: the 
+supplementary constraint encoded by the `CombinatorialVariation` on top fo the 
+`CombinatorialInstance`.
+"""
+function formulation(::CombinatorialInstance, ::CombinatorialLinearFormulation)
 end

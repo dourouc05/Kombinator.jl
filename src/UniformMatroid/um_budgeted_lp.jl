@@ -1,19 +1,11 @@
-function _budgeted_um_lp_model(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int}, solver)
-    dim = dimension(i)
-
-    model = Model(solver)
-    @variable(model, x[1:dim], Bin)
-    @objective(model, Max, sum(x[j] * i.instance.values[j] for j in 1:dim))
-    @constraint(model, sum(x) <= i.instance.m)
-    @constraint(model, c, sum(x[j] * i.weights[j] for j in 1:dim) >= 0)
-
-    set_silent(model)
-
-    return model, x, c
+function formulation(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int}, ::DefaultLinearFormulation; solver=nothing)
+    m, x = formulation(i.instance, DefaultLinearFormulation(), solver=solver)
+    @constraint(m, c, sum(x[j] * i.weights[j] for j in 1:dimension(i)) >= 0)
+    return m, x, c
 end
 
 function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int}, ::DefaultLinearFormulation; solver=nothing)
-    model, x, c = _budgeted_um_lp_model(i, solver)
+    model, x, c = formulation(i, DefaultLinearFormulation(), solver=solver)
 
     budgets = if i.compute_all_values == false
             [i.min_budget]
