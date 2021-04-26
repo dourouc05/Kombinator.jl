@@ -11,7 +11,7 @@ It can be formalised as follows:
 ``\\mathrm{s.t.} \\sum_i x_i \\leq m, \\quad x \\in \\{0, 1\\}^d``
 """
 struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: CombinatorialInstance
-    values::Vector{T}
+    values::Vector{T} # TODO: rename as rewards for more consistency.
     m::Int
     objective::O
 

@@ -1,8 +1,8 @@
-function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::DynamicProgramming) where T 
+function solve(i::MinimumBudget{ElementaryPathInstance{T, Maximise}, T}, ::DynamicProgramming) where T 
     return solve(i, BellmanFordAlgorithm())
 end
 
-function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::BellmanFordAlgorithm) where T
+function solve(i::MinimumBudget{ElementaryPathInstance{T, Maximise}, T}, ::BellmanFordAlgorithm) where T
     V = Dict{Tuple{T, Int}, Float64}()
     S = Dict{Tuple{T, Int}, Vector{Edge{T}}}()
 
@@ -11,7 +11,7 @@ function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::BellmanFordAlgo
     β0 = solve(i.instance, BellmanFordAlgorithm())
     for v in vertices(i.instance.graph)
         S[v, 0] = β0.solutions[v]
-        V[v, 0] = length(S[v, 0]) == 0 ? 0 : sum(i.instance.costs[e] for e in S[v, 0])
+        V[v, 0] = length(S[v, 0]) == 0 ? 0 : sum(i.instance.rewards[e] for e in S[v, 0])
     end
 
     for β in 1:i.min_budget
@@ -55,10 +55,10 @@ function solve(i::MinimumBudget{ElementaryPathInstance{T}, T}, ::BellmanFordAlgo
                     end
 
                     # Compute the maximum: is passing through w advantageous?
-                    if V[w, remaining_budget] + i.instance.costs[Edge(w, v)] > V[v, β] && used_budget >= remaining_budget
+                    if V[w, remaining_budget] + i.instance.rewards[Edge(w, v)] > V[v, β] && used_budget >= remaining_budget
                         changed = true
 
-                        V[v, β] = V[w, remaining_budget] + i.instance.costs[Edge(w, v)]
+                        V[v, β] = V[w, remaining_budget] + i.instance.rewards[Edge(w, v)]
                         S[v, β] = vcat(S[w, remaining_budget], Edge(w, v))
                     end
                 end

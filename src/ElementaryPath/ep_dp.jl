@@ -20,7 +20,7 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
 
         for e in edges(i.graph)
             u, v = src(e), dst(e)
-            w = i.costs[Edge(u, v)]
+            w = i.rewards[Edge(u, v)]
 
             # If using the solution to the currently explored subproblem would
             # lead to a cycle, skip it.
@@ -45,7 +45,7 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
     # Checking existence of negative-cost cycle.
     for e in edges(i.graph)
         u, v = src(e), dst(e)
-        w = i.costs[Edge(u, v)]
+        w = i.rewards[Edge(u, v)]
 
         if V[u] + w > V[v]
             @warn("The graph contains a positive-cost cycle around edge $(u) -> $(v).")
