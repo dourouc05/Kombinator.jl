@@ -111,37 +111,46 @@ end
         g = complete_digraph(3)
         rewards = Dict(Edge(1, 2) => 1.0, Edge(3, 1) => -1.0, Edge(3, 2) => -1.0, Edge(2, 3) => 1.0, Edge(2, 1) => -1.0, Edge(1, 3) => 0.0)
         weights = Dict(Edge(1, 2) => 0, Edge(3, 1) => 0, Edge(3, 2) => 0, Edge(2, 3) => 0, Edge(2, 1) => 0, Edge(1, 3) => 2)
-        i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 2)
+        i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 2, compute_all_values=true)
         
         warn_msg = "The graph contains a positive-cost cycle around edge 3 -> 1."
         d = @test_logs (:warn, warn_msg) solve(i, BellmanFordAlgorithm())
         l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+        
+        @test d.path == [Edge(1, 3)]
 
-        for s in [d, l]
-            if s !== false
-                @test s.path == [Edge(1, 3)]
+        @test d.solutions[1, 0] == []
+        @test d.solutions[2, 0] == [Edge(1, 2)]
+        @test d.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
+        @test d.states[1, 0] == 0.0
+        @test d.states[2, 0] == 1.0
+        @test d.states[3, 0] == 2.0
 
-                @test s.solutions[1, 0] == []
-                @test s.solutions[2, 0] == [Edge(1, 2)]
-                @test s.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
-                @test s.states[1, 0] == 0.0
-                @test s.states[2, 0] == 1.0
-                @test s.states[3, 0] == 2.0
+        @test d.solutions[1, 1] == []
+        @test d.solutions[2, 1] == [Edge(1, 3), Edge(3, 2)]
+        @test d.solutions[3, 1] == [Edge(1, 3)]
+        @test d.states[1, 1] == 0.0
+        @test d.states[2, 1] == -1.0
+        @test d.states[3, 1] == 0.0
 
-                @test s.solutions[1, 1] == []
-                @test s.solutions[2, 1] == [Edge(1, 3), Edge(3, 2)]
-                @test s.solutions[3, 1] == [Edge(1, 3)]
-                @test s.states[1, 1] == 0.0
-                @test s.states[2, 1] == -1.0
-                @test s.states[3, 1] == 0.0
+        @test d.solutions[1, 2] == []
+        @test d.solutions[2, 2] == [Edge(1, 3), Edge(3, 2)]
+        @test d.solutions[3, 2] == [Edge(1, 3)]
+        @test d.states[1, 2] == 0.0
+        @test d.states[2, 2] == -1.0
+        @test d.states[3, 2] == 0.0
 
-                @test s.solutions[1, 2] == []
-                @test s.solutions[2, 2] == [Edge(1, 3), Edge(3, 2)]
-                @test s.solutions[3, 2] == [Edge(1, 3)]
-                @test s.states[1, 2] == 0.0
-                @test s.states[2, 2] == -1.0
-                @test s.states[3, 2] == 0.0
-            end
+        if l !== false
+            @show collect(keys(l.solutions))
+            @show collect(keys(l.states))
+
+            # All solutions have the same destination! Only paths from 1 to 3, unlike DP.
+            @test l.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
+            @test l.solutions[3, 1] == [Edge(1, 3)]
+            @test l.solutions[3, 2] == [Edge(1, 3)]
+            @test l.states[3, 0] == 2.0
+            @test l.states[3, 1] == 0.0
+            @test l.states[3, 2] == 0.0
         end
     end
 end

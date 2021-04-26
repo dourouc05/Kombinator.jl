@@ -21,13 +21,13 @@ function solve(i::MinimumBudget{ElementaryPathInstance{Int, Maximise}, Int}, ::D
         optimize!(model)
 
         if termination_status(model) == MOI.OPTIMAL
-            V[dimension(i) + 1, budget + 1] = objective_value(model)
-            S[dimension(i) + 1, budget + 1] = _extract_lp_solution(i, x)
+            V[i.instance.dst, budget] = objective_value(model)
+            S[i.instance.dst, budget] = _extract_lp_solution(i, x)
         else
-            V[dimension(i) + 1, budget + 1] = -Inf
-            S[dimension(i) + 1, budget + 1] = Int[-1]
+            V[i.instance.dst, budget] = -Inf
+            S[i.instance.dst, budget] = Int[-1]
         end
     end
 
-    return BudgetedElementaryPathSolution(i, S[dimension(i) + 1, i.min_budget + 1], V, S)
+    return BudgetedElementaryPathSolution(i, S[i.instance.dst, i.min_budget], V, S)
 end
