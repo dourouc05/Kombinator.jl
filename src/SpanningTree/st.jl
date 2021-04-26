@@ -8,6 +8,10 @@ struct SpanningTreeInstance{T <: Real, O <: CombinatorialObjective} <: Combinato
     end
 end
 
+function dimension(i::SpanningTreeInstance{T}) where T
+    return ne(i.graph)
+end
+
 function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where T
     if e in keys(i.rewards)
         return i.rewards[e]

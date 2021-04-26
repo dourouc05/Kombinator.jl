@@ -113,6 +113,15 @@ end
         @test length(s) == 2
         @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
         @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
+
+        # LP formulation, mostly like the multiplicate approximation algorithm.
+        sol = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
+        @test sol !== nothing
+        @test sol.instance == i
+        s = sol.tree
+        @test length(s) == 2
+        @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
+        @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
     end
 
     @testset "Conformity" begin

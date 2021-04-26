@@ -71,15 +71,5 @@ end
 function solve(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearFormulation; solver=nothing)
     m, x = formulation(i, DefaultLinearFormulation(), solver=solver)
     optimize!(m)
-
-    solution = Edge{Int}[]
-    for e in edges(i.graph)
-        if JuMP.value(x[e]) >= 0.5
-            push!(solution, e)
-        elseif JuMP.value(x[reverse(e)]) >= 0.5
-            push!(solution, reverse(e))
-        end
-    end
-
-    return SpanningTreeSolution(i, solution)
+    return SpanningTreeSolution(i, _extract_lp_solution(i, x))
 end
