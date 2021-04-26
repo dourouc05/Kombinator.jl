@@ -141,9 +141,6 @@ end
         @test d.states[3, 2] == 0.0
 
         if l !== false
-            @show collect(keys(l.solutions))
-            @show collect(keys(l.states))
-
             # All solutions have the same destination! Only paths from 1 to 3, unlike DP.
             @test l.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
             @test l.solutions[3, 1] == [Edge(1, 3)]
