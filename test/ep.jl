@@ -16,11 +16,13 @@
         i = ElementaryPathInstance(g, costs, 1, 3)
 
         d = solve(i, BellmanFordAlgorithm())
-        l = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
 
         for s in [d, l]
-            @test s.instance == i
-            @test s.path == [Edge(1, 2), Edge(2, 3)]
+            if s !== false
+                @test s.instance == i
+                @test s.path == [Edge(1, 2), Edge(2, 3)]
+            end
         end
 
         add_edge!(g, 1, 3)
@@ -28,11 +30,13 @@
         i = ElementaryPathInstance(g, costs, 1, 3)
 
         d = solve(i, BellmanFordAlgorithm())
-        l = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
 
         for s in [d, l]
-            @test s.instance == i
-            @test s.path == [Edge(1, 3)]
+            if s !== false
+                @test s.instance == i
+                @test s.path == [Edge(1, 3)]
+            end
         end
     end
 end
@@ -83,11 +87,13 @@ end
         i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 4)
         
         d = solve(i, BellmanFordAlgorithm())
-        l = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
 
         for s in [d, l]
-            @test s.instance == i
-            @test s.path == [Edge(1, 3)]
+            if s !== false
+                @test s.instance == i
+                @test s.path == [Edge(1, 3)]
+            end
         end
 
         warn_msg = "The requested maximum budget 5 is higher than the instance's minimum budget 4. Therefore, some values have not been computed and are unavailable."
@@ -109,29 +115,33 @@ end
         
         warn_msg = "The graph contains a positive-cost cycle around edge 3 -> 1."
         d = @test_logs (:warn, warn_msg) solve(i, BellmanFordAlgorithm())
-        l = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+        l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
 
-        @test d.path == [Edge(1, 3)]
+        for s in [d, l]
+            if s !== false
+                @test s.path == [Edge(1, 3)]
 
-        @test d.solutions[1, 0] == []
-        @test d.solutions[2, 0] == [Edge(1, 2)]
-        @test d.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
-        @test d.states[1, 0] == 0.0
-        @test d.states[2, 0] == 1.0
-        @test d.states[3, 0] == 2.0
+                @test s.solutions[1, 0] == []
+                @test s.solutions[2, 0] == [Edge(1, 2)]
+                @test s.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
+                @test s.states[1, 0] == 0.0
+                @test s.states[2, 0] == 1.0
+                @test s.states[3, 0] == 2.0
 
-        @test d.solutions[1, 1] == []
-        @test d.solutions[2, 1] == [Edge(1, 3), Edge(3, 2)]
-        @test d.solutions[3, 1] == [Edge(1, 3)]
-        @test d.states[1, 1] == 0.0
-        @test d.states[2, 1] == -1.0
-        @test d.states[3, 1] == 0.0
+                @test s.solutions[1, 1] == []
+                @test s.solutions[2, 1] == [Edge(1, 3), Edge(3, 2)]
+                @test s.solutions[3, 1] == [Edge(1, 3)]
+                @test s.states[1, 1] == 0.0
+                @test s.states[2, 1] == -1.0
+                @test s.states[3, 1] == 0.0
 
-        @test d.solutions[1, 2] == []
-        @test d.solutions[2, 2] == [Edge(1, 3), Edge(3, 2)]
-        @test d.solutions[3, 2] == [Edge(1, 3)]
-        @test d.states[1, 2] == 0.0
-        @test d.states[2, 2] == -1.0
-        @test d.states[3, 2] == 0.0
+                @test s.solutions[1, 2] == []
+                @test s.solutions[2, 2] == [Edge(1, 3), Edge(3, 2)]
+                @test s.solutions[3, 2] == [Edge(1, 3)]
+                @test s.states[1, 2] == 0.0
+                @test s.states[2, 2] == -1.0
+                @test s.states[3, 2] == 0.0
+            end
+        end
     end
 end
