@@ -81,12 +81,6 @@ function edge_would_create_loop(ld::LoopDetector, s::Int, t::Int)
     return ld.node_done[s] == ld.node_done[t]
 end
 
-function reset!(ld::LoopDetector)
-    ld.node_done .= -1
-    ld.next_value = 1
-    return
-end
-
 function Base.copy!(dst::LoopDetector, src::LoopDetector)
     dst.node_done .= src.node_done
     dst.next_value = src.next_value
