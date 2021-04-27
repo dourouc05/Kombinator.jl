@@ -3,17 +3,25 @@
         @testset "Positive-reward cycle" begin
             g = path_digraph(3)
             add_edge!(g, 2, 1)
-            costs = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 3.0, Edge(2, 1) => 25.0)
+            rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 3.0, Edge(2, 1) => 25.0)
 
-            i = ElementaryPathInstance(g, costs, 1, 3)
+            i = ElementaryPathInstance(g, rewards, 1, 3)
             @test_logs (:warn, "The graph contains a positive-cost cycle around edge 2 -> 1.") solve(i, BellmanFordAlgorithm())
+
+            i = ElementaryPathInstance(g, rewards, 1, 3)
+            i2 = copy(i)
+            @test i.graph == i2.graph
+            @test i.rewards == i2.rewards
+            @test i.src == i2.src
+            @test i.dst == i2.dst
+            @test i.objective == i2.objective
         end
     end
 
     @testset "Basic" begin
         g = path_digraph(3)
-        costs = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
-        i = ElementaryPathInstance(g, costs, 1, 3)
+        rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
+        i = ElementaryPathInstance(g, rewards, 1, 3)
 
         d = solve(i, BellmanFordAlgorithm())
         l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
@@ -26,8 +34,8 @@
         end
 
         add_edge!(g, 1, 3)
-        costs[Edge(1, 3)] = 3.0
-        i = ElementaryPathInstance(g, costs, 1, 3)
+        rewards[Edge(1, 3)] = 3.0
+        i = ElementaryPathInstance(g, rewards, 1, 3)
 
         d = solve(i, BellmanFordAlgorithm())
         l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.

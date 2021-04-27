@@ -7,6 +7,12 @@
         @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, Edge{Int}[]) == 0
         @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, [Edge(1, 2)]) == 1.0
         @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, [Edge(1, 2), Edge(1, 3)]) == 1.5
+
+        i = SpanningTreeInstance(graph, rewards)
+        i2 = copy(i)
+        @test i.graph == i2.graph
+        @test i.rewards == i2.rewards
+        @test i.objective == i2.objective
     end
     
     @testset "Helpers (budgeted)" begin

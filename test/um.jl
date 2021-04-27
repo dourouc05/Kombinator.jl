@@ -2,6 +2,12 @@
     @testset "Interface" begin
         @test_throws ErrorException UniformMatroidInstance(Float64[5, 4, 3], -1)
         @test_throws ErrorException UniformMatroidInstance(Float64[5, 4, 3], 0)
+
+        i = UniformMatroidInstance(Float64[5, 4, 3], 1)
+        i2 = copy(i)
+        @test i.m == i2.m
+        @test i.rewards == i2.rewards
+        @test i.objective == i2.objective
     end
 
     @testset "Basic" begin
