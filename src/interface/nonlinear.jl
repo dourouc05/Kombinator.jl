@@ -26,8 +26,8 @@ precision at which the problem should be solved.
 """
 struct NonlinearCombinatorialInstance <: CombinatorialInstance
     combinatorial_structure::CombinatorialInstance
-    linear_coefficients::Vector{Float64}
-    nonlinear_coefficients::Vector{Float64}
+    linear_coefficients::Union{Vector{Float64}, Dict{Any, Float64}}
+    nonlinear_coefficients::Union{Vector{Float64}, Dict{Any, Float64}}
     nonlinear_function::NonlinearFunction
     ε::Float64
 end

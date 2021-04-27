@@ -3,12 +3,67 @@ struct ExactNonlinearSolver <: NonlinearCombinatorialAlgorithm
 end
 
 function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver)
-    li = i.combinatorial_structure()
     return solve(i, algo, Val(i.nonlinear_function))
 end
 
 function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{SquareRoot})
+    # This formulation is valid only for maximising (concave objective 
+    # function). Otherwise, think about general MINLP solvers...
+    @assert i.instance.objective == Maximise
+
+    # Base formulation for the combinatorial problem.
+    m, x = formulation(i.combinatorial_structure, solver=algo.solver)
+
+    # Formulation for the nonlinear term. 
+    dot_product = @variable(m, lower_bound=0.0) # b^T x
+    nonlinear_term = @variable(m, lower_bound=0.0) # t
+
+    @constraint(m, eq, dot_product == sum(i.nonlinear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)))
+    @constraint(m, cone, [1 + dot_product, 1 - dot_product, 2 * nonlinear_term] in SecondOrderCone())
+
+    # New objective.
+    @objective(m, Max, sum(i.linear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)) + nonlinear_term)
+
+    # Solve the new formulation.
+    set_silent(m)
+    t0 = time_ns()
+    optimize!(m)
+    t1 = time_ns()
+
+    if termination_status(m) != MOI.OPTIMAL
+        error("The model was not solved correctly.")
+    end
+
+    # Retrieve the solution.
+    # TODO: need a generic way of building solutions! 
 end
 
 function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{Square})
+    # This formulation is valid only for minimising (convex objective 
+    # function). Otherwise, think about general MINLP solvers...
+    @assert i.instance.objective == Minimise
+
+    # Base formulation for the combinatorial problem.
+    m, x = formulation(i.combinatorial_structure, solver=algo.solver)
+
+    # Formulation for the nonlinear term. Quite easy, JuMP supports quadratic 
+    # objective functions.
+    dot_product = @variable(m, lower_bound=0.0) # b^T x
+    @constraint(m, eq, dot_product == sum(i.nonlinear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)))
+
+    # New objective.
+    @objective(m, Max, sum(i.linear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)) + nonlinear_term^2)
+
+    # Solve the new formulation.
+    set_silent(m)
+    t0 = time_ns()
+    optimize!(m)
+    t1 = time_ns()
+
+    if termination_status(m) != MOI.OPTIMAL
+        error("The model was not solved correctly.")
+    end
+
+    # Retrieve the solution.
+    # TODO: need a generic way of building solutions! 
 end
