@@ -8,8 +8,12 @@ struct SpanningTreeInstance{T <: Real, O <: CombinatorialObjective} <: Combinato
     end
 end
 
-function dimension(i::SpanningTreeInstance{T}) where T
+function dimension(i::SpanningTreeInstance{T, O}) where {T, O}
     return ne(i.graph)
+end
+
+function copy(i::SpanningTreeInstance{T, O}; graph::AbstractGraph{T}=i.graph, rewards::Dict{Edge{T}, Float64}=i.rewards, objective::CombinatorialObjective=i.objective) where {T, O <: CombinatorialObjective}
+    return SpanningTreeInstance(graph, rewards, objective)
 end
 
 function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where T

@@ -4,6 +4,7 @@ using Kombinator
 
 using JuMP
 
+import Base: copy
 import Kombinator: solve, dimension, value, values
 
 export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution, items, items_all_budgets

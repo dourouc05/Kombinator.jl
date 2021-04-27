@@ -8,7 +8,7 @@ function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgrammin
     S[1, dimension(i)] = Int[]
 
     for δ in (dimension(i) - 1):-1:1
-        v, x = findmax(i.values[δ + 1:dimension(i)])
+        v, x = findmax(i.rewards[δ + 1:dimension(i)])
         V[1, δ] = v
         S[1, δ] = [x]
     end
@@ -22,7 +22,7 @@ function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgrammin
     for µ in 2:i.m
         for δ in (dimension(i) - 1):-1:0
             obj_idx = δ + 1
-            take_δ = i.values[obj_idx] + V[µ - 1, δ + 1]
+            take_δ = i.rewards[obj_idx] + V[µ - 1, δ + 1]
             dont_take_δ = V[µ, δ + 1]
 
             if take_δ > dont_take_δ

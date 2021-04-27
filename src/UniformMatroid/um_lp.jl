@@ -3,7 +3,7 @@ function formulation(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLine
 
     model = Model(solver)
     x = @variable(model, [1:dim], Bin)
-    @objective(model, Max, sum(x[j] * i.values[j] for j in 1:dim))
+    @objective(model, Max, sum(x[j] * i.rewards[j] for j in 1:dim))
     @constraint(model, sum(x) <= i.m)
 
     set_silent(model)

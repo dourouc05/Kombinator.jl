@@ -24,6 +24,10 @@ end
 
 dimension(i::ElementaryPathInstance{T, O}) where {T, O} = ne(i.graph)
 
+function copy(i::ElementaryPathInstance{T, O}; graph::AbstractGraph{T}=i.graph, rewards::Dict{Edge{T}, Float64}=i.rewards, src::T=i.src, dst::T=i.dst, objective::CombinatorialObjective=i.objective) where {T, O <: CombinatorialObjective}
+    return ElementaryPathInstance(graph, rewards, src, dst, objective)
+end
+
 struct ElementaryPathSolution{T, O <: CombinatorialObjective} <: CombinatorialInstance
     instance::ElementaryPathInstance{T, O}
     path::Vector{Edge{T}}

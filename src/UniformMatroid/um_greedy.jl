@@ -3,6 +3,6 @@ function solve(instance::UniformMatroidInstance{Float64, Maximise}, ::GreedyAlgo
     # optimum solution.
     # Implementation: no need for sorting, partialsortperm returns the 
     # largest items.
-    items = collect(partialsortperm(instance.values, 1:instance.m, rev=true))
+    items = collect(partialsortperm(instance.rewards, 1:instance.m, rev=true))
     return UniformMatroidSolution(instance, items)
 end

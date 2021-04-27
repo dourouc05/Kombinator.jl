@@ -6,6 +6,7 @@ using DataStructures
 using JuMP
 using LightGraphs
 
+import Base: copy
 import Kombinator: solve, dimension, approximation_ratio, approximation_term
 
 export SpanningTreeInstance, SpanningTreeSolution, BudgetedSpanningTreeSolution, SimpleBudgetedSpanningTreeSolution, BudgetedSpanningTreeLagrangianSolution

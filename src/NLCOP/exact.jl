@@ -3,7 +3,7 @@ struct ExactNonlinearSolver <: NonlinearCombinatorialAlgorithm
 end
 
 function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver)
-    # TODO: better handling for nonlinear functions. Based on Convex.jl?
+    li = i.combinatorial_structure()
     return solve(i, algo, Val(i.nonlinear_function))
 end
 

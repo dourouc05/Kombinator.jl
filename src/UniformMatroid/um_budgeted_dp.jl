@@ -15,8 +15,8 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
             # i.e., there are d - δ items to consider.
             m_ = min(dimension(i) - δ, µ)
 
-            items = collect(partialsortperm(i.instance.values[(δ + 1):dimension(i)], 1:m_, rev=true)) .+ δ
-            V[µ, δ + 1, 0 + 1] = sum(i.instance.values[o] for o in items)
+            items = collect(partialsortperm(i.instance.rewards[(δ + 1):dimension(i)], 1:m_, rev=true)) .+ δ
+            V[µ, δ + 1, 0 + 1] = sum(i.instance.rewards[o] for o in items)
             S[µ, δ, 0] = items
         end
     end
@@ -52,7 +52,7 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
             end
 
             # Take the best one available object.
-            v, x = findmax(collect(i.instance.values[t] for t in all_objects))
+            v, x = findmax(collect(i.instance.rewards[t] for t in all_objects))
             x = all_objects[x]
 
             V[1, δ + 1, β + 1] = v
@@ -65,7 +65,7 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         for µ in 2:i.instance.m
             for δ in (dimension(i) - 1):-1:0
                 remaining_budget_with_δ = max(0, β - weights(i)[δ + 1])
-                take_δ = i.instance.values[δ + 1] + V[µ - 1, δ + 1 + 1, remaining_budget_with_δ + 1]
+                take_δ = i.instance.rewards[δ + 1] + V[µ - 1, δ + 1 + 1, remaining_budget_with_δ + 1]
                 dont_take_δ = V[µ, δ + 1 + 1, β + 1]
 
                 both_subproblems_infeasible = -Inf == take_δ && -Inf == dont_take_δ

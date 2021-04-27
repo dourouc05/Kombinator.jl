@@ -7,15 +7,15 @@ sets are the sets containing at most `m` elements.
 
 It can be formalised as follows:
 
-``\\max \\sum_i \\mathrm{values}_i x_i``
+``\\max \\sum_i \\mathrm{rewards}_i x_i``
 ``\\mathrm{s.t.} \\sum_i x_i \\leq m, \\quad x \\in \\{0, 1\\}^d``
 """
 struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: CombinatorialInstance
-    values::Vector{T} # TODO: rename as rewards for more consistency.
+    rewards::Vector{T} # TODO: rename as rewards for more consistency.
     m::Int
     objective::O
 
-    function UniformMatroidInstance(values::Vector{T}, m::Int, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
+    function UniformMatroidInstance(rewards::Vector{T}, m::Int, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
         # Error checking.
         if m < 0
           error("m is less than zero: there is no solution.")
@@ -26,11 +26,15 @@ struct UniformMatroidInstance{T <: Real, O <: CombinatorialObjective} <: Combina
         end
 
         # Return a new instance.
-        return new{T, O}(values, m, objective)
+        return new{T, O}(rewards, m, objective)
     end
 end
 
-dimension(i::UniformMatroidInstance) = length(i.values)
+dimension(i::UniformMatroidInstance) = length(i.rewards)
+
+function copy(i::UniformMatroidInstance{T, O}; rewards::Vector{T}=i.rewards, m::Int=i.m, objective::CombinatorialObjective=i.objective) where {T <: Real, O <: CombinatorialObjective}
+    return UniformMatroidInstance(rewards, m, objective)
+end
 
 # Solution.
 
@@ -40,7 +44,7 @@ struct UniformMatroidSolution{T <: Real} <: CombinatorialSolution
 end
 
 function value(s::UniformMatroidSolution{T}) where {T <: Real}
-    return sum(s.instance.values[i] for i in s.items)
+    return sum(s.instance.rewards[i] for i in s.items)
 end
 
 # Solution for min-budgeted problems.
@@ -53,7 +57,7 @@ struct MinBudgetedUniformMatroidSolution{T <: Real, U <: Real} <: CombinatorialS
 end
 
 function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
-    return sum(s.instance.instance.values[i] for i in s.items)
+    return sum(s.instance.instance.rewards[i] for i in s.items)
 end
 
 function items(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T, U}
@@ -74,5 +78,5 @@ function value(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T
     if -1 in its
         return -Inf
     end
-    return sum(s.instance.instance.values[i] for i in its)
+    return sum(s.instance.instance.rewards[i] for i in its)
 end
