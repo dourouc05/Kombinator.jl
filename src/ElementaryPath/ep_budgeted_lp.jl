@@ -25,7 +25,7 @@ function solve(i::MinimumBudget{ElementaryPathInstance{Int, Maximise}, Int}, ::D
             S[i.instance.dst, budget] = _extract_lp_solution(i, x)
         else
             V[i.instance.dst, budget] = -Inf
-            S[i.instance.dst, budget] = Int[-1]
+            S[i.instance.dst, budget] = Edge{Int}[]
         end
     end
 
