@@ -114,7 +114,7 @@
             w = Int[32, 32, 32, 32, 0, 32, 32, 32, 0, 32]
             m = 3
 
-            i = MinimumBudget(UniformMatroidInstance(v, m), w, 3, compute_all_values=true)
+            i = MinimumBudget(UniformMatroidInstance(v, m), w, 320, compute_all_values=true)
             d = solve(i, DynamicProgramming())
             l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
             
@@ -138,7 +138,7 @@
             w = [16, 32, 16, 24, 16, 16, 0, 16, 0, 32]
             m = 3
 
-            i = MinimumBudget(UniformMatroidInstance(v, m), w, compute_all_values=true)
+            i = MinimumBudget(UniformMatroidInstance(v, m), w, 320, compute_all_values=true)
             d = solve(i, DynamicProgramming())
             l = ! is_travis && solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
 
