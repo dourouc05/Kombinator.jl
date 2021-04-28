@@ -23,10 +23,25 @@ function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where T
     return i.rewards[reverse(e)]
 end
 
+# Solution.
+
 struct SpanningTreeSolution{T, O} <: CombinatorialSolution
     instance::SpanningTreeInstance{T, O}
     tree::Vector{Edge{T}}
 end
+
+function create_solution(i::SpanningTreeSolution{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
+    tree_edges = Edge{T}[]
+    for (k, v) in tree
+        if v >= 0.5
+            push!(tree_edges, k)
+        end
+    end
+
+    return SpanningTreeSolution(i, tree_edges)
+end
+
+# Budgeted solution.
 
 abstract type BudgetedSpanningTreeSolution{T, U} <: CombinatorialSolution
     # instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
@@ -62,4 +77,15 @@ struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: BudgetedSpanningT
     tree::Vector{Edge{T}}
     states::Dict{Tuple{T, Int}, Float64}
     solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
+end
+
+function create_solution(i::MinimumBudget{SpanningTreeInstance{T, O}, U}, tree::Dict{Edge{T}, Float64}) where {T, O, U}
+    tree_edges = Edge{T}[]
+    for (k, v) in tree
+        if v >= 0.5
+            push!(tree_edges, k)
+        end
+    end
+
+    return SimpleBudgetedSpanningTreeSolution(i, tree_edges)
 end

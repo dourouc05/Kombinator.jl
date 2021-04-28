@@ -38,22 +38,37 @@ end
 
 # Solution.
 
-struct UniformMatroidSolution{T <: Real} <: CombinatorialSolution
-    instance::UniformMatroidInstance{T}
+struct UniformMatroidSolution{T <: Real, O <: CombinatorialObjective} <: CombinatorialSolution
+    instance::UniformMatroidInstance{T, O}
     items::Vector{Int} # Indices to the chosen items.
 end
 
-function value(s::UniformMatroidSolution{T}) where {T <: Real}
+function value(s::UniformMatroidSolution{T, O}) where {T <: Real, O}
     return sum(s.instance.rewards[i] for i in s.items)
 end
 
-# Solution for min-budgeted problems.
+function create_solution(i::UniformMatroidSolution{T, O}, item::Dict{Edge{T}, Float64}) where {T, O}
+    items_vector = Edge{T}[]
+    for (k, v) in item
+        if v >= 0.5
+            push!(items_vector, k)
+        end
+    end
+
+    return UniformMatroidSolution(i, items_vector)
+end
+
+# Budgeted solution.
 
 struct MinBudgetedUniformMatroidSolution{T <: Real, U <: Real} <: CombinatorialSolution
     instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
     items::Vector{Int} # Indices to the chosen items for the min_budget.
     state::Array{Float64, 3} # Data structure built by the dynamic-programming recursion.
     solutions::Dict{Tuple{Int, Int, Int}, Vector{Int}} # From the indices of state to the corresponding solution.
+end
+
+function MinBudgetedUniformMatroidSolution(instance::MinimumBudget{UniformMatroidInstance{T, O}, U}, items::Vector{Int}) where {T, O <: CombinatorialObjective, U}
+    return MinBudgetedUniformMatroidSolution(instance, items, zeros(0, 0, 0), Dict{Tuple{Int, Int, Int}, Vector{Int}}())
 end
 
 function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
@@ -79,4 +94,15 @@ function value(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T
         return -Inf
     end
     return sum(s.instance.instance.rewards[i] for i in its)
+end
+
+function create_solution(i::UniformMatroidSolution{T, O}, item::Dict{Edge{T}, Float64}) where {T, O}
+    items_vector = Int[]
+    for (k, v) in item
+        if v >= 0.5
+            push!(items_vector, k)
+        end
+    end
+
+    return MinBudgetedUniformMatroidSolution(i, items_vector)
 end

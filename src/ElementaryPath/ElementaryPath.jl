@@ -8,7 +8,7 @@ using LightGraphs
 import Base: copy
 import Kombinator: solve, dimension
 
-export ElementaryPathInstance, ElementaryPathSolution, BudgetedElementaryPathSolution, paths_all_budgets, paths_all_budgets_as_tuples
+export ElementaryPathInstance, ElementaryPathSolution, BudgetedElementaryPathSolution, paths_all_budgets, paths_all_budgets_as_tuples, create_solution
 
 include("ep.jl")
 
