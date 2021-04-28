@@ -65,5 +65,6 @@ function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::
     end
 
     # Retrieve the solution.
-    # TODO: need a generic way of building solutions! 
+    dict_sol = Dict(k => x[k] for k in eachindex(i.linear_coefficients))
+    return create_solution(i, dict_sol)
 end
