@@ -2,27 +2,27 @@ struct ExactNonlinearSolver <: NonlinearCombinatorialAlgorithm
     solver # MINLP solver with support for the nonlinear function.
 end
 
-function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver)
-    return solve(i, algo, Val(i.nonlinear_function))
+function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver)
+    return solve(nli, algo, Val(nli.nonlinear_function))
 end
 
-function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{SquareRoot})
+function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{SquareRoot})
     # This formulation is valid only for maximising (concave objective 
     # function). Otherwise, think about general MINLP solvers...
-    @assert i.instance.objective == Maximise
+    @assert nli.combinatorial_structure.objective == Maximise()
 
     # Base formulation for the combinatorial problem.
-    m, x = formulation(i.combinatorial_structure, solver=algo.solver)
+    m, x = formulation(nli.combinatorial_structure, nli.formulation, solver=algo.solver)
 
     # Formulation for the nonlinear term. 
     dot_product = @variable(m, lower_bound=0.0) # b^T x
     nonlinear_term = @variable(m, lower_bound=0.0) # t
 
-    @constraint(m, eq, dot_product == sum(i.nonlinear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)))
+    @constraint(m, eq, dot_product == sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients)))
     @constraint(m, cone, [1 + dot_product, 1 - dot_product, 2 * nonlinear_term] in SecondOrderCone())
 
     # New objective.
-    @objective(m, Max, sum(i.linear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)) + nonlinear_term)
+    @objective(m, Max, sum(nli.linear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients)) + nonlinear_term)
 
     # Solve the new formulation.
     set_silent(m)
@@ -35,24 +35,25 @@ function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::
     end
 
     # Retrieve the solution.
-    # TODO: need a generic way of building solutions! 
+    dict_sol = Dict(k => JuMP.value(x[k]) for k in eachindex(nli.linear_coefficients))
+    return create_solution(nli.combinatorial_structure, dict_sol)
 end
 
-function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{Square})
+function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{Square})
     # This formulation is valid only for minimising (convex objective 
     # function). Otherwise, think about general MINLP solvers...
-    @assert i.instance.objective == Minimise
+    @assert nli.combinatorial_structure.objective == Minimise()
 
     # Base formulation for the combinatorial problem.
-    m, x = formulation(i.combinatorial_structure, solver=algo.solver)
+    m, x = formulation(nli.combinatorial_structure, solver=algo.solver)
 
     # Formulation for the nonlinear term. Quite easy, JuMP supports quadratic 
     # objective functions.
     dot_product = @variable(m, lower_bound=0.0) # b^T x
-    @constraint(m, eq, dot_product == sum(i.nonlinear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)))
+    @constraint(m, eq, dot_product == sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients)))
 
     # New objective.
-    @objective(m, Max, sum(i.linear_coefficients[i] * x[i] for i in eachindex(i.nonlinear_coefficients)) + nonlinear_term^2)
+    @objective(m, Max, sum(nli.linear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients)) + nonlinear_term^2)
 
     # Solve the new formulation.
     set_silent(m)
@@ -65,6 +66,6 @@ function solve(i::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::
     end
 
     # Retrieve the solution.
-    dict_sol = Dict(k => x[k] for k in eachindex(i.linear_coefficients))
-    return create_solution(i, dict_sol)
+    dict_sol = Dict(k => JuMP.value(x[k]) for k in eachindex(nli.linear_coefficients))
+    return create_solution(nli.combinatorial_structure, dict_sol)
 end

@@ -83,8 +83,7 @@ Returns the dimension of this instance.
 
 All instances should implement this method.
 """
-function dimension(::CombinatorialInstance)
-end
+function dimension end # i::CombinatorialInstance
 
 function dimension(i::CombinatorialVariation)
     return dimension(i.instance)
@@ -103,8 +102,7 @@ For `CombinatorialVariation`, it also returns a third argument: the
 supplementary constraint encoded by the `CombinatorialVariation` on top fo the 
 `CombinatorialInstance`.
 """
-function formulation(::CombinatorialInstance, ::CombinatorialLinearFormulation)
-end
+function formulation end # i::CombinatorialInstance, f::CombinatorialLinearFormulation; solver=nothing
 
 """
     create_solution(::CombinatorialInstance, ::Dict{K, Float64}) where {K}
@@ -122,5 +120,4 @@ variables, with associated values of 0 (not in the solution) or 1
 two equivalent dictionaries that can be passed: either 
 `Dict(Edge(1, 2) => 1.0)` or `Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.0)`.
 """
-function create_solution(::CombinatorialInstance, ::Dict{K, Float64}) where {K}
-end
+function create_solution end # i::CombinatorialInstance, vals::Dict{K, Float64}

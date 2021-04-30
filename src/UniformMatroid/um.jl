@@ -47,7 +47,7 @@ function value(s::UniformMatroidSolution{T, O}) where {T <: Real, O}
     return sum(s.instance.rewards[i] for i in s.items)
 end
 
-function create_solution(i::UniformMatroidSolution{T, O}, item::Dict{Int, Float64}) where {T, O}
+function create_solution(i::UniformMatroidInstance{T, O}, item::Dict{Int, Float64}) where {T <: Real, O <: CombinatorialObjective}
     items_vector = Int[]
     for (k, v) in item
         if v >= 0.5

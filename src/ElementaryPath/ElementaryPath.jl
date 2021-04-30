@@ -6,9 +6,9 @@ using JuMP
 using LightGraphs
 
 import Base: copy
-import Kombinator: solve, dimension
+import Kombinator: solve, dimension, formulation, create_solution
 
-export ElementaryPathInstance, ElementaryPathSolution, BudgetedElementaryPathSolution, paths_all_budgets, paths_all_budgets_as_tuples, create_solution
+export ElementaryPathInstance, ElementaryPathSolution, BudgetedElementaryPathSolution, paths_all_budgets, paths_all_budgets_as_tuples
 
 include("ep.jl")
 

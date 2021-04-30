@@ -30,7 +30,7 @@ struct SpanningTreeSolution{T, O} <: CombinatorialSolution
     tree::Vector{Edge{T}}
 end
 
-function create_solution(i::SpanningTreeSolution{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
+function create_solution(i::SpanningTreeInstance{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
     tree_edges = Edge{T}[]
     for (k, v) in tree
         if v >= 0.5

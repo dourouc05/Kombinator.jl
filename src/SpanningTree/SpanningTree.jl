@@ -7,7 +7,7 @@ using JuMP
 using LightGraphs
 
 import Base: copy
-import Kombinator: solve, dimension, approximation_ratio, approximation_term, create_solution
+import Kombinator: solve, dimension, approximation_ratio, approximation_term, formulation, create_solution
 
 export SpanningTreeInstance, SpanningTreeSolution, BudgetedSpanningTreeSolution, SimpleBudgetedSpanningTreeSolution, BudgetedSpanningTreeLagrangianSolution
 

@@ -30,6 +30,7 @@ struct NonlinearCombinatorialInstance <: CombinatorialInstance
     nonlinear_coefficients::Union{Vector{Float64}, Dict{Any, Float64}}
     nonlinear_function::NonlinearFunction
     ε::Float64
+    formulation::CombinatorialLinearFormulation
 end
 
 abstract type NonlinearCombinatorialAlgorithm <: CombinatorialAlgorithm end
