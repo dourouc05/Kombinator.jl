@@ -36,7 +36,7 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, 
 
     # Retrieve the solution.
     dict_sol = Dict(k => JuMP.value(x[k]) for k in eachindex(nli.linear_coefficients))
-    return create_solution(nli.combinatorial_structure, dict_sol)
+    return make_solution(nli.combinatorial_structure, dict_sol)
 end
 
 function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, ::Val{Square})
@@ -67,5 +67,5 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, 
 
     # Retrieve the solution.
     dict_sol = Dict(k => JuMP.value(x[k]) for k in eachindex(nli.linear_coefficients))
-    return create_solution(nli.combinatorial_structure, dict_sol)
+    return make_solution(nli.combinatorial_structure, dict_sol)
 end

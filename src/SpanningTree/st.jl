@@ -30,7 +30,7 @@ struct SpanningTreeSolution{T, O} <: CombinatorialSolution
     tree::Vector{Edge{T}}
 end
 
-function create_solution(i::SpanningTreeInstance{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
+function make_solution(i::SpanningTreeInstance{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
     tree_edges = Edge{T}[]
     for (k, v) in tree
         if v >= 0.5
@@ -79,7 +79,7 @@ struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: BudgetedSpanningT
     solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
 end
 
-function create_solution(i::MinimumBudget{SpanningTreeInstance{T, O}, U}, tree::Dict{Edge{T}, Float64}) where {T, O, U}
+function make_solution(i::MinimumBudget{SpanningTreeInstance{T, O}, U}, tree::Dict{Edge{T}, Float64}) where {T, O, U}
     tree_edges = Edge{T}[]
     for (k, v) in tree
         if v >= 0.5

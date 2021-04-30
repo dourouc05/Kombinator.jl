@@ -41,7 +41,7 @@ function ElementaryPathSolution(instance::ElementaryPathInstance{T, O}, path::Ve
     return ElementaryPathSolution(instance, path, Dict{T, Float64}(), Dict{T, Vector{Edge{T}}}())
 end
 
-function create_solution(i::ElementaryPathInstance{T, O}, path::Dict{Edge{T}, Float64}) where {T, O}
+function make_solution(i::ElementaryPathInstance{T, O}, path::Dict{Edge{T}, Float64}) where {T, O}
     path_edges = Edge{T}[]
     for (k, v) in path
         if v >= 0.5
@@ -65,7 +65,7 @@ function BudgetedElementaryPathSolution(instance::MinimumBudget{ElementaryPathIn
     return BudgetedElementaryPathSolution(instance, path, Dict{Tuple{T, Int}, Float64}(), Dict{Tuple{T, Int}, Vector{Edge{T}}}())
 end
 
-function create_solution(i::MinimumBudget{ElementaryPathInstance{T, O}, T}, path::Dict{Edge{T}, Float64}) where {T, O}
+function make_solution(i::MinimumBudget{ElementaryPathInstance{T, O}, T}, path::Dict{Edge{T}, Float64}) where {T, O}
     path_edges = Edge{T}[]
     for (k, v) in path
         if v >= 0.5

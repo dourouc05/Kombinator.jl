@@ -47,7 +47,7 @@ function value(s::UniformMatroidSolution{T, O}) where {T <: Real, O}
     return sum(s.instance.rewards[i] for i in s.items)
 end
 
-function create_solution(i::UniformMatroidInstance{T, O}, item::Dict{Int, Float64}) where {T <: Real, O <: CombinatorialObjective}
+function make_solution(i::UniformMatroidInstance{T, O}, item::Dict{Int, Float64}) where {T <: Real, O <: CombinatorialObjective}
     items_vector = Int[]
     for (k, v) in item
         if v >= 0.5
@@ -96,7 +96,7 @@ function value(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T
     return sum(s.instance.instance.rewards[i] for i in its)
 end
 
-function create_solution(i::MinimumBudget{UniformMatroidInstance{T, O}, U}, item::Dict{Int, Float64}) where {T, O, U}
+function make_solution(i::MinimumBudget{UniformMatroidInstance{T, O}, U}, item::Dict{Int, Float64}) where {T, O, U}
     items_vector = Int[]
     for (k, v) in item
         if v >= 0.5
