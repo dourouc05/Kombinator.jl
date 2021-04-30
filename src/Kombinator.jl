@@ -15,7 +15,7 @@ using LightGraphs
 using Munkres
 using Reexport
 
-import Base: values
+import Base: values, copy
 import LightGraphs: src, dst
 import JuMP: value, solve
 

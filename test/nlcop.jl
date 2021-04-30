@@ -9,7 +9,7 @@
                 # Minimum value for the sqrt(sum of the two chosen nlw): sqrt(2 + 1) ≈ 1.73.
 
                 li = UniformMatroidInstance(lw, m, Maximise())
-                nli = NonlinearCombinatorialInstance(li, lw, nlw, SquareRoot, 0.01, DefaultLinearFormulation())
+                nli = NonlinearCombinatorialInstance(li, lw, nlw, SquareRoot, 0.01, DefaultLinearFormulation(), true, DefaultLinearFormulation())
                 s = solve(nli, ExactNonlinearSolver(Gurobi.Optimizer))
 
                 @test s.instance == li

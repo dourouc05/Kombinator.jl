@@ -10,7 +10,8 @@ struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <: CombinatorialVar
     instance::CI
     weights::Union{Vector{T}, Dict{<: Any, T}}
     min_budget::T
-    compute_all_values::Bool
+    compute_all_values::Bool # Solutions will be output for all budget values, 
+    # usually with the same time complexity as a single solve.
 end
 
 function MinimumBudget(i::CI, weights::Union{Vector{T}, Dict{<: Any, T}}, min_budget::T=zero(T); compute_all_values::Bool=false) where {CI, T}
@@ -23,6 +24,10 @@ end
 
 function budget(i::MinimumBudget) # TODO: remove me?
     return i.min_budget
+end
+
+function copy(i::MinimumBudget; instance::CI=i.instance, weights::Union{Vector{T}, Dict{<: Any, T}}=i.weights, min_budget::T=i.min_budget, compute_all_values::Bool=i.compute_all_values) where {CI <: CombinatorialInstance, T <: Real}
+    return MinimumBudget(ci, weights, min_budget, compute_all_values)
 end
 
 """
@@ -50,4 +55,8 @@ end
 
 function budget(i::MaximumBudget) # TODO: remove me?
     return i.max_budget
+end
+
+function copy(i::MaximumBudget; instance::CI=i.instance, weights::Union{Vector{T}, Dict{<: Any, T}}=i.weights, max_budget::T=i.max_budget, compute_all_values::Bool=i.compute_all_values) where {CI <: CombinatorialInstance, T <: Real}
+    return MaximumBudget(ci, weights, max_budget, compute_all_values)
 end

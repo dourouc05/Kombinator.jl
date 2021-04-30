@@ -29,8 +29,11 @@ struct NonlinearCombinatorialInstance <: CombinatorialInstance
     linear_coefficients::Union{Vector{Float64}, Dict{Any, Float64}}
     nonlinear_coefficients::Union{Vector{Float64}, Dict{Any, Float64}}
     nonlinear_function::NonlinearFunction
-    ε::Float64
-    formulation::CombinatorialLinearFormulation
+    # TODO: move these parameters to the specific algorithms (they are not really defining the problem to solve).
+    ε::Float64 # Only for approximations.
+    linear_algo::CombinatorialAlgorithm # Only for approximations.
+    all_budgets_at_once::Bool # Only for approximation.
+    formulation::CombinatorialLinearFormulation # Only for exact approach. Could be merged with linear_algo, but with a loss of precision in type (potentially useful for users).
 end
 
 abstract type NonlinearCombinatorialAlgorithm <: CombinatorialAlgorithm end
