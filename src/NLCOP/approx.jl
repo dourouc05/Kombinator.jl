@@ -7,6 +7,9 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
     # to support minimisation?
     @assert nli.combinatorial_structure.objective == Maximise()
 
+    # TODO: what if the budgeted term in the objective doesn't have integer components? 
+    # TODO: what about ε?
+
     # Transform the enumerated nonlinearity as a true function.
     if nli.nonlinear_function == Square
         nl_func = (x) -> sum(nli.linear_coefficients[i] * x[i] for i in eachindex(nli.linear_coefficients)) + (sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients))) ^2
@@ -22,8 +25,8 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
 
     # Make a linear instance with the linear coefficients 
     # (`nli.combinatorial_structure` does not always have this property).
-    li = copy(nli.combinatorial_structure, values=nli.linear_coefficients)
-    bi = MinimumBudget(li, nli.nonlinear_coefficients, max_budget)
+    li = copy(nli.combinatorial_structure, rewards=nli.linear_coefficients)
+    bi = MinimumBudget(li, Int.(nli.nonlinear_coefficients), max_budget)
 
     # Compute all interesting budgeted solutions, depending on how it is requested to be done.
     solutions = Pair{Int, CombinatorialSolution}[]
@@ -45,8 +48,8 @@ end
 function _upper_bound_budget(nli::NonlinearCombinatorialInstance)
     # Make a linear instance to maximise the total weight.
     li = copy(nli.combinatorial_structure, rewards=nli.nonlinear_coefficients)
-    x = solve(li, nli.linear_algo)
-    return sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients) if x[i] > 0.5)
+    x = solve(li, nli.linear_algo).variables
+    return Int(sum(nli.nonlinear_coefficients[i] for i in eachindex(nli.nonlinear_coefficients) if i in x))
 end
 
 function _pick_best_solution(solutions::Vector{Pair{Int, CombinatorialSolution}}, nl_func::Function)

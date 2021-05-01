@@ -27,7 +27,7 @@ function budget(i::MinimumBudget) # TODO: remove me?
 end
 
 function copy(i::MinimumBudget; instance::CI=i.instance, weights::Union{Vector{T}, Dict{<: Any, T}}=i.weights, min_budget::T=i.min_budget, compute_all_values::Bool=i.compute_all_values) where {CI <: CombinatorialInstance, T <: Real}
-    return MinimumBudget(ci, weights, min_budget, compute_all_values)
+    return MinimumBudget(instance, weights, min_budget, compute_all_values)
 end
 
 """
