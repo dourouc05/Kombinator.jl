@@ -18,6 +18,9 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ExactNonlinearSolver, 
     dot_product = @variable(m, lower_bound=0.0) # b^T x
     nonlinear_term = @variable(m, lower_bound=0.0) # t
 
+    set_name(dot_product, "dot_product")
+    set_name(nonlinear_term, "nonlinear_term")
+
     @constraint(m, eq, dot_product == sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients)))
     @constraint(m, cone, [1 + dot_product, 1 - dot_product, 2 * nonlinear_term] in SecondOrderCone())
 

@@ -27,9 +27,13 @@ function formulation(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearForm
     set_silent(m)
     
     x = @variable(m, [e in edges(graph)], binary=true)
-    flow = @variable(m, [e in edges(graph)], lower_bound=0)
+    flow = @variable(m, [e in edges(graph)], lower_bound=0, upper_bound=n - 1)
+
     inflow(v) = length(inedges(graph, v)) == 0 ? 0 : sum(flow[e] for e in inedges(graph, v))
     outflow(v) = length(outedges(graph, v)) == 0 ? 0 : sum(flow[e] for e in outedges(graph, v))
+    
+    inx(v) = length(inedges(graph, v)) == 0 ? 0 : sum(x[e] for e in inedges(graph, v))
+    outx(v) = length(outedges(graph, v)) == 0 ? 0 : sum(x[e] for e in outedges(graph, v))
     
     # Set the names, due to the use of anonymous variables with JuMP.
     for e in edges(graph)
@@ -41,6 +45,9 @@ function formulation(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearForm
     #   vertex in the graph.
     @constraint(m, inflow(source) == 0)
     @constraint(m, outflow(source) == n - 1)
+    @constraint(m, inx(source) == 0)
+    @constraint(m, outx(source) >= 1)
+    @constraint(m, outx(source) <= 4)
 
     # - When the flow exits one of the other nodes, the node keeps one unit 
     #   for itself and redistributes the rest.
@@ -64,7 +71,7 @@ function formulation(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearForm
     # Finally, the objective function.
     @objective(m, Max, sum(i.rewards[e] * (x[e] + x[reverse(e)]) for e in keys(i.rewards)))
 
-    # Don't return flows, these are not really decision variables.
+    # Don't return flows, these are not really decision variables. 
     return m, x
 end
 
