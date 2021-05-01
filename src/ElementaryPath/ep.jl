@@ -32,13 +32,13 @@ end
 
 struct ElementaryPathSolution{T, O <: CombinatorialObjective} <: CombinatorialInstance
     instance::ElementaryPathInstance{T, O}
-    path::Vector{Edge{T}}
+    variables::Vector{Edge{T}}
     states::Dict{T, Float64}
     solutions::Dict{T, Vector{Edge{T}}}
 end
 
-function ElementaryPathSolution(instance::ElementaryPathInstance{T, O}, path::Vector{Edge{T}}) where {T, O <: CombinatorialObjective}
-    return ElementaryPathSolution(instance, path, Dict{T, Float64}(), Dict{T, Vector{Edge{T}}}())
+function ElementaryPathSolution(instance::ElementaryPathInstance{T, O}, variables::Vector{Edge{T}}) where {T, O <: CombinatorialObjective}
+    return ElementaryPathSolution(instance, variables, Dict{T, Float64}(), Dict{T, Vector{Edge{T}}}())
 end
 
 function make_solution(i::ElementaryPathInstance{T, O}, path::Dict{Edge{T}, Float64}) where {T, O}
@@ -56,13 +56,13 @@ end
 
 struct BudgetedElementaryPathSolution{T, O} <: CombinatorialSolution
     instance::MinimumBudget{ElementaryPathInstance{T, O}, T}
-    path::Vector{Edge{T}}
+    variables::Vector{Edge{T}}
     states::Dict{Tuple{T, Int}, Float64}
     solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
 end
 
-function BudgetedElementaryPathSolution(instance::MinimumBudget{ElementaryPathInstance{T, O}, T}, path::Vector{Edge{T}}) where {T, O <: CombinatorialObjective}
-    return BudgetedElementaryPathSolution(instance, path, Dict{Tuple{T, Int}, Float64}(), Dict{Tuple{T, Int}, Vector{Edge{T}}}())
+function BudgetedElementaryPathSolution(instance::MinimumBudget{ElementaryPathInstance{T, O}, T}, variables::Vector{Edge{T}}) where {T, O <: CombinatorialObjective}
+    return BudgetedElementaryPathSolution(instance, variables, Dict{Tuple{T, Int}, Float64}(), Dict{Tuple{T, Int}, Vector{Edge{T}}}())
 end
 
 function make_solution(i::MinimumBudget{ElementaryPathInstance{T, O}, T}, path::Dict{Edge{T}, Float64}) where {T, O}

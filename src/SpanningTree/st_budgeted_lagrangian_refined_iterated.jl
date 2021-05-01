@@ -49,22 +49,22 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
 
             # This subproblem is infeasible. Maybe it's because the overall problem is infeasible or just because too many
             # edges were removed.
-            if length(sol.tree) == 0
+            if length(sol.variables) == 0
                 continue
             end
 
             # Impossible to have a feasible solution with these two edges, probably because of the budget constraint.
             # Due to the direction of the budget constraint (>= budget), it is not possible to check for feasibility
             # before solving an instance.
-            if ! (e1 in sol.tree) || ! (e2 in sol.tree)
+            if ! (e1 in sol.variables) || ! (e2 in sol.variables)
                 continue
             end
 
             # Only keep the best solution.
-            sol_value = _budgeted_spanning_tree_compute_value(i, sol.tree)
+            sol_value = _budgeted_spanning_tree_compute_value(i, sol.variables)
             if sol_value > best_sol_value
                 # sol's instance is the one used internally for the subproblems.
-                best_sol = SimpleBudgetedSpanningTreeSolution(i, sol.tree)
+                best_sol = SimpleBudgetedSpanningTreeSolution(i, sol.variables)
                 best_sol_value = sol_value
             end
         end

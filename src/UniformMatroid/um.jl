@@ -40,11 +40,11 @@ end
 
 struct UniformMatroidSolution{T <: Real, O <: CombinatorialObjective} <: CombinatorialSolution
     instance::UniformMatroidInstance{T, O}
-    items::Vector{Int} # Indices to the chosen items.
+    variables::Vector{Int} # Indices to the chosen items.
 end
 
 function value(s::UniformMatroidSolution{T, O}) where {T <: Real, O}
-    return sum(s.instance.rewards[i] for i in s.items)
+    return sum(s.instance.rewards[i] for i in s.variables)
 end
 
 function make_solution(i::UniformMatroidInstance{T, O}, item::Dict{Int, Float64}) where {T <: Real, O <: CombinatorialObjective}
@@ -72,7 +72,7 @@ function MinBudgetedUniformMatroidSolution(instance::MinimumBudget{UniformMatroi
 end
 
 function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
-    return sum(s.instance.instance.rewards[i] for i in s.items)
+    return sum(s.instance.instance.rewards[i] for i in s.variables)
 end
 
 function items(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T, U}

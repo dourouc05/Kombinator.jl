@@ -56,14 +56,14 @@
                 @testset "Bellman-Ford" begin
                     s = solve(i, BellmanFordAlgorithm())
                     @test s.instance == i
-                    @test s.path == [Edge(1, 2), Edge(2, 3)]
+                    @test s.variables == [Edge(1, 2), Edge(2, 3)]
                 end
 
                 if ! is_travis
                     @testset "Linear programming" begin
                         s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
                         @test s.instance == i
-                        @test s.path == [Edge(1, 2), Edge(2, 3)]
+                        @test s.variables == [Edge(1, 2), Edge(2, 3)]
                     end
                 end
             end
@@ -79,14 +79,14 @@
                 @testset "Bellman-Ford" begin
                     s = solve(i, BellmanFordAlgorithm())
                     @test s.instance == i
-                    @test s.path == [Edge(1, 3)]
+                    @test s.variables == [Edge(1, 3)]
                 end
 
                 if ! is_travis
                     @testset "Linear programming" begin
                         s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
                         @test s.instance == i
-                        @test s.path == [Edge(1, 3)]
+                        @test s.variables == [Edge(1, 3)]
                     end
                 end
             end
@@ -123,7 +123,7 @@
                     d = solve(i, BellmanFordAlgorithm())
 
                     @test d.instance == i
-                    @test d.path == [] # No path with a total weight of at least 4.
+                    @test d.variables == [] # No path with a total weight of at least 4.
 
                     for β in [0, 1, 2]
                         @test d.solutions[1, β] == []
@@ -141,7 +141,7 @@
                     @testset "Linear programming" begin
                         s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
                         @test s.instance == i
-                        @test s.path == []
+                        @test s.variables == []
                     end
                 end
             end
@@ -157,14 +157,14 @@
                 @testset "Bellman-Ford" begin
                     s = solve(i, BellmanFordAlgorithm())
                     @test s.instance == i
-                    @test s.path == [Edge(1, 3)]
+                    @test s.variables == [Edge(1, 3)]
                 end
 
                 if ! is_travis
                     @testset "Linear programming" begin
                         s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
                         @test s.instance == i
-                        @test s.path == [Edge(1, 3)]
+                        @test s.variables == [Edge(1, 3)]
                     end
                 end
             end
@@ -181,7 +181,7 @@
                 warn_msg = "The graph contains a positive-cost cycle around edge 3 -> 1."
                 d = @test_logs (:warn, warn_msg) solve(i, BellmanFordAlgorithm())
 
-                @test d.path == [Edge(1, 3)]
+                @test d.variables == [Edge(1, 3)]
 
                 @test d.solutions[1, 0] == []
                 @test d.solutions[2, 0] == [Edge(1, 2)]

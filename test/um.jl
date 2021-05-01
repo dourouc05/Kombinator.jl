@@ -21,15 +21,15 @@
             @test i.m == m
 
             @test value(g) == value(d)
-            @test length(g.items) <= m
-            @test length(d.items) <= m
+            @test length(g.variables) <= m
+            @test length(d.variables) <= m
 
             @test g.instance == i
             @test d.instance == i
 
             if ! is_travis
                 @test value(g) == value(l)
-                @test length(l.items) <= m
+                @test length(l.variables) <= m
                 @test l.instance == i
             end
         end

@@ -59,11 +59,11 @@
 
             for s in [p, g, d, l]
                 @test s.instance == i
-                @test length(s.tree) == 4
-                @test Edge(1, 2) in s.tree
-                @test Edge(2, 3) in s.tree
-                @test Edge(3, 4) in s.tree
-                @test Edge(4, 5) in s.tree
+                @test length(s.variables) == 4
+                @test Edge(1, 2) in s.variables
+                @test Edge(2, 3) in s.variables
+                @test Edge(3, 4) in s.variables
+                @test Edge(4, 5) in s.variables
             end
         end
 
@@ -79,9 +79,9 @@
 
             for s in [p, g, d, l]
                 @test s.instance == i
-                @test length(s.tree) == 4 # Five nodes in the graph.
-                @test length(unique(s.tree)) == 4 # Only unique edges.
-                @test Edge(4, 5) in s.tree # Only edge with nonzero cost.
+                @test length(s.variables) == 4 # Five nodes in the graph.
+                @test length(unique(s.variables)) == 4 # Only unique edges.
+                @test Edge(4, 5) in s.variables # Only edge with nonzero cost.
             end
         end
     end
@@ -116,17 +116,17 @@
                 lagrangian = solve(i, LagrangianAlgorithm(), ε=ε)
                 @test lagrangian.λ ≈ 0.25 atol=ε
                 @test lagrangian.value ≈ 3.75 atol=ε
-                @test length(lagrangian.tree) == 2
+                @test length(lagrangian.variables) == 2
                 
                 # Two solutions have this Lagrangian cost: a feasible one and an infeasible one.
-                if Edge(1, 3) in lagrangian.tree # Strictly feasible solution.
-                    @test Edge(1, 3) in lagrangian.tree
-                    @test Edge(2, 3) in lagrangian.tree
-                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, lagrangian.tree) > budget
+                if Edge(1, 3) in lagrangian.variables # Strictly feasible solution.
+                    @test Edge(1, 3) in lagrangian.variables
+                    @test Edge(2, 3) in lagrangian.variables
+                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, lagrangian.variables) > budget
                 else # Infeasible solution.
-                    @test Edge(1, 2) in lagrangian.tree
-                    @test Edge(2, 3) in lagrangian.tree
-                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, lagrangian.tree) < budget
+                    @test Edge(1, 2) in lagrangian.variables
+                    @test Edge(2, 3) in lagrangian.variables
+                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, lagrangian.variables) < budget
                 end
             end
 
@@ -134,7 +134,7 @@
                 sol = solve(i, LagrangianRefinementAlgorithm())
                 @test sol !== nothing
                 @test sol.instance == i
-                s = sol.tree
+                s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
                 @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
@@ -144,7 +144,7 @@
                 sol = solve(i, IteratedLagrangianRefinementAlgorithm())
                 @test sol !== nothing
                 @test sol.instance == i
-                s = sol.tree
+                s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
                 @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
@@ -155,7 +155,7 @@
                 sol = solve(i, DynamicProgramming())
                 @test sol !== nothing
                 @test sol.instance == i
-                s = sol.tree
+                s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
                 @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
@@ -166,7 +166,7 @@
                 sol = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
                 @test sol !== nothing
                 @test sol.instance == i
-                s = sol.tree
+                s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
                 @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
@@ -186,19 +186,19 @@
                 @testset "Lagrangian refinement" begin
                     s = solve(i, LagrangianRefinementAlgorithm())
                     @test s !== nothing
-                    @test s.tree == [Edge(1, 2)]
+                    @test s.variables == [Edge(1, 2)]
                 end
 
                 @testset "Iterated Lagrangian refinement" begin
                     s = solve(i, IteratedLagrangianRefinementAlgorithm())
                     @test s !== nothing
-                    @test s.tree == [Edge(1, 2)]
+                    @test s.variables == [Edge(1, 2)]
                 end
 
                 @testset "Dynamic programming" begin
                     s = solve(i, DynamicProgramming())
                     @test s !== nothing
-                    @test s.tree == [Edge(1, 2)]
+                    @test s.variables == [Edge(1, 2)]
                 end
             end
 
@@ -208,19 +208,19 @@
                 @testset "Lagrangian refinement" begin                
                     s = solve(i, LagrangianRefinementAlgorithm())
                     @test s !== nothing
-                    @test s.tree == Edge{Int}[]
+                    @test s.variables == Edge{Int}[]
                 end
 
                 @testset "Iterated Lagrangian refinement" begin
                     s = solve(i, IteratedLagrangianRefinementAlgorithm())
                     @test s !== nothing
-                    @test s.tree == Edge{Int}[]
+                    @test s.variables == Edge{Int}[]
                 end
 
                 @testset "Dynamic programming" begin
                     s = solve(i, DynamicProgramming())
                     @test s !== nothing
-                    @test s.tree == Edge{Int}[]
+                    @test s.variables == Edge{Int}[]
                 end
             end
         end

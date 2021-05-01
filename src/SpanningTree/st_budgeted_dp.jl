@@ -94,7 +94,7 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                 w_no_src = Dict(map(map_edge, collect(keys(instance.weights))) .=> values(instance.weights))
                 i_no_src = MinimumBudget(SpanningTreeInstance(g_no_src, r_no_src), w_no_src, remaining_budget)
                 s_no_src = solve(i_no_src, DynamicProgramming())
-                t_no_src = [unmap_edge(e) for e in s_no_src.tree]
+                t_no_src = [unmap_edge(e) for e in s_no_src.variables]
                 v_no_src = _budgeted_spanning_tree_compute_value(instance, t_no_src)
                 
                 g_no_dst = copy(instance.instance.graph)
@@ -107,7 +107,7 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                 w_no_dst = Dict(map(map_edge, collect(keys(instance.weights))) .=> values(instance.weights))
                 i_no_dst = MinimumBudget(SpanningTreeInstance(g_no_dst, r_no_dst), w_no_dst, remaining_budget)
                 s_no_dst = solve(i_no_dst, DynamicProgramming())
-                t_no_dst = [unmap_edge(e) for e in s_no_dst.tree]
+                t_no_dst = [unmap_edge(e) for e in s_no_dst.variables]
                 v_no_dst = _budgeted_spanning_tree_compute_value(instance, t_no_dst)
 
                 if length(t_no_src) == 0 && length(t_no_dst) == 0

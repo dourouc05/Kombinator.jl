@@ -44,7 +44,7 @@ end
 
 function _upper_bound_budget(nli::NonlinearCombinatorialInstance)
     # Make a linear instance to maximise the total weight.
-    li = copy(nli.combinatorial_structure, rewards=nli.nonlinear_term)
+    li = copy(nli.combinatorial_structure, rewards=nli.nonlinear_coefficients)
     x = solve(li, nli.linear_algo)
     return sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients) if x[i] > 0.5)
 end

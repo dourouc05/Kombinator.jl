@@ -27,7 +27,7 @@ end
 
 struct SpanningTreeSolution{T, O} <: CombinatorialSolution
     instance::SpanningTreeInstance{T, O}
-    tree::Vector{Edge{T}}
+    variables::Vector{Edge{T}}
 end
 
 function make_solution(i::SpanningTreeInstance{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
@@ -45,15 +45,15 @@ end
 
 abstract type BudgetedSpanningTreeSolution{T, U} <: CombinatorialSolution
     # instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
-    # tree::Vector{Edge{T}}
+    # variables::Vector{Edge{T}}
 end
 
 struct SimpleBudgetedSpanningTreeSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
-    tree::Vector{Edge{T}}
+    variables::Vector{Edge{T}}
 
-    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
-        return new{T, U}(instance, tree)
+    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, variables::Vector{Edge{T}}) where {T, U}
+        return new{T, U}(instance, variables)
     end
 
     function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}) where {T, U}
@@ -65,7 +65,7 @@ end
 struct BudgetedSpanningTreeLagrangianSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
     # Used to store important temporary results from solving the Lagrangian dual.
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
-    tree::Vector{Edge{T}}
+    variables::Vector{Edge{T}}
     λ::Float64 # Optimum dual multiplier.
     value::Float64 # Optimum value of the dual problem (i.e. with penalised constraint).
     λmax::Float64 # No dual value higher than this is useful (i.e. they all yield the same solution).
@@ -74,7 +74,7 @@ end
 struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
     # Used to store important temporary results from dynamic programming.
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
-    tree::Vector{Edge{T}}
+    variables::Vector{Edge{T}}
     states::Dict{Tuple{T, Int}, Float64}
     solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
 end

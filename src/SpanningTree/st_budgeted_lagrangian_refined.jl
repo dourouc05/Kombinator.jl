@@ -23,14 +23,14 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
     feasible_instance = SpanningTreeInstance(i.instance.graph, feasible_rewards)
     feasible_solution = solve(feasible_instance, PrimAlgorithm())
 
-    if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.tree) < i.min_budget
+    if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.variables) < i.min_budget
         # By maximising the left-hand side of the budget constraint, impossible to reach the target budget. No solution!
         return SimpleBudgetedSpanningTreeSolution(i)
     end
 
     # Solve the Lagrangian relaxation to optimality.
     lagrangian = solve(i, LagrangianAlgorithm(), ε=ε)
-    λ0, v0, st0 = lagrangian.λ, lagrangian.value, lagrangian.tree
+    λ0, v0, st0 = lagrangian.λ, lagrangian.value, lagrangian.variables
     λmax = lagrangian.λmax
     b0 = _budgeted_spanning_tree_compute_weight(i, st0) # Budget consumption of this first solution.
 
@@ -77,7 +77,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
         if stalling # Second test: minimise the left-hand side of the budget constraint, in hope of finding a feasible solution.
             # This process is highly similar to the computation of feasible_solution, but with a reverse objective function.
             infeasible_rewards = Dict{Edge{T}, Float64}(e => - i.weights[e] for e in keys(i.weights))
-            infeasible_solution = solve(SpanningTreeInstance(i.instance.graph, infeasible_rewards), PrimAlgorithm()).tree
+            infeasible_solution = solve(SpanningTreeInstance(i.instance.graph, infeasible_rewards), PrimAlgorithm()).variables
 
             if _budgeted_spanning_tree_compute_weight(i, infeasible_solution) < i.min_budget
                 x⁻ = infeasible_solution
@@ -104,7 +104,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
 
             # Is the process stalling? If so, reuse feasible_solution, which is guaranteed to be feasible.
             if λi >= λmax
-                x⁺ = feasible_solution.tree
+                x⁺ = feasible_solution.variables
                 break
             end
         end

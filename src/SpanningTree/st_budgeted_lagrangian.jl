@@ -7,7 +7,7 @@ function _st_prim_budgeted_lagrangian(i::MinimumBudget{SpanningTreeInstance{T, M
     sti_rewards = Dict{Edge{T}, Float64}(e => i.instance.rewards[e] + λ * i.weights[e] for e in keys(i.instance.rewards))
     sti = SpanningTreeInstance(i.instance.graph, sti_rewards)
     sti_sol = solve(sti, PrimAlgorithm())
-    return _budgeted_spanning_tree_compute_value(sti, sti_sol.tree) - λ * i.min_budget, sti_sol.tree
+    return _budgeted_spanning_tree_compute_value(sti, sti_sol.variables) - λ * i.min_budget, sti_sol.variables
 end
 
 function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm; ε::Float64) where {T, U}
