@@ -13,7 +13,6 @@ if ! is_travis
     using JuMP
     # Why Gurobi?
     # - Need support for lazy constraints (elementary paths):
-    #   - Gurobi.jl does not seem to work with lazy constraints
     #   - Mosek does not support them
     # - Need support for MISOCP
     #   - Pajarito is not yet ported to MOI
@@ -23,8 +22,6 @@ end
 @testset "Kombinator.jl" begin
     include("um.jl")
     include("st.jl")
-    # include("um.jl")
-    # include("st.jl")
     include("ep.jl")
     # include("matching.jl")
 
