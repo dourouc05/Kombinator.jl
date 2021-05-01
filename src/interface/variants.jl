@@ -1,3 +1,5 @@
+# Minimum budget.
+
 """
     struct MinimumBudget{CI <: CombinatorialInstance, T <: Real}
 
@@ -31,6 +33,40 @@ function copy(i::MinimumBudget; instance::CI=i.instance, weights::Union{Vector{T
 end
 
 """
+    abstract type MinBudgetedSolution
+
+A type of solution that is specifically tailored for the minimum-budget 
+variant.
+"""
+abstract type MinBudgetedSolution <: CombinatorialSolution end
+
+"""
+    abstract type SingleMinBudgetedSolution
+
+A type of `MinBudgetedSolution` when only one solution is available, to the 
+single value of the budget that is defined in the related instance. Objects
+of this type do not have to implement more fields than any 
+`CombinatorialSolution`.
+"""
+abstract type SingleMinBudgetedSolution <: MinBudgetedSolution end
+
+"""
+    abstract type MultipleMinBudgetedSolution
+
+A type of `MinBudgetedSolution` when several solutions are available, with 
+the several values of the budget that are specified by the combinatorial 
+instance (typically, from zero to a maximum value). 
+
+Objects of this type have to implement the usual fields of 
+`CombinatorialSolution`, but also `solutions`, a mapping from a budget value
+to the corresponding solution (`solutions`[i]` corresponds to a minimum budget
+of `i`).
+"""
+abstract type MultipleMinBudgetedSolution <: MinBudgetedSolution end
+
+# Maximum budget.
+
+"""
     struct MaximumBudget{CI <: CombinatorialInstance, T <: Real}
 
 Implement a maximum-budget constraint, i.e. a maximum quantity of a resource 
@@ -60,3 +96,35 @@ end
 function copy(i::MaximumBudget; instance::CI=i.instance, weights::Union{Vector{T}, Dict{<: Any, T}}=i.weights, max_budget::T=i.max_budget, compute_all_values::Bool=i.compute_all_values) where {CI <: CombinatorialInstance, T <: Real}
     return MaximumBudget(ci, weights, max_budget, compute_all_values)
 end
+
+"""
+    abstract type MaxBudgetedSolution
+
+A type of solution that is specifically tailored for the maximum-budget 
+variant.
+"""
+abstract type MaxBudgetedSolution <: CombinatorialSolution end
+
+"""
+    abstract type SingleMaxBudgetedSolution
+
+A type of `MaxBudgetedSolution` when only one solution is available, to the 
+single value of the budget that is defined in the related instance. Objects
+of this type do not have to implement more fields than any 
+`CombinatorialSolution`.
+"""
+abstract type SingleMaxBudgetedSolution <: MaxBudgetedSolution end
+
+"""
+    abstract type MultipleMaxBudgetedSolution
+
+A type of `MaxBudgetedSolution` when several solutions are available, with 
+the several values of the budget that are specified by the combinatorial 
+instance (typically, from zero to a maximum value). 
+
+Objects of this type have to implement the usual fields of 
+`CombinatorialSolution`, but also `solutions`, a mapping from a budget value
+to the corresponding solution (`solutions`[i]` corresponds to a maximum budget
+of `i`).
+"""
+abstract type MultipleMaxBudgetedSolution <: MaxBudgetedSolution end

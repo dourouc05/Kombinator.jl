@@ -11,14 +11,15 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
     # TODO: what about ε?
 
     # Transform the enumerated nonlinearity as a true function.
+    sum_over_linear(x::CombinatorialSolution) = sum(nli.linear_coefficients[i] for i in eachindex(nli.linear_coefficients) if i in x)
+    sum_over_nonlinear(x::CombinatorialSolution) = sum(nli.nonlinear_coefficients[i] for i in eachindex(nli.nonlinear_coefficients) if i in x)
     if nli.nonlinear_function == Square
-        nl_func = (x) -> sum(nli.linear_coefficients[i] * x[i] for i in eachindex(nli.linear_coefficients)) + (sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients))) ^2
+        nl_func = (x) -> sum_over_linear(x) + (sum_over_nonlinear(x)) ^2
     elseif nli.nonlinear_function == SquareRoot
-        nl_func = (x) -> sum(nli.linear_coefficients[i] * x[i] for i in eachindex(nli.linear_coefficients)) + sqrt(sum(nli.nonlinear_coefficients[i] * x[i] for i in eachindex(nli.nonlinear_coefficients)))
+        nl_func = (x) -> sum_over_linear(x) + sqrt(sum_over_nonlinear(x))
     else
         error("Nonlinear function not recognised: $(nli.nonlinear_function).")
     end
-    # TODO: this function should rather take a CombinatorialSolution as argument, but it requires more details about the underlying data structures.
 
     # Get an upper bound on the budget.
     max_budget = _upper_bound_budget(nli)::Int
