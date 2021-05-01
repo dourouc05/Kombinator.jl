@@ -27,7 +27,7 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
     # Make a linear instance with the linear coefficients 
     # (`nli.combinatorial_structure` does not always have this property).
     li = copy(nli.combinatorial_structure, rewards=nli.linear_coefficients)
-    bi = MinimumBudget(li, Int.(nli.nonlinear_coefficients), max_budget)
+    bi = MinimumBudget(li, _round_coefficients(nli.nonlinear_coefficients, nli), max_budget)
 
     # Compute all interesting budgeted solutions, depending on how it is requested to be done.
     solutions = Dict{Int, Vector}[]
@@ -46,6 +46,22 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
     best_sol, _ = _pick_best_solution(solutions, nl_func)
     best_sol_dict = Dict(x => 1.0 for x in best_sol)
     return make_solution(nli.combinatorial_structure, best_sol_dict)
+end
+
+function _round_coefficients(x::Vector{Int}, ::NonlinearCombinatorialInstance)
+    return x
+end
+
+function _round_coefficients(x::Vector{T}, nli::NonlinearCombinatorialInstance) where {T <: Real}
+    return Int[round(Int, v / nli.ε) for v in x]
+end
+
+function _round_coefficients(x::Dict{K, Int}, ::NonlinearCombinatorialInstance) where {K}
+    return x
+end
+
+function _round_coefficients(x::Dict{K, T}, nli::NonlinearCombinatorialInstance) where {K, T <: Real}
+    return Dict{K, Int}(k => round(Int, v / nli.ε) for (k, v) in x)
 end
 
 function _upper_bound_budget(nli::NonlinearCombinatorialInstance)

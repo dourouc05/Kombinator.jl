@@ -114,11 +114,13 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                     V[β, i] = V[β, i - 1]
                     S[β, i] = S[β, i - 1]
                     copy!(LD[β, i], LD[β, i - 1])
-                elseif length(t_no_src) == 0 || (length(t_no_src) > 0 && v_no_dst > v_no_src)
+                elseif length(t_no_src) == 0 || (length(t_no_src) > 0 && v_no_dst >= v_no_src)
+                    # Includes the case where both subproblems have the same 
+                    # value. Pick to continue with t_no_src arbitrarily.
                     V[β, i] = v_no_dst + edge_value
                     S[β, i] = t_no_dst
                     push!(S[β, i], edge)
-            
+
                     # No available data structure to copy, regenerate it from 
                     # scratch.
                     for e in S[β, i]
@@ -128,7 +130,7 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
                     V[β, i] = v_no_src + edge_value
                     S[β, i] = t_no_src
                     push!(S[β, i], edge)
-            
+
                     # No available data structure to copy, regenerate it from 
                     # scratch.
                     for e in S[β, i]
