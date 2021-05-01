@@ -39,7 +39,7 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         for δ in (dimension(i) - 1):-1:0
             # Filter the available objects (i.e. above δ+1 and satisfying the
             # budget constraint) and retrieve just their indices.
-            all_objects = collect(enumerate(weights(i)))
+            all_objects = collect(enumerate(i.weights))
             all_objects = collect(filter(o -> o[1] >= δ + 1, all_objects))
             all_objects = collect(filter(o -> o[2] >= β, all_objects))
             all_objects = collect(t[1] for t in all_objects)
@@ -61,10 +61,10 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
     end
 
     # Dynamic part.
-    for β in 1:budget(i)
+    for β in 1:i.min_budget
         for µ in 2:i.instance.m
             for δ in (dimension(i) - 1):-1:0
-                remaining_budget_with_δ = max(0, β - weights(i)[δ + 1])
+                remaining_budget_with_δ = max(0, β - i.weights[δ + 1])
                 take_δ = i.instance.rewards[δ + 1] + V[µ - 1, δ + 1 + 1, remaining_budget_with_δ + 1]
                 dont_take_δ = V[µ, δ + 1 + 1, β + 1]
 
@@ -84,5 +84,5 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         end
     end
 
-    return MinBudgetedUniformMatroidSolution(i, S[i.instance.m, 0, budget(i)], V, S)
+    return MinBudgetedUniformMatroidSolution(i, S[i.instance.m, 0, i.min_budget], V, S)
 end

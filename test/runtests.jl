@@ -25,8 +25,8 @@ end
     include("st.jl")
     # include("um.jl")
     # include("st.jl")
-    # include("ep.jl")
+    include("ep.jl")
     # include("matching.jl")
 
-    include("nlcop.jl")
+    # include("nlcop.jl")
 end

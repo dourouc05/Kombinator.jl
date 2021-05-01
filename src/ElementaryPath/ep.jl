@@ -77,21 +77,21 @@ function make_solution(i::MinimumBudget{ElementaryPathInstance{T, O}, T}, path::
 end
 
 function _check_and_warn_budget_too_high(s::BudgetedElementaryPathSolution{T, O}, max_budget::Int) where {T, O}
-    if max_budget > budget(s.instance)
-        @warn "The requested maximum budget $max_budget is higher than the instance's minimum budget $(budget(s.instance)). Therefore, some values have not been computed and are unavailable."
+    if max_budget > s.instance.min_budget
+        @warn "The requested maximum budget $max_budget is higher than the instance's minimum budget $(s.instance.min_budget). Therefore, some values have not been computed and are unavailable."
     end
 end
 
 function paths_all_budgets(s::BudgetedElementaryPathSolution{T, O}, max_budget::Int) where {T, O}
     _check_and_warn_budget_too_high(s, max_budget)
-    mb = min(max_budget, budget(s.instance))
+    mb = min(max_budget, s.instance.min_budget)
     return Dict{Int, Vector{Edge{T}}}(
         budget => s.solutions[s.instance.instance.dst, budget] for budget in 0:mb)
 end
 
 function paths_all_budgets_as_tuples(s::BudgetedElementaryPathSolution{T, O}, max_budget::Int) where {T, O}
     _check_and_warn_budget_too_high(s, max_budget)
-    mb = min(max_budget, budget(s.instance))
+    mb = min(max_budget, s.instance.min_budget)
     return Dict{Int, Vector{Tuple{T, T}}}(
         budget => [(src(e), dst(e)) for e in s.solutions[s.instance.instance.dst, budget]]
         for budget in 0:mb)

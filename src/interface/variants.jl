@@ -20,14 +20,6 @@ function MinimumBudget(i::CI, weights::Union{Vector{T}, Dict{<: Any, T}}, min_bu
     return MinimumBudget(i, weights, min_budget, compute_all_values)
 end
 
-function weights(i::MinimumBudget) # TODO: remove me?
-    return i.weights
-end
-
-function budget(i::MinimumBudget) # TODO: remove me?
-    return i.min_budget
-end
-
 function copy(i::MinimumBudget; instance::CI=i.instance, weights::Union{Vector{T}, Dict{<: Any, T}}=i.weights, min_budget::T=i.min_budget, compute_all_values::Bool=i.compute_all_values) where {CI <: CombinatorialInstance, T <: Real}
     return MinimumBudget(instance, weights, min_budget, compute_all_values)
 end
@@ -83,14 +75,6 @@ end
 
 function MaximumBudget(i::CI, weights::Union{Vector{T}, Dict{<: Any, T}}, max_budget::T; compute_all_values::Bool=false) where {CI, T}
     return MaximumBudget(i, weights, max_budget, compute_all_values)
-end
-
-function weights(i::MaximumBudget) # TODO: remove me?
-    return i.weights
-end
-
-function budget(i::MaximumBudget) # TODO: remove me?
-    return i.max_budget
 end
 
 function copy(i::MaximumBudget; instance::CI=i.instance, weights::Union{Vector{T}, Dict{<: Any, T}}=i.weights, max_budget::T=i.max_budget, compute_all_values::Bool=i.compute_all_values) where {CI <: CombinatorialInstance, T <: Real}
