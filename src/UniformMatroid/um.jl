@@ -60,15 +60,15 @@ end
 
 # Budgeted solution.
 
-struct MinBudgetedUniformMatroidSolution{T <: Real, U <: Real} <: CombinatorialSolution
+struct MinBudgetedUniformMatroidSolution{T <: Real, U <: Real} <: MultipleMinBudgetedSolution
     instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
     items::Vector{Int} # Indices to the chosen items for the min_budget.
     state::Array{Float64, 3} # Data structure built by the dynamic-programming recursion.
-    solutions::Dict{Tuple{Int, Int, Int}, Vector{Int}} # From the indices of state to the corresponding solution.
+    solutions::Dict{Int, Vector{Int}}
 end
 
 function MinBudgetedUniformMatroidSolution(instance::MinimumBudget{UniformMatroidInstance{T, O}, U}, items::Vector{Int}) where {T, O <: CombinatorialObjective, U}
-    return MinBudgetedUniformMatroidSolution(instance, items, zeros(0, 0, 0), Dict{Tuple{Int, Int, Int}, Vector{Int}}())
+    return MinBudgetedUniformMatroidSolution(instance, items, zeros(0, 0, 0), Dict{Int, Vector{Int}}())
 end
 
 function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
@@ -76,14 +76,14 @@ function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
 end
 
 function items(s::MinBudgetedUniformMatroidSolution{T, U}, budget::Int) where {T, U}
-    return s.solutions[s.instance.instance.m, 0, budget]
+    return s.solutions[budget]
 end
 
 function items_all_budgets(s::MinBudgetedUniformMatroidSolution{T, U}, max_budget::Int) where {T, U}
     sol = Dict{Int, Vector{Int}}()
     m = s.instance.instance.m
     for budget in 0:max_budget
-        sol[budget] = s.solutions[m, 0, budget]
+        sol[budget] = s.solutions[budget]
     end
     return sol
 end

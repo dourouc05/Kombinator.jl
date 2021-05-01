@@ -70,5 +70,6 @@ function solve(i::MinimumBudget{ElementaryPathInstance{T, Maximise}, T}, ::Bellm
         end
     end
 
-    return BudgetedElementaryPathSolution(i, S[i.instance.dst, i.min_budget], V, S)
+    S_refined = Dict(β => S[i.instance.dst, β] for β in 0:i.min_budget)
+    return BudgetedElementaryPathSolution(i, S[i.instance.dst, i.min_budget], V, S_refined)
 end

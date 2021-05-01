@@ -14,7 +14,7 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         end
         
     V = Array{Float64, 3}(undef, i.instance.m, dimension(i) + 1, i.min_budget + 1)
-    S = Dict{Tuple{Int, Int, Int}, Vector{Int}}() 
+    S = Dict{Int, Vector{Int}}() 
     
     for budget in budgets
         set_normalized_rhs(c, budget)
@@ -23,12 +23,12 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         if termination_status(model) == MOI.OPTIMAL
             sol = findall(JuMP.value.(x) .>= 0.5)
             V[i.instance.m, 0 + 1, budget + 1] = objective_value(model)
-            S[i.instance.m, 0, budget] = sol
+            S[budget] = sol
         else
             V[i.instance.m, 0 + 1, budget + 1] = -Inf
-            S[i.instance.m, 0, budget] = Int[-1]
+            S[budget] = Int[-1]
         end
     end
 
-    return MinBudgetedUniformMatroidSolution(i, S[i.instance.m, 0, maximum(budgets)], V, S)
+    return MinBudgetedUniformMatroidSolution(i, S[maximum(budgets)], V, S)
 end

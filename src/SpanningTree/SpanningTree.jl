@@ -9,7 +9,7 @@ using LightGraphs
 import Base: copy
 import Kombinator: solve, dimension, approximation_ratio, approximation_term, formulation, make_solution
 
-export SpanningTreeInstance, SpanningTreeSolution, BudgetedSpanningTreeSolution, SimpleBudgetedSpanningTreeSolution, BudgetedSpanningTreeLagrangianSolution
+export SpanningTreeInstance, SpanningTreeSolution, SimpleBudgetedSpanningTreeSolution, BudgetedSpanningTreeLagrangianSolution, BudgetedSpanningTreeDynamicProgrammingSolution
 
 include("st.jl")
 

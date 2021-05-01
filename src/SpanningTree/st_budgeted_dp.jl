@@ -149,5 +149,6 @@ function solve(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::
         end
     end
 
-    return BudgetedSpanningTreeDynamicProgrammingSolution(instance, S[instance.min_budget, dimension(instance)], V, S)
+    S_refined = Dict(β => S[β, dimension(instance)] for β in 0:instance.min_budget)
+    return BudgetedSpanningTreeDynamicProgrammingSolution(instance, S[instance.min_budget, dimension(instance)], V, S_refined)
 end

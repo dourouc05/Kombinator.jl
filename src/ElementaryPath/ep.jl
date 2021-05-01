@@ -54,15 +54,15 @@ end
 
 # Budgeted solution.
 
-struct BudgetedElementaryPathSolution{T, O} <: CombinatorialSolution
+struct BudgetedElementaryPathSolution{T, O} <: MultipleMinBudgetedSolution
     instance::MinimumBudget{ElementaryPathInstance{T, O}, T}
     variables::Vector{Edge{T}}
     states::Dict{Tuple{T, Int}, Float64}
-    solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
+    solutions::Dict{Int, Vector{Edge{T}}}
 end
 
 function BudgetedElementaryPathSolution(instance::MinimumBudget{ElementaryPathInstance{T, O}, T}, variables::Vector{Edge{T}}) where {T, O <: CombinatorialObjective}
-    return BudgetedElementaryPathSolution(instance, variables, Dict{Tuple{T, Int}, Float64}(), Dict{Tuple{T, Int}, Vector{Edge{T}}}())
+    return BudgetedElementaryPathSolution(instance, variables, Dict{Tuple{T, Int}, Float64}(), Dict{Int, Vector{Edge{T}}}())
 end
 
 function make_solution(i::MinimumBudget{ElementaryPathInstance{T, O}, T}, path::Dict{Edge{T}, Float64}) where {T, O}
@@ -86,13 +86,13 @@ function paths_all_budgets(s::BudgetedElementaryPathSolution{T, O}, max_budget::
     _check_and_warn_budget_too_high(s, max_budget)
     mb = min(max_budget, s.instance.min_budget)
     return Dict{Int, Vector{Edge{T}}}(
-        budget => s.solutions[s.instance.instance.dst, budget] for budget in 0:mb)
+        budget => s.solutions[budget] for budget in 0:mb)
 end
 
 function paths_all_budgets_as_tuples(s::BudgetedElementaryPathSolution{T, O}, max_budget::Int) where {T, O}
     _check_and_warn_budget_too_high(s, max_budget)
     mb = min(max_budget, s.instance.min_budget)
     return Dict{Int, Vector{Tuple{T, T}}}(
-        budget => [(src(e), dst(e)) for e in s.solutions[s.instance.instance.dst, budget]]
+        budget => [(src(e), dst(e)) for e in s.solutions[budget]]
         for budget in 0:mb)
 end

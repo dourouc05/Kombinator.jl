@@ -81,10 +81,10 @@
                 @test d.state[m, 0 + 1, 2 + 1] == 9.0
                 @test d.state[m, 0 + 1, 3 + 1] == -Inf
 
-                @test d.solutions[m, 0, 0] == [1, 2]
-                @test d.solutions[m, 0, 1] == [1, 2]
-                @test d.solutions[m, 0, 2] == [1, 2]
-                @test d.solutions[m, 0, 3] == [-1]
+                @test d.solutions[0] == [1, 2]
+                @test d.solutions[1] == [1, 2]
+                @test d.solutions[2] == [1, 2]
+                @test d.solutions[3] == [-1]
                 
                 test_items_at(d, expected_items)
                 test_solution_at(d, expected)
@@ -96,7 +96,7 @@
                     
                     for i in 0:3
                         @test l.state[m, 0 + 1, i + 1] ≈ d.state[m, 0 + 1, i + 1]
-                        @test l.solutions[m, 0, i] == d.solutions[m, 0, i]
+                        @test l.solutions[i] == d.solutions[i]
                     end
                     
                     test_items_at(l, expected_items)

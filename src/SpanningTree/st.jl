@@ -43,12 +43,7 @@ end
 
 # Budgeted solution.
 
-abstract type BudgetedSpanningTreeSolution{T, U} <: CombinatorialSolution
-    # instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
-    # variables::Vector{Edge{T}}
-end
-
-struct SimpleBudgetedSpanningTreeSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
+struct SimpleBudgetedSpanningTreeSolution{T, U} <: SingleMinBudgetedSolution
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     variables::Vector{Edge{T}}
 
@@ -62,7 +57,7 @@ struct SimpleBudgetedSpanningTreeSolution{T, U} <: BudgetedSpanningTreeSolution{
     end
 end
 
-struct BudgetedSpanningTreeLagrangianSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
+struct BudgetedSpanningTreeLagrangianSolution{T, U} <: SingleMinBudgetedSolution
     # Used to store important temporary results from solving the Lagrangian dual.
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     variables::Vector{Edge{T}}
@@ -71,12 +66,12 @@ struct BudgetedSpanningTreeLagrangianSolution{T, U} <: BudgetedSpanningTreeSolut
     λmax::Float64 # No dual value higher than this is useful (i.e. they all yield the same solution).
 end
 
-struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: BudgetedSpanningTreeSolution{T, U}
+struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: MultipleMinBudgetedSolution
     # Used to store important temporary results from dynamic programming.
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     variables::Vector{Edge{T}}
     states::Dict{Tuple{T, Int}, Float64}
-    solutions::Dict{Tuple{T, Int}, Vector{Edge{T}}}
+    solutions::Dict{Int, Vector{Edge{T}}}
 end
 
 function make_solution(i::MinimumBudget{SpanningTreeInstance{T, O}, U}, tree::Dict{Edge{T}, Float64}) where {T, O, U}

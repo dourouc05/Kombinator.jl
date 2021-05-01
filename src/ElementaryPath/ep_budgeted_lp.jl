@@ -14,7 +14,7 @@ function solve(i::MinimumBudget{ElementaryPathInstance{Int, Maximise}, Int}, ::D
         end
         
     V = Dict{Tuple{Int, Int}, Float64}()
-    S = Dict{Tuple{Int, Int}, Vector{Edge{Int}}}() 
+    S = Dict{Int, Vector{Edge{Int}}}() 
     
     for budget in budgets
         set_normalized_rhs(c, budget)
@@ -22,12 +22,12 @@ function solve(i::MinimumBudget{ElementaryPathInstance{Int, Maximise}, Int}, ::D
 
         if termination_status(model) == MOI.OPTIMAL
             V[i.instance.dst, budget] = objective_value(model)
-            S[i.instance.dst, budget] = _extract_lp_solution(i, x)
+            S[budget] = _extract_lp_solution(i, x)
         else
             V[i.instance.dst, budget] = -Inf
-            S[i.instance.dst, budget] = Edge{Int}[]
+            S[budget] = Edge{Int}[]
         end
     end
 
-    return BudgetedElementaryPathSolution(i, S[i.instance.dst, i.min_budget], V, S)
+    return BudgetedElementaryPathSolution(i, S[i.min_budget], V, S)
 end

@@ -14,20 +14,20 @@ function solve(i::MinimumBudget{SpanningTreeInstance{Int, Maximise}, Int}, ::Def
         end
         
     V = Dict{Tuple{Int, Int}, Float64}()
-    S = Dict{Tuple{Int, Int}, Vector{Edge{Int}}}() 
+    S = Dict{Int, Vector{Edge{Int}}}() 
     
     for budget in budgets
         set_normalized_rhs(c, budget)
         optimize!(model)
 
         if termination_status(model) == MOI.OPTIMAL
-            V[budget + 1, dimension(i) + 1] = objective_value(model)
-            S[budget + 1, dimension(i) + 1] = _extract_lp_solution(i, x)
+            V[budget, dimension(i)] = objective_value(model)
+            S[budget] = _extract_lp_solution(i, x)
         else
-            V[budget + 1, dimension(i) + 1] = -Inf
-            S[budget + 1, dimension(i) + 1] = Int[-1]
+            V[budget, dimension(i)] = -Inf
+            S[budget] = Int[-1]
         end
     end
 
-    return BudgetedSpanningTreeDynamicProgrammingSolution(i, S[i.min_budget + 1, dimension(i) + 1], V, S)
+    return BudgetedSpanningTreeDynamicProgrammingSolution(i, S[i.min_budget], V, S)
 end

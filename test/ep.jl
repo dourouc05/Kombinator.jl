@@ -22,7 +22,7 @@
         i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 4)
         path = [Edge(1, 3)]
         states = Dict((1, 2) => 0.0, (3, 1) => 2.0, (1, 3) => 0.0, (1, 4) => 0.0, (3, 2) => 2.0, (2, 0) => 1.0, (3, 3) => 1.0, (2, 1) => 1.0, (3, 4) => 1.0, (2, 2) => -Inf, (2, 3) => -Inf, (1, 0) => 0.0, (2, 4) => -Inf, (1, 1) => 0.0, (3, 0) => 2.0)
-        solutions = Dict{Tuple{Int, Int}, Vector{Edge{Int}}}((1, 2) => [], (3, 1) => [Edge(1, 2), Edge(2, 3)], (1, 3) => [], (1, 4) => [], (3, 2) => [Edge(1, 2), Edge(2, 3)], (2, 0) => [Edge(1, 2)], (3, 3) => [Edge(1, 3)], (2, 1) => [Edge(1, 2)], (3, 4) => [Edge(1, 3)], (2, 2) => [], (2, 3) => [], (1, 0) => [], (2, 4) => [], (1, 1) => [], (3, 0) => [Edge(1, 2), Edge(2, 3)])
+        solutions = Dict{Int, Vector{Edge{Int}}}(0 => [Edge(1, 2), Edge(2, 3)], 1 => [Edge(1, 2), Edge(2, 3)], 2 => [Edge(1, 2), Edge(2, 3)], 3 => [Edge(1, 3)], 4 => [Edge(1, 3)])
         d = BudgetedElementaryPathSolution(i, path, states, solutions)
 
         warn_msg = "The requested maximum budget 5 is higher than the instance's minimum budget 4. Therefore, some values have not been computed and are unavailable."
@@ -126,14 +126,10 @@
                     @test d.variables == [] # No path with a total weight of at least 4.
 
                     for β in [0, 1, 2]
-                        @test d.solutions[1, β] == []
-                        @test d.solutions[2, β] == ((β == 2) ? [] : [Edge(1, 2)])
-                        @test d.solutions[3, β] == [Edge(1, 2), Edge(2, 3)]
+                        @test d.solutions[β] == [Edge(1, 2), Edge(2, 3)]
                     end
                     for β in [3, 4]
-                        for v in [1, 2, 3]
-                            @test d.solutions[v, β] == []
-                        end
+                        @test d.solutions[β] == []
                     end
                 end
 
@@ -183,35 +179,30 @@
 
                 @test d.variables == [Edge(1, 3)]
 
-                @test d.solutions[1, 0] == []
-                @test d.solutions[2, 0] == [Edge(1, 2)]
-                @test d.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
                 @test d.states[1, 0] == 0.0
                 @test d.states[2, 0] == 1.0
                 @test d.states[3, 0] == 2.0
 
-                @test d.solutions[1, 1] == []
-                @test d.solutions[2, 1] == [Edge(1, 3), Edge(3, 2)]
-                @test d.solutions[3, 1] == [Edge(1, 3)]
                 @test d.states[1, 1] == 0.0
                 @test d.states[2, 1] == -1.0
                 @test d.states[3, 1] == 0.0
 
-                @test d.solutions[1, 2] == []
-                @test d.solutions[2, 2] == [Edge(1, 3), Edge(3, 2)]
-                @test d.solutions[3, 2] == [Edge(1, 3)]
                 @test d.states[1, 2] == 0.0
                 @test d.states[2, 2] == -1.0
                 @test d.states[3, 2] == 0.0
+                
+                @test d.solutions[0] == [Edge(1, 2), Edge(2, 3)]
+                @test d.solutions[1] == [Edge(1, 3)]
+                @test d.solutions[2] == [Edge(1, 3)]
             end
 
             if ! is_travis
                 @testset "Linear programming" begin
                     l = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
                     # All solutions have the same destination! Only paths from 1 to 3, unlike DP.
-                    @test l.solutions[3, 0] == [Edge(1, 2), Edge(2, 3)]
-                    @test l.solutions[3, 1] == [Edge(1, 3)]
-                    @test l.solutions[3, 2] == [Edge(1, 3)]
+                    @test l.solutions[0] == [Edge(1, 2), Edge(2, 3)]
+                    @test l.solutions[1] == [Edge(1, 3)]
+                    @test l.solutions[2] == [Edge(1, 3)]
                     @test l.states[3, 0] == 2.0
                     @test l.states[3, 1] == 0.0
                     @test l.states[3, 2] == 0.0

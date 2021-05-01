@@ -84,5 +84,6 @@ function solve(i::MinimumBudget{UniformMatroidInstance{Float64, Maximise}, Int},
         end
     end
 
-    return MinBudgetedUniformMatroidSolution(i, S[i.instance.m, 0, i.min_budget], V, S)
+    S_refined = Dict(β => S[i.instance.m, 0, β] for β in 0:i.min_budget)
+    return MinBudgetedUniformMatroidSolution(i, S[i.instance.m, 0, i.min_budget], V, S_refined)
 end
