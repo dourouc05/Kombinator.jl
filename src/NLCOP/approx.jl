@@ -11,8 +11,8 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
     # TODO: what about ε?
 
     # Transform the enumerated nonlinearity as a true function.
-    sum_over_linear(x::CombinatorialSolution) = sum(nli.linear_coefficients[i] for i in eachindex(nli.linear_coefficients) if i in x)
-    sum_over_nonlinear(x::CombinatorialSolution) = sum(nli.nonlinear_coefficients[i] for i in eachindex(nli.nonlinear_coefficients) if i in x)
+    sum_over_linear(x) = sum(nli.linear_coefficients[i] for i in eachindex(nli.linear_coefficients) if i in x)
+    sum_over_nonlinear(x) = sum(nli.nonlinear_coefficients[i] for i in eachindex(nli.nonlinear_coefficients) if i in x)
     if nli.nonlinear_function == Square
         nl_func = (x) -> sum_over_linear(x) + (sum_over_nonlinear(x)) ^2
     elseif nli.nonlinear_function == SquareRoot
@@ -30,20 +30,22 @@ function solve(nli::NonlinearCombinatorialInstance, algo::ApproximateNonlinearSo
     bi = MinimumBudget(li, Int.(nli.nonlinear_coefficients), max_budget)
 
     # Compute all interesting budgeted solutions, depending on how it is requested to be done.
-    solutions = Pair{Int, CombinatorialSolution}[]
+    solutions = Dict{Int, Vector}[]
     if nli.all_budgets_at_once
         bbi = copy(bi, compute_all_values=true)
-        solutions = solve(bbi, nli.linear_algo)::Vector{Pair{Int, CombinatorialSolution}}
+        sols = solve(bbi, nli.linear_algo)::MultipleMinBudgetedSolution
+        solutions = sols.solutions
     else
         for budget in 0:max_budget
             bbi = copy(bi, min_budget=budget)
-            push!(solutions, (budget, solve(bbi, nli.linear_algo)))
+            solutions[budget] = solve(bbi, nli.linear_algo).variables
         end
     end
 
     # Return the best solution.
     best_sol, _ = _pick_best_solution(solutions, nl_func)
-    return make_solution(nli.combinatorial_structure, best_sol)
+    best_sol_dict = Dict(x => 1.0 for x in best_sol)
+    return make_solution(nli.combinatorial_structure, best_sol_dict)
 end
 
 function _upper_bound_budget(nli::NonlinearCombinatorialInstance)
@@ -53,7 +55,7 @@ function _upper_bound_budget(nli::NonlinearCombinatorialInstance)
     return Int(sum(nli.nonlinear_coefficients[i] for i in eachindex(nli.nonlinear_coefficients) if i in x))
 end
 
-function _pick_best_solution(solutions::Vector{Pair{Int, CombinatorialSolution}}, nl_func::Function)
+function _pick_best_solution(solutions::Dict{Int, Vector{T}}, nl_func::Function) where {T}
     best_solution = Int[]
     best_objective = -Inf
     for (budget, sol) in solutions
@@ -64,7 +66,7 @@ function _pick_best_solution(solutions::Vector{Pair{Int, CombinatorialSolution}}
         end
 
         # Compute the maximum.
-        f_x = nl_func(sol, budget)
+        f_x = nl_func(sol)
         if f_x > best_objective
             best_solution = sol
             best_objective = f_x
