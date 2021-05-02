@@ -48,9 +48,12 @@ for sym in names(@__MODULE__, all=true)
     )
         continue
     end
-    @show sym
     @eval export $sym
 end
+
+# Reexport some symbols that are not included in the previous loop (imported 
+# from other modules).
+export solve
 
 # Include internal extensions.
 include("UniformMatroid/UniformMatroid.jl")
