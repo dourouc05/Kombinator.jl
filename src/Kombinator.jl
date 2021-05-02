@@ -27,15 +27,15 @@ include("interface/algorithm.jl")
 include("interface/variants.jl")
 include("interface/nonlinear.jl")
 
-include("BipartiteMatching/matching.jl")
-include("BipartiteMatching/matching_hungarian.jl")
-include("BipartiteMatching/matching_dp.jl")
-include("BipartiteMatching/matching_budgeted.jl")
-include("BipartiteMatching/matching_budgeted_dp.jl")
-include("BipartiteMatching/matching_budgeted_lagrangian.jl")
+# include("BipartiteMatching/matching.jl")
+# include("BipartiteMatching/matching_hungarian.jl")
+# include("BipartiteMatching/matching_dp.jl")
+# include("BipartiteMatching/matching_budgeted.jl")
+# include("BipartiteMatching/matching_budgeted_dp.jl")
+# include("BipartiteMatching/matching_budgeted_lagrangian.jl")
 
 # Export all symbols. Code copied from JuMP.
-symbols_to_exlude = [Symbol(@__MODULE__), :eval, :include]
+symbols_to_exlude = [Symbol(@__MODULE__), :eval, :include, :symbols_to_exlude]
 
 for sym in names(@__MODULE__, all=true)
     sym_string = string(sym)
@@ -48,6 +48,7 @@ for sym in names(@__MODULE__, all=true)
     )
         continue
     end
+    @show sym
     @eval export $sym
 end
 
