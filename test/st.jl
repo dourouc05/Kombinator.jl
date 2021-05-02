@@ -81,7 +81,7 @@
                 @test s.instance == i
                 @test length(s.variables) == 4 # Five nodes in the graph.
                 @test length(unique(s.variables)) == 4 # Only unique edges.
-                @test Edge(4, 5) in s.variables # Only edge with nonzero cost.
+                @test Edge(4, 5) in s.variables || Edge(5, 4) in s.variables # Only edge with nonzero cost.
             end
         end
     end

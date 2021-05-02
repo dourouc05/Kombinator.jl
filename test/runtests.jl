@@ -6,7 +6,7 @@ using LightGraphs
 using Munkres
 using Test
 
-is_travis = "TRAVIS_JULIA_VERSION" in keys(ENV) || true
+is_travis = "GITHUB_ACTIONS" in keys(ENV)
 # TODO: need for optional dependencies for this to work, I suppose.
 # https://github.com/JuliaLang/Pkg.jl/issues/1285
 if ! is_travis
