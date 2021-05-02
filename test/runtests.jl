@@ -9,7 +9,7 @@ using Test
 is_travis = "GITHUB_ACTIONS" in keys(ENV)
 # TODO: need for optional dependencies for this to work, I suppose.
 # https://github.com/JuliaLang/Pkg.jl/issues/1285
-if ! is_travis
+if !is_travis
     using JuMP
     # Why Gurobi?
     # - Need support for lazy constraints (elementary paths):

@@ -3,7 +3,7 @@
         g = path_digraph(3)
         add_edge!(g, 2, 1)
         rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 3.0, Edge(2, 1) => 25.0)
-        
+
         i = ElementaryPathInstance(g, rewards, 1, 3)
         i2 = copy(i)
         @test i.graph == i2.graph
@@ -18,20 +18,57 @@
         add_edge!(g, 1, 3)
         rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0, Edge(1, 3) => 1.0)
         weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1, Edge(1, 3) => 4)
-        
+
         i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 4)
         path = [Edge(1, 3)]
-        states = Dict((1, 2) => 0.0, (3, 1) => 2.0, (1, 3) => 0.0, (1, 4) => 0.0, (3, 2) => 2.0, (2, 0) => 1.0, (3, 3) => 1.0, (2, 1) => 1.0, (3, 4) => 1.0, (2, 2) => -Inf, (2, 3) => -Inf, (1, 0) => 0.0, (2, 4) => -Inf, (1, 1) => 0.0, (3, 0) => 2.0)
-        solutions = Dict{Int, Vector{Edge{Int}}}(0 => [Edge(1, 2), Edge(2, 3)], 1 => [Edge(1, 2), Edge(2, 3)], 2 => [Edge(1, 2), Edge(2, 3)], 3 => [Edge(1, 3)], 4 => [Edge(1, 3)])
+        states = Dict(
+            (1, 2) => 0.0,
+            (3, 1) => 2.0,
+            (1, 3) => 0.0,
+            (1, 4) => 0.0,
+            (3, 2) => 2.0,
+            (2, 0) => 1.0,
+            (3, 3) => 1.0,
+            (2, 1) => 1.0,
+            (3, 4) => 1.0,
+            (2, 2) => -Inf,
+            (2, 3) => -Inf,
+            (1, 0) => 0.0,
+            (2, 4) => -Inf,
+            (1, 1) => 0.0,
+            (3, 0) => 2.0,
+        )
+        solutions = Dict{Int, Vector{Edge{Int}}}(
+            0 => [Edge(1, 2), Edge(2, 3)],
+            1 => [Edge(1, 2), Edge(2, 3)],
+            2 => [Edge(1, 2), Edge(2, 3)],
+            3 => [Edge(1, 3)],
+            4 => [Edge(1, 3)],
+        )
         d = BudgetedElementaryPathSolution(i, path, states, solutions)
 
         warn_msg = "The requested maximum budget 5 is higher than the instance's minimum budget 4. Therefore, some values have not been computed and are unavailable."
-        @test_logs (:warn, warn_msg) Kombinator.paths_all_budgets_as_tuples(d, 5)
-        sol = Dict(0 => [(1, 2), (2, 3)], 1 => [(1, 2), (2, 3)], 2 => [(1, 2), (2, 3)], 3 => [(1, 3)], 4 => [(1, 3)])
+        @test_logs (:warn, warn_msg) Kombinator.paths_all_budgets_as_tuples(
+            d,
+            5,
+        )
+        sol = Dict(
+            0 => [(1, 2), (2, 3)],
+            1 => [(1, 2), (2, 3)],
+            2 => [(1, 2), (2, 3)],
+            3 => [(1, 3)],
+            4 => [(1, 3)],
+        )
         @test Kombinator.paths_all_budgets_as_tuples(d, 4) == sol
 
         @test_logs (:warn, warn_msg) Kombinator.paths_all_budgets(d, 5)
-        sol = Dict(0 => [Edge(1, 2), Edge(2, 3)], 1 => [Edge(1, 2), Edge(2, 3)], 2 => [Edge(1, 2), Edge(2, 3)], 3 => [Edge(1, 3)], 4 => [Edge(1, 3)])
+        sol = Dict(
+            0 => [Edge(1, 2), Edge(2, 3)],
+            1 => [Edge(1, 2), Edge(2, 3)],
+            2 => [Edge(1, 2), Edge(2, 3)],
+            3 => [Edge(1, 3)],
+            4 => [Edge(1, 3)],
+        )
         @test Kombinator.paths_all_budgets(d, 4) == sol
     end
 
@@ -40,10 +77,17 @@
             @testset "Positive-reward cycle" begin
                 g = path_digraph(3)
                 add_edge!(g, 2, 1)
-                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 3.0, Edge(2, 1) => 25.0)
+                rewards = Dict(
+                    Edge(1, 2) => 1.0,
+                    Edge(2, 3) => 3.0,
+                    Edge(2, 1) => 25.0,
+                )
 
                 i = ElementaryPathInstance(g, rewards, 1, 3)
-                @test_logs (:warn, "The graph contains a positive-cost cycle around edge 2 -> 1.") solve(i, BellmanFordAlgorithm())
+                @test_logs (
+                    :warn,
+                    "The graph contains a positive-cost cycle around edge 2 -> 1.",
+                ) solve(i, BellmanFordAlgorithm())
             end
         end
 
@@ -59,20 +103,29 @@
                     @test s.variables == [Edge(1, 2), Edge(2, 3)]
                 end
 
-                if ! is_travis
+                if !is_travis
                     @testset "Linear programming" begin
-                        s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+                        s = solve(
+                            i,
+                            DefaultLinearFormulation(),
+                            solver=Gurobi.Optimizer,
+                        ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == [Edge(1, 2), Edge(2, 3)]
                     end
                 end
             end
-            
+
             @testset "High-weight edge" begin
                 g = path_digraph(3)
                 add_edge!(g, 1, 3)
-                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0, Edge(1, 3) => 4.0)
-                weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1, Edge(1, 3) => 4)
+                rewards = Dict(
+                    Edge(1, 2) => 1.0,
+                    Edge(2, 3) => 1.0,
+                    Edge(1, 3) => 4.0,
+                )
+                weights =
+                    Dict(Edge(1, 2) => 1, Edge(2, 3) => 1, Edge(1, 3) => 4)
 
                 i = ElementaryPathInstance(g, rewards, 1, 3)
 
@@ -82,9 +135,13 @@
                     @test s.variables == [Edge(1, 3)]
                 end
 
-                if ! is_travis
+                if !is_travis
                     @testset "Linear programming" begin
-                        s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+                        s = solve(
+                            i,
+                            DefaultLinearFormulation(),
+                            solver=Gurobi.Optimizer,
+                        ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == [Edge(1, 3)]
                     end
@@ -117,7 +174,11 @@
                 rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
                 weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1)
 
-                i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 4)
+                i = MinimumBudget(
+                    ElementaryPathInstance(g, rewards, 1, 3),
+                    weights,
+                    4,
+                )
 
                 @testset "Bellman-Ford" begin
                     d = solve(i, BellmanFordAlgorithm())
@@ -133,9 +194,13 @@
                     end
                 end
 
-                if ! is_travis
+                if !is_travis
                     @testset "Linear programming" begin
-                        s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+                        s = solve(
+                            i,
+                            DefaultLinearFormulation(),
+                            solver=Gurobi.Optimizer,
+                        ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == []
                     end
@@ -145,20 +210,33 @@
             @testset "High-weight edge" begin
                 g = path_digraph(3)
                 add_edge!(g, 1, 3)
-                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0, Edge(1, 3) => 1.0)
-                weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1, Edge(1, 3) => 4)
+                rewards = Dict(
+                    Edge(1, 2) => 1.0,
+                    Edge(2, 3) => 1.0,
+                    Edge(1, 3) => 1.0,
+                )
+                weights =
+                    Dict(Edge(1, 2) => 1, Edge(2, 3) => 1, Edge(1, 3) => 4)
 
-                i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 4)
-                
+                i = MinimumBudget(
+                    ElementaryPathInstance(g, rewards, 1, 3),
+                    weights,
+                    4,
+                )
+
                 @testset "Bellman-Ford" begin
                     s = solve(i, BellmanFordAlgorithm())
                     @test s.instance == i
                     @test s.variables == [Edge(1, 3)]
                 end
 
-                if ! is_travis
+                if !is_travis
                     @testset "Linear programming" begin
-                        s = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+                        s = solve(
+                            i,
+                            DefaultLinearFormulation(),
+                            solver=Gurobi.Optimizer,
+                        ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == [Edge(1, 3)]
                     end
@@ -169,13 +247,35 @@
         @testset "Conformity" begin
             # More advanced tests to ensure the algorithm works as expected.
             g = complete_digraph(3)
-            rewards = Dict(Edge(1, 2) => 1.0, Edge(3, 1) => -1.0, Edge(3, 2) => -1.0, Edge(2, 3) => 1.0, Edge(2, 1) => -1.0, Edge(1, 3) => 0.0)
-            weights = Dict(Edge(1, 2) => 0, Edge(3, 1) => 0, Edge(3, 2) => 0, Edge(2, 3) => 0, Edge(2, 1) => 0, Edge(1, 3) => 2)
-            i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 2, compute_all_values=true)
-            
+            rewards = Dict(
+                Edge(1, 2) => 1.0,
+                Edge(3, 1) => -1.0,
+                Edge(3, 2) => -1.0,
+                Edge(2, 3) => 1.0,
+                Edge(2, 1) => -1.0,
+                Edge(1, 3) => 0.0,
+            )
+            weights = Dict(
+                Edge(1, 2) => 0,
+                Edge(3, 1) => 0,
+                Edge(3, 2) => 0,
+                Edge(2, 3) => 0,
+                Edge(2, 1) => 0,
+                Edge(1, 3) => 2,
+            )
+            i = MinimumBudget(
+                ElementaryPathInstance(g, rewards, 1, 3),
+                weights,
+                2,
+                compute_all_values=true,
+            )
+
             @testset "Bellman-Ford" begin
                 warn_msg = "The graph contains a positive-cost cycle around edge 3 -> 1."
-                d = @test_logs (:warn, warn_msg) solve(i, BellmanFordAlgorithm())
+                d = @test_logs (:warn, warn_msg) solve(
+                    i,
+                    BellmanFordAlgorithm(),
+                )
 
                 @test d.variables == [Edge(1, 3)]
 
@@ -190,15 +290,19 @@
                 @test d.states[1, 2] == 0.0
                 @test d.states[2, 2] == -1.0
                 @test d.states[3, 2] == 0.0
-                
+
                 @test d.solutions[0] == [Edge(1, 2), Edge(2, 3)]
                 @test d.solutions[1] == [Edge(1, 3)]
                 @test d.solutions[2] == [Edge(1, 3)]
             end
 
-            if ! is_travis
+            if !is_travis
                 @testset "Linear programming" begin
-                    l = solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer) # Cbc unsupported.
+                    l = solve(
+                        i,
+                        DefaultLinearFormulation(),
+                        solver=Gurobi.Optimizer,
+                    ) # Cbc unsupported.
                     # All solutions have the same destination! Only paths from 1 to 3, unlike DP.
                     @test l.solutions[0] == [Edge(1, 2), Edge(2, 3)]
                     @test l.solutions[1] == [Edge(1, 3)]

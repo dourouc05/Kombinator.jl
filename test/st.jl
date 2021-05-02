@@ -22,34 +22,74 @@
     @testset "Value of a tree" begin
         @testset "Vanilla" begin
             graph = complete_graph(5)
-            rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+            rewards =
+                Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
             i = SpanningTreeInstance(graph, rewards)
 
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, Edge{Int}[]) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, [Edge(1, 2)]) == 1.0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, [Edge(1, 2), Edge(1, 3)]) == 1.5
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                i,
+                Edge{Int}[],
+            ) == 0
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                i,
+                [Edge(1, 2)],
+            ) == 1.0
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                i,
+                [Edge(1, 2), Edge(1, 3)],
+            ) == 1.5
         end
 
         @testset "Budgeted" begin
             graph = complete_graph(3)
-            rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+            rewards =
+                Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
             weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
             i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
 
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, Edge{Int}[]) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, [Edge(1, 2)]) == 1.0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(i, [Edge(1, 2), Edge(1, 3)]) == 1.5
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                i,
+                Edge{Int}[],
+            ) == 0
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                i,
+                [Edge(1, 2)],
+            ) == 1.0
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                i,
+                [Edge(1, 2), Edge(1, 3)],
+            ) == 1.5
 
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, Edge{Int}[]) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, [Edge(1, 2)]) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, [Edge(1, 2), Edge(1, 3)]) == 2
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                i,
+                Edge{Int}[],
+            ) == 0
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                i,
+                [Edge(1, 2)],
+            ) == 0
+            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                i,
+                [Edge(1, 2), Edge(1, 3)],
+            ) == 2
         end
     end
 
     @testset "Maximum spanning tree" begin
         @testset "Basic" begin
             graph = complete_graph(5)
-            rewards = Dict(Edge(1, 2) => 121.0, Edge(1, 3) => 10.0, Edge(1, 4) => 10.0, Edge(1, 5) => 10.0, Edge(2, 3) => 121.0, Edge(2, 4) => 10.0, Edge(2, 5) => 10.0, Edge(3, 4) => 121.0, Edge(3, 5) => 10.0, Edge(4, 5) => 121.0)
+            rewards = Dict(
+                Edge(1, 2) => 121.0,
+                Edge(1, 3) => 10.0,
+                Edge(1, 4) => 10.0,
+                Edge(1, 5) => 10.0,
+                Edge(2, 3) => 121.0,
+                Edge(2, 4) => 10.0,
+                Edge(2, 5) => 10.0,
+                Edge(3, 4) => 121.0,
+                Edge(3, 5) => 10.0,
+                Edge(4, 5) => 121.0,
+            )
 
             i = SpanningTreeInstance(graph, rewards)
             p = solve(i, PrimAlgorithm())
@@ -69,7 +109,18 @@
 
         @testset "Conformity" begin
             graph = complete_graph(5)
-            rewards = Dict(Edge(2, 5) => 0.0, Edge(3, 5) => 0.0, Edge(4, 5) => 1.0, Edge(1, 2) => 0.0, Edge(2, 3) => 0.0, Edge(1, 4) => 0.0, Edge(2, 4) => 0.0, Edge(1, 5) => 0.0, Edge(1, 3) => 0.0, Edge(3, 4) => 0.0)
+            rewards = Dict(
+                Edge(2, 5) => 0.0,
+                Edge(3, 5) => 0.0,
+                Edge(4, 5) => 1.0,
+                Edge(1, 2) => 0.0,
+                Edge(2, 3) => 0.0,
+                Edge(1, 4) => 0.0,
+                Edge(2, 4) => 0.0,
+                Edge(1, 5) => 0.0,
+                Edge(1, 3) => 0.0,
+                Edge(3, 4) => 0.0,
+            )
 
             i = SpanningTreeInstance(graph, rewards)
             p = solve(i, PrimAlgorithm())
@@ -90,43 +141,79 @@
         @testset "Interface" begin
             @testset "Approximation: Lagrangian refinement" begin
                 graph = complete_graph(3)
-                rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-                weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
-                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+                rewards = Dict(
+                    Edge(1, 2) => 1.0,
+                    Edge(1, 3) => 0.5,
+                    Edge(2, 3) => 3.0,
+                )
+                weights =
+                    Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
+                i = MinimumBudget(
+                    SpanningTreeInstance(graph, rewards),
+                    weights,
+                    0,
+                )
 
-                @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁻=1.0)
-                @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁻=2.0)
-                @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁺=1.0)
-                @test_throws ErrorException solve(i, LagrangianRefinementAlgorithm(), ζ⁺=0.2)
+                @test_throws ErrorException solve(
+                    i,
+                    LagrangianRefinementAlgorithm(),
+                    ζ⁻=1.0,
+                )
+                @test_throws ErrorException solve(
+                    i,
+                    LagrangianRefinementAlgorithm(),
+                    ζ⁻=2.0,
+                )
+                @test_throws ErrorException solve(
+                    i,
+                    LagrangianRefinementAlgorithm(),
+                    ζ⁺=1.0,
+                )
+                @test_throws ErrorException solve(
+                    i,
+                    LagrangianRefinementAlgorithm(),
+                    ζ⁺=0.2,
+                )
             end
         end
 
         @testset "Basic" begin
             graph = complete_graph(3)
-            rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+            rewards =
+                Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
             weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
             # weights = Dict(Edge(1, 2) => 1, Edge(1, 3) => 2, Edge(2, 3) => 1)
 
             ε = 0.0001
             budget = 1
-            
-            i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, budget)
+
+            i = MinimumBudget(
+                SpanningTreeInstance(graph, rewards),
+                weights,
+                budget,
+            )
 
             @testset "Lagrangian relaxation" begin
                 lagrangian = solve(i, LagrangianAlgorithm(), ε=ε)
-                @test lagrangian.λ ≈ 0.25 atol=ε
-                @test lagrangian.value ≈ 3.75 atol=ε
+                @test lagrangian.λ ≈ 0.25 atol = ε
+                @test lagrangian.value ≈ 3.75 atol = ε
                 @test length(lagrangian.variables) == 2
-                
+
                 # Two solutions have this Lagrangian cost: a feasible one and an infeasible one.
                 if Edge(1, 3) in lagrangian.variables # Strictly feasible solution.
                     @test Edge(1, 3) in lagrangian.variables
                     @test Edge(2, 3) in lagrangian.variables
-                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, lagrangian.variables) > budget
+                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                        i,
+                        lagrangian.variables,
+                    ) > budget
                 else # Infeasible solution.
                     @test Edge(1, 2) in lagrangian.variables
                     @test Edge(2, 3) in lagrangian.variables
-                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, lagrangian.variables) < budget
+                    @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                        i,
+                        lagrangian.variables,
+                    ) < budget
                 end
             end
 
@@ -137,7 +224,10 @@
                 s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
-                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    s,
+                ) >= budget
             end
 
             @testset "Iterated Lagrangian refinement (multiplicative approximation algorithm)" begin
@@ -147,7 +237,10 @@
                 s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
-                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    s,
+                ) >= budget
             end
 
             @testset "Dynamic programming" begin
@@ -158,7 +251,10 @@
                 s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
-                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    s,
+                ) >= budget
             end
 
             @testset "Linear programming" begin
@@ -169,10 +265,13 @@
                 s = sol.variables
                 @test length(s) == 2
                 @test Edge(1, 3) in s # Only important edge in this instance: the only one to have a non-zero weight.
-                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(i, s) >= budget
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    s,
+                ) >= budget
             end
         end
-        
+
         # More advanced tests to ensure the algorithm works as expected.
 
         @testset "Conformity" begin
@@ -205,7 +304,7 @@
             @testset "Infeasible budget" begin
                 i = MinimumBudget(SpanningTreeInstance(graph, r), w, 20)
 
-                @testset "Lagrangian refinement" begin                
+                @testset "Lagrangian refinement" begin
                     s = solve(i, LagrangianRefinementAlgorithm())
                     @test s !== nothing
                     @test s.variables == Edge{Int}[]
