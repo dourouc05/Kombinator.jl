@@ -15,9 +15,9 @@
                     nlw,
                     SquareRoot,
                     0.01,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Gurobi.Optimizer),
                 )
                 s = solve(nli, ExactNonlinearSolver(Gurobi.Optimizer))
 
@@ -39,9 +39,9 @@
                     nlw,
                     SquareRoot,
                     0.01,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Gurobi.Optimizer),
                 )
                 s = solve(nli, ExactNonlinearSolver(Gurobi.Optimizer))
 
@@ -73,9 +73,9 @@
                     nlw,
                     SquareRoot,
                     0.01,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Gurobi.Optimizer),
                 )
                 s = solve(nli, ExactNonlinearSolver(Gurobi.Optimizer))
 
