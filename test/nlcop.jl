@@ -130,11 +130,11 @@
                     nlw,
                     SquareRoot,
                     0.01,
-                    DefaultLinearFormulation(Gurobi.Optimizer),
+                    DefaultLinearFormulation(Cbc.Optimizer),
                     true,
-                    DefaultLinearFormulation(nothing),
+                    DefaultLinearFormulation(Cbc.Optimizer),
                 )
-                s = solve(nli, ApproximateNonlinearSolver(DefaultLinearFormulation(Gurobi.Optimizer)))
+                s = solve(nli, ApproximateNonlinearSolver(DefaultLinearFormulation(Cbc.Optimizer)))
 
                 @test s.instance == li
                 @test Set(s.variables) == Set([4, 5])
@@ -170,6 +170,35 @@
             @test obj_lin + obj_nl ≈ 15.47 atol = 1.0e-2
         end
 
+        @testset "Basic: spanning tree, LP-based" begin
+            graph = complete_graph(5)
+            lw = Dict{Edge{Int}, Float64}(
+                e => min(src(e), dst(e)) for e in edges(graph)
+            )
+            nlw = Dict{Edge{Int}, Float64}(
+                e => ne(graph) - min(src(e), dst(e)) for e in edges(graph)
+            )
+
+            li = SpanningTreeInstance(graph, lw, Maximise())
+            nli = NonlinearCombinatorialInstance(
+                li,
+                lw,
+                nlw,
+                SquareRoot,
+                0.01,
+                DefaultLinearFormulation(Cbc.Optimizer),
+                true,
+                DefaultLinearFormulation(Cbc.Optimizer),
+            )
+            s = solve(nli, ApproximateNonlinearSolver(DefaultLinearFormulation(Cbc.Optimizer)))
+            
+            obj_lin = sum(e in keys(lw) ? lw[e] : lw[reverse(e)] for e in s.variables)
+            obj_nl = sqrt(sum(e in keys(nlw) ? nlw[e] : lw[reverse(e)] for e in s.variables))
+
+            @test s.instance == li
+            @test obj_lin + obj_nl ≈ 15.29 atol = 1.0e-2
+        end
+
         @testset "Basic: elementary path, DP-based" begin
             graph = complete_digraph(5)
             lw = Dict{Edge{Int}, Float64}(e => src(e) for e in edges(graph))
@@ -197,6 +226,34 @@
             @test Set(s.variables) ==
                   Set([Edge(1, 2), Edge(2, 3), Edge(3, 4), Edge(4, 5)])
             @test obj_lin + obj_nl ≈ 18.36 atol = 1.0e-2
+        end
+
+        if !is_travis
+            @testset "Basic: elementary path, LP-based" begin
+                graph = complete_digraph(5)
+                lw = Dict{Edge{Int}, Float64}(e => src(e) for e in edges(graph))
+                nlw = Dict{Edge{Int}, Float64}(
+                    e => ne(graph) - src(e) for e in edges(graph)
+                )
+
+                li = ElementaryPathInstance(graph, lw, 1, 5, Maximise())
+                nli = NonlinearCombinatorialInstance(
+                    li,
+                    lw,
+                    nlw,
+                    SquareRoot,
+                    0.01,
+                    DefaultLinearFormulation(Gurobi.Optimizer),
+                    true,
+                    DefaultLinearFormulation(Gurobi.Optimizer),
+                )
+                s = solve(nli, ApproximateNonlinearSolver(DefaultLinearFormulation(Gurobi.Optimizer)))
+
+                obj_lin = sum(lw[e] for e in s.variables)
+                obj_nl = sqrt(sum(nlw[e] for e in s.variables))
+
+                @test s.instance == li
+            end
         end
     end
 end

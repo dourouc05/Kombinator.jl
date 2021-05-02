@@ -80,8 +80,13 @@ function _elementary_path_lazy_callback(
     while length(lhs_edges) > 0
         # Find one subtour among these edges. Same technique as above: start
         # from a node of the tour, use edges until you find the starting point.
-        first_edge = copy(lhs_edges[1])
+        first_edge = lhs_edges[1]
         deleteat!(lhs_edges, 1)
+
+        # No loop of just one edge.
+        if length(lhs_edges) == 0
+            break
+        end
 
         src_node = src(first_edge) # Memorise the source for this iteration.
         cur_node = dst(lhs_edges[1]) # First node to explore.
