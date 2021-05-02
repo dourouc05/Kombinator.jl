@@ -1,16 +1,38 @@
-approximation_term(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
-approximation_ratio(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm) where {T, U} = NaN
-
-function _st_prim_budgeted_lagrangian(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, λ::Float64) where {T, U}
-    # Solve the subproblem for one value of the dual multiplier λ:
-    #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
-    sti_rewards = Dict{Edge{T}, Float64}(e => i.instance.rewards[e] + λ * i.weights[e] for e in keys(i.instance.rewards))
-    sti = SpanningTreeInstance(i.instance.graph, sti_rewards)
-    sti_sol = solve(sti, PrimAlgorithm())
-    return _budgeted_spanning_tree_compute_value(sti, sti_sol.variables) - λ * i.min_budget, sti_sol.variables
+function approximation_term(
+    ::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::LagrangianAlgorithm,
+) where {T, U}
+    return NaN
+end
+function approximation_ratio(
+    ::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::LagrangianAlgorithm,
+) where {T, U}
+    return NaN
 end
 
-function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianAlgorithm; ε::Float64) where {T, U}
+function _st_prim_budgeted_lagrangian(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    λ::Float64,
+) where {T, U}
+    # Solve the subproblem for one value of the dual multiplier λ:
+    #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
+    sti_rewards = Dict{Edge{T}, Float64}(
+        e => i.instance.rewards[e] + λ * i.weights[e] for
+        e in keys(i.instance.rewards)
+    )
+    sti = SpanningTreeInstance(i.instance.graph, sti_rewards)
+    sti_sol = solve(sti, PrimAlgorithm())
+    return _budgeted_spanning_tree_compute_value(sti, sti_sol.variables) -
+           λ * i.min_budget,
+    sti_sol.variables
+end
+
+function solve(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::LagrangianAlgorithm;
+    ε::Float64,
+) where {T, U}
     # Approximately solve the problem \min_{l ≥ 0} l(λ), where
     #     l(λ) = \max_{x spanning tree} (rewards + λ weights) x - λ budget.
     # This problem is the Lagrangian dual of the budgeted maximum spanning-tree problem:
@@ -44,8 +66,20 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
     vlow, stlow = _st_prim_budgeted_lagrangian(i, λlow)
     vhigh, sthigh = _st_prim_budgeted_lagrangian(i, λhigh)
     if vlow < vhigh
-        return BudgetedSpanningTreeLagrangianSolution(i, stlow, λlow, vlow, λmax)
+        return BudgetedSpanningTreeLagrangianSolution(
+            i,
+            stlow,
+            λlow,
+            vlow,
+            λmax,
+        )
     else
-        return BudgetedSpanningTreeLagrangianSolution(i, sthigh, λhigh, vhigh, λmax)
+        return BudgetedSpanningTreeLagrangianSolution(
+            i,
+            sthigh,
+            λhigh,
+            vhigh,
+            λmax,
+        )
     end
 end

@@ -42,7 +42,10 @@ for sym in names(@__MODULE__, all=true)
     if sym in symbols_to_exlude || startswith(sym_string, "_")
         continue
     end
-    if !(Base.isidentifier(sym) || (startswith(sym_string, "@") && Base.isidentifier(sym_string[2:end])))
+    if !(
+        Base.isidentifier(sym) ||
+        (startswith(sym_string, "@") && Base.isidentifier(sym_string[2:end]))
+    )
         continue
     end
     @eval export $sym

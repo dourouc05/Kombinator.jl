@@ -1,4 +1,8 @@
-function formulation(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLinearFormulation; solver=nothing)
+function formulation(
+    i::UniformMatroidInstance{Float64, Maximise},
+    ::DefaultLinearFormulation;
+    solver=nothing,
+)
     dim = dimension(i)
 
     model = Model(solver)
@@ -11,7 +15,11 @@ function formulation(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLine
     return model, x
 end
 
-function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DefaultLinearFormulation; solver=nothing)
+function solve(
+    i::UniformMatroidInstance{Float64, Maximise},
+    ::DefaultLinearFormulation;
+    solver=nothing,
+)
     m, x = formulation(i, DefaultLinearFormulation(), solver=solver)
     optimize!(m)
     return UniformMatroidSolution(i, findall(JuMP.value.(x) .>= 0.5))

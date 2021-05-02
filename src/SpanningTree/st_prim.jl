@@ -1,13 +1,21 @@
-function solve(i::SpanningTreeInstance{T, Maximise}, ::GreedyAlgorithm) where T
+function solve(
+    i::SpanningTreeInstance{T, Maximise},
+    ::GreedyAlgorithm,
+) where {T}
     return solve(i, PrimAlgorithm())
 end
 
-function solve(i::SpanningTreeInstance{T, Maximise}, ::PrimAlgorithm) where T
+function solve(i::SpanningTreeInstance{T, Maximise}, ::PrimAlgorithm) where {T}
     remaining_edges = PriorityQueue{Edge{T}, Float64}(Base.Reverse) # Easy retrieval of highest-reward edge.
     node_done = falses(nv(i.graph))
 
     # Helper methods.
-    edges_around(g, v) = ((v < x) ? edgetype(g)(v, x) : edgetype(g)(x, v) for x in neighbors(g, v))
+    function edges_around(g, v)
+        return (
+            (v < x) ? edgetype(g)(v, x) : edgetype(g)(x, v) for
+            x in neighbors(g, v)
+        )
+    end
 
     # Initialise with the source node (arbitrarily, the first one).
     first_node = first(vertices(i.graph))
@@ -25,15 +33,15 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::PrimAlgorithm) where T
         while isnothing(new_node)
             e = dequeue!(remaining_edges)
 
-            if node_done[src(e)] && ! node_done[dst(e)]
+            if node_done[src(e)] && !node_done[dst(e)]
                 new_node = dst(e)
             end
-            if ! node_done[src(e)] && node_done[dst(e)]
+            if !node_done[src(e)] && node_done[dst(e)]
                 new_node = src(e)
             end
         end
 
-        @assert ! node_done[new_node]
+        @assert !node_done[new_node]
 
         # Use this edge in the solution.
         push!(solution, e)
@@ -47,7 +55,8 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::PrimAlgorithm) where T
             end
 
             # Ensure the edge links a node already in the tree and another one outside.
-            if (node_done[src(ϵ)] && ! node_done[dst(ϵ)]) || (! node_done[src(ϵ)] && node_done[dst(ϵ)])
+            if (node_done[src(ϵ)] && !node_done[dst(ϵ)]) ||
+               (!node_done[src(ϵ)] && node_done[dst(ϵ)])
                 enqueue!(remaining_edges, ϵ => reward(i, ϵ))
             end
         end

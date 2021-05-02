@@ -1,9 +1,14 @@
-struct SpanningTreeInstance{T <: Real, O <: CombinatorialObjective} <: CombinatorialInstance
+struct SpanningTreeInstance{T <: Real, O <: CombinatorialObjective} <:
+       CombinatorialInstance
     graph::AbstractGraph{T}
     rewards::Dict{Edge{T}, Float64}
     objective::O
 
-    function SpanningTreeInstance(graph::AbstractGraph{T}, rewards::Dict{Edge{T}, Float64}, objective::O=Maximise()) where {T <: Real, O <: CombinatorialObjective}
+    function SpanningTreeInstance(
+        graph::AbstractGraph{T},
+        rewards::Dict{Edge{T}, Float64},
+        objective::O=Maximise(),
+    ) where {T <: Real, O <: CombinatorialObjective}
         return new{T, O}(graph, rewards, objective)
     end
 end
@@ -12,11 +17,16 @@ function dimension(i::SpanningTreeInstance{T, O}) where {T, O}
     return ne(i.graph)
 end
 
-function copy(i::SpanningTreeInstance{T, O}; graph::AbstractGraph{T}=i.graph, rewards::Dict{Edge{T}, Float64}=i.rewards, objective::CombinatorialObjective=i.objective) where {T, O <: CombinatorialObjective}
+function copy(
+    i::SpanningTreeInstance{T, O};
+    graph::AbstractGraph{T}=i.graph,
+    rewards::Dict{Edge{T}, Float64}=i.rewards,
+    objective::CombinatorialObjective=i.objective,
+) where {T, O <: CombinatorialObjective}
     return SpanningTreeInstance(graph, rewards, objective)
 end
 
-function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where T
+function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where {T}
     if e in keys(i.rewards)
         return i.rewards[e]
     end
@@ -30,7 +40,10 @@ struct SpanningTreeSolution{T, O} <: CombinatorialSolution
     variables::Vector{Edge{T}}
 end
 
-function make_solution(i::SpanningTreeInstance{T, O}, tree::Dict{Edge{T}, Float64}) where {T, O}
+function make_solution(
+    i::SpanningTreeInstance{T, O},
+    tree::Dict{Edge{T}, Float64},
+) where {T, O}
     tree_edges = Edge{T}[]
     for (k, v) in tree
         if v >= 0.5
@@ -47,11 +60,16 @@ struct SimpleBudgetedSpanningTreeSolution{T, U} <: SingleMinBudgetedSolution
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     variables::Vector{Edge{T}}
 
-    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, variables::Vector{Edge{T}}) where {T, U}
+    function SimpleBudgetedSpanningTreeSolution(
+        instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+        variables::Vector{Edge{T}},
+    ) where {T, U}
         return new{T, U}(instance, variables)
     end
 
-    function SimpleBudgetedSpanningTreeSolution(instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}) where {T, U}
+    function SimpleBudgetedSpanningTreeSolution(
+        instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ) where {T, U}
         # No feasible solution.
         return new{T, U}(instance, edgetype(instance.instance.graph)[])
     end
@@ -66,7 +84,8 @@ struct BudgetedSpanningTreeLagrangianSolution{T, U} <: SingleMinBudgetedSolution
     λmax::Float64 # No dual value higher than this is useful (i.e. they all yield the same solution).
 end
 
-struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: MultipleMinBudgetedSolution
+struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <:
+       MultipleMinBudgetedSolution
     # Used to store important temporary results from dynamic programming.
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     variables::Vector{Edge{T}}
@@ -74,7 +93,10 @@ struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <: MultipleMinBudget
     solutions::Dict{Int, Vector{Edge{T}}}
 end
 
-function make_solution(i::MinimumBudget{SpanningTreeInstance{T, O}, U}, tree::Dict{Edge{T}, Float64}) where {T, O, U}
+function make_solution(
+    i::MinimumBudget{SpanningTreeInstance{T, O}, U},
+    tree::Dict{Edge{T}, Float64},
+) where {T, O, U}
     tree_edges = Edge{T}[]
     for (k, v) in tree
         if v >= 0.5

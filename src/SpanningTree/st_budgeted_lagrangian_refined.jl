@@ -1,8 +1,24 @@
-approximation_term(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = maximum(values(i.rewards))
-approximation_ratio(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm) where {T, U} = NaN
+function approximation_term(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::LagrangianRefinementAlgorithm,
+) where {T, U}
+    return maximum(values(i.rewards))
+end
+function approximation_ratio(
+    ::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::LagrangianRefinementAlgorithm,
+) where {T, U}
+    return NaN
+end
 
-function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::LagrangianRefinementAlgorithm;
-               ε::Float64=1.0e-3, ζ⁻::Float64=0.2, ζ⁺::Float64=5.0, stalling⁻::Float64=1.0e-5) where {T, U}
+function solve(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::LagrangianRefinementAlgorithm;
+    ε::Float64=1.0e-3,
+    ζ⁻::Float64=0.2,
+    ζ⁺::Float64=5.0,
+    stalling⁻::Float64=1.0e-5,
+) where {T, U}
     # Approximately solve the following problem:
     #     \max_{x spanning tree} rewards x  s.t.  weights x >= budget
     # This algorithm provides an additive approximation to this problem. If x* is the optimum solution and x~ the one
@@ -12,18 +28,27 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
 
     # Check assumptions.
     if ζ⁻ >= 1.0
-        error("ζ⁻ must be strictly less than 1.0: the dual multiplier λ is multiplied by ζ⁻ to reach an infeasible solution by less penalising the budget constraint.")
+        error(
+            "ζ⁻ must be strictly less than 1.0: the dual multiplier λ is multiplied by ζ⁻ to reach an infeasible solution by less penalising the budget constraint.",
+        )
     end
     if ζ⁺ <= 1.0
-        error("ζ⁺ must be strictly greater than 1.0: the dual multiplier λ is multiplied by ζ⁺ to reach a feasible solution by penalising more the budget constraint.")
+        error(
+            "ζ⁺ must be strictly greater than 1.0: the dual multiplier λ is multiplied by ζ⁺ to reach a feasible solution by penalising more the budget constraint.",
+        )
     end
 
     # Ensure the problem is feasible by only considering the budget constraint.
-    feasible_rewards = Dict{Edge{T}, Float64}(e => i.weights[e] for e in keys(i.instance.rewards))
+    feasible_rewards = Dict{Edge{T}, Float64}(
+        e => i.weights[e] for e in keys(i.instance.rewards)
+    )
     feasible_instance = SpanningTreeInstance(i.instance.graph, feasible_rewards)
     feasible_solution = solve(feasible_instance, PrimAlgorithm())
 
-    if _budgeted_spanning_tree_compute_value(feasible_instance, feasible_solution.variables) < i.min_budget
+    if _budgeted_spanning_tree_compute_value(
+        feasible_instance,
+        feasible_solution.variables,
+    ) < i.min_budget
         # By maximising the left-hand side of the budget constraint, impossible to reach the target budget. No solution!
         return SimpleBudgetedSpanningTreeSolution(i)
     end
@@ -76,10 +101,17 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
 
         if stalling # Second test: minimise the left-hand side of the budget constraint, in hope of finding a feasible solution.
             # This process is highly similar to the computation of feasible_solution, but with a reverse objective function.
-            infeasible_rewards = Dict{Edge{T}, Float64}(e => - i.weights[e] for e in keys(i.weights))
-            infeasible_solution = solve(SpanningTreeInstance(i.instance.graph, infeasible_rewards), PrimAlgorithm()).variables
+            infeasible_rewards = Dict{Edge{T}, Float64}(
+                e => -i.weights[e] for e in keys(i.weights)
+            )
+            infeasible_solution =
+                solve(
+                    SpanningTreeInstance(i.instance.graph, infeasible_rewards),
+                    PrimAlgorithm(),
+                ).variables
 
-            if _budgeted_spanning_tree_compute_weight(i, infeasible_solution) < i.min_budget
+            if _budgeted_spanning_tree_compute_weight(i, infeasible_solution) <
+               i.min_budget
                 x⁻ = infeasible_solution
                 stalling = false
             end
@@ -112,7 +144,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Lagrang
 
     # Normalise the solutions: the input graph is undirected, the direction of the edges is not important.
     # In case one solution has the edge v -> w and the other one w -> v, make them equal. s
-    sort_edge(e::Edge{T}) where T = (src(e) < dst(e)) ? e : reverse(e)
+    sort_edge(e::Edge{T}) where {T} = (src(e) < dst(e)) ? e : reverse(e)
     x⁺ = [sort_edge(e) for e in x⁺]
     x⁻ = [sort_edge(e) for e in x⁻]
 

@@ -14,6 +14,9 @@ function _extract_lp_solution(i::SpanningTreeInstance{Int, Maximise}, x)
     return _extract_lp_solution_sub(i.graph, x)
 end
 
-function _extract_lp_solution(i::MinimumBudget{SpanningTreeInstance{Int, Maximise}, Int}, x)
+function _extract_lp_solution(
+    i::MinimumBudget{SpanningTreeInstance{Int, Maximise}, Int},
+    x,
+)
     return _extract_lp_solution_sub(i.instance.graph, x)
 end

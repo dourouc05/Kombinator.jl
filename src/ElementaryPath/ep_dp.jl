@@ -1,8 +1,8 @@
-function solve(i::ElementaryPathInstance{T}, ::DynamicProgramming) where T 
+function solve(i::ElementaryPathInstance{T}, ::DynamicProgramming) where {T}
     return solve(i, BellmanFordAlgorithm())
 end
 
-function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T 
+function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where {T}
     # Assumption: no positive-cost cycle in the graph.
     V = Dict{T, Float64}()
     S = Dict{T, Vector{Edge{T}}}()
@@ -37,7 +37,7 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
             end
         end
 
-        if ! changes
+        if !changes
             break
         end
     end
@@ -48,7 +48,9 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where T
         w = i.rewards[Edge(u, v)]
 
         if V[u] + w > V[v]
-            @warn("The graph contains a positive-cost cycle around edge $(u) -> $(v).")
+            @warn(
+                "The graph contains a positive-cost cycle around edge $(u) -> $(v)."
+            )
         end
     end
 

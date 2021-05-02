@@ -1,4 +1,7 @@
-function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where T
+function solve(
+    i::SpanningTreeInstance{T, Maximise},
+    ::DynamicProgramming,
+) where {T}
     # A dynamic-programming stance on Prim's algorithm.
 
     # Get an indexed list of *all* edges, sorted by increasing value.
@@ -6,7 +9,7 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     for e in edges(i.graph)
         push!(sorted_edges, e => reward(i, e))
     end
-    sort!(sorted_edges, by=(p) -> - p[2])
+    sort!(sorted_edges, by=(p) -> -p[2])
 
     # Fill the DP table, considering edges one by one (from the best to the
     # poorest), Prim-like.
@@ -17,7 +20,7 @@ function solve(i::SpanningTreeInstance{T, Maximise}, ::DynamicProgramming) where
     first_edge, first_edge_value = sorted_edges[1]
     V[1] = first_edge_value
     S[1] = Edge{T}[first_edge]
-    
+
     ld = LoopDetector(nv(i.graph))
     visit_edge(ld, src(first_edge), dst(first_edge))
 

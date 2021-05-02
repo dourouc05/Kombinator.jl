@@ -1,4 +1,7 @@
-function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgramming)
+function solve(
+    i::UniformMatroidInstance{Float64, Maximise},
+    ::DynamicProgramming,
+)
     # V[µ, δ]: µ items, up to δ.
     V = Matrix{Float64}(undef, i.m, dimension(i))
     S = Dict{Tuple{Int, Int}, Vector{Int}}()
@@ -8,18 +11,18 @@ function solve(i::UniformMatroidInstance{Float64, Maximise}, ::DynamicProgrammin
     S[1, dimension(i)] = Int[]
 
     for δ in (dimension(i) - 1):-1:1
-        v, x = findmax(i.rewards[δ + 1:dimension(i)])
+        v, x = findmax(i.rewards[(δ + 1):dimension(i)])
         V[1, δ] = v
         S[1, δ] = [x]
     end
 
-    for µ in 2:i.m
+    for µ in 2:(i.m)
         V[µ, dimension(i)] = 0.0
         S[µ, dimension(i)] = Int[]
     end
 
     # Dynamic part.
-    for µ in 2:i.m
+    for µ in 2:(i.m)
         for δ in (dimension(i) - 1):-1:0
             obj_idx = δ + 1
             take_δ = i.rewards[obj_idx] + V[µ - 1, δ + 1]

@@ -1,4 +1,8 @@
-function formulation(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearFormulation; solver=nothing)
+function formulation(
+    i::SpanningTreeInstance{Int, Maximise},
+    ::DefaultLinearFormulation;
+    solver=nothing,
+)
     # Input graph supposed to be undirected.
     n = nv(i.graph)
     graph = DiGraph(n)
@@ -25,16 +29,29 @@ function formulation(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearForm
     # formulation (p. 38).
     m = Model(solver)
     set_silent(m)
-    
-    x = @variable(m, [e in edges(graph)], binary=true)
-    flow = @variable(m, [e in edges(graph)], lower_bound=0, upper_bound=n - 1)
 
-    inflow(v) = length(inedges(graph, v)) == 0 ? 0 : sum(flow[e] for e in inedges(graph, v))
-    outflow(v) = length(outedges(graph, v)) == 0 ? 0 : sum(flow[e] for e in outedges(graph, v))
-    
-    inx(v) = length(inedges(graph, v)) == 0 ? 0 : sum(x[e] for e in inedges(graph, v))
-    outx(v) = length(outedges(graph, v)) == 0 ? 0 : sum(x[e] for e in outedges(graph, v))
-    
+    x = @variable(m, [e in edges(graph)], binary = true)
+    flow =
+        @variable(m, [e in edges(graph)], lower_bound = 0, upper_bound = n - 1)
+
+    function inflow(v)
+        return length(inedges(graph, v)) == 0 ? 0 :
+               sum(flow[e] for e in inedges(graph, v))
+    end
+    function outflow(v)
+        return length(outedges(graph, v)) == 0 ? 0 :
+               sum(flow[e] for e in outedges(graph, v))
+    end
+
+    function inx(v)
+        return length(inedges(graph, v)) == 0 ? 0 :
+               sum(x[e] for e in inedges(graph, v))
+    end
+    function outx(v)
+        return length(outedges(graph, v)) == 0 ? 0 :
+               sum(x[e] for e in outedges(graph, v))
+    end
+
     # Set the names, due to the use of anonymous variables with JuMP.
     for e in edges(graph)
         set_name(x[e], "x_$(src(e))_$(dst(e))")
@@ -69,13 +86,21 @@ function formulation(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearForm
     end
 
     # Finally, the objective function.
-    @objective(m, Max, sum(i.rewards[e] * (x[e] + x[reverse(e)]) for e in keys(i.rewards)))
+    @objective(
+        m,
+        Max,
+        sum(i.rewards[e] * (x[e] + x[reverse(e)]) for e in keys(i.rewards))
+    )
 
     # Don't return flows, these are not really decision variables. 
     return m, x
 end
 
-function solve(i::SpanningTreeInstance{Int, Maximise}, ::DefaultLinearFormulation; solver=nothing)
+function solve(
+    i::SpanningTreeInstance{Int, Maximise},
+    ::DefaultLinearFormulation;
+    solver=nothing,
+)
     m, x = formulation(i, DefaultLinearFormulation(), solver=solver)
     optimize!(m)
     return SpanningTreeSolution(i, _extract_lp_solution(i, x))

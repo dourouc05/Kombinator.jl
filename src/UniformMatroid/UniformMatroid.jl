@@ -7,7 +7,11 @@ using JuMP
 import Base: copy
 import Kombinator: solve, dimension, value, values, formulation, make_solution
 
-export UniformMatroidInstance, UniformMatroidSolution, MinBudgetedUniformMatroidSolution, items, items_all_budgets
+export UniformMatroidInstance,
+    UniformMatroidSolution,
+    MinBudgetedUniformMatroidSolution,
+    items,
+    items_all_budgets
 
 include("um.jl")
 

@@ -1,22 +1,34 @@
-function _budgeted_spanning_tree_compute_weight(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
+function _budgeted_spanning_tree_compute_weight(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    tree::Vector{Edge{T}},
+) where {T, U}
     if length(tree) == 0
         return 0
     end
     return sum(i.weights[(e in keys(i.weights)) ? e : reverse(e)] for e in tree)
 end
 
-function _budgeted_spanning_tree_compute_value(i::SpanningTreeInstance{T}, tree::Vector{Edge{T}}) where {T, U}
+function _budgeted_spanning_tree_compute_value(
+    i::SpanningTreeInstance{T},
+    tree::Vector{Edge{T}},
+) where {T, U}
     if length(tree) == 0
         return 0
     end
     return sum(i.rewards[(e in keys(i.rewards)) ? e : reverse(e)] for e in tree)
 end
 
-function _budgeted_spanning_tree_compute_value(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, tree::Vector{Edge{T}}) where {T, U}
+function _budgeted_spanning_tree_compute_value(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    tree::Vector{Edge{T}},
+) where {T, U}
     if length(tree) == 0
         return 0
     end
-    return sum(i.instance.rewards[(e in keys(i.instance.rewards)) ? e : reverse(e)] for e in tree)
+    return sum(
+        i.instance.rewards[(e in keys(i.instance.rewards)) ? e : reverse(e)] for
+        e in tree
+    )
 end
 
 # How to ensure that adding an edge will not create loops? 
@@ -63,7 +75,7 @@ function visit_edge(ld::LoopDetector, s::Int, t::Int)
             ld.node_done[ld.node_done .== ld.node_done[t]] .= ld.node_done[s]
         end
     end
-    return 
+    return
 end
 
 function edge_would_create_loop(ld::LoopDetector, e::Edge{Int})

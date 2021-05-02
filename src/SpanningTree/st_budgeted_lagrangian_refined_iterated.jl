@@ -1,7 +1,20 @@
-approximation_term(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::IteratedLagrangianRefinementAlgorithm) where {T, U} = NaN
-approximation_ratio(::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::IteratedLagrangianRefinementAlgorithm) where {T, U} = 0.5
+function approximation_term(
+    ::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::IteratedLagrangianRefinementAlgorithm,
+) where {T, U}
+    return NaN
+end
+function approximation_ratio(
+    ::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::IteratedLagrangianRefinementAlgorithm,
+) where {T, U}
+    return 0.5
+end
 
-function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::IteratedLagrangianRefinementAlgorithm) where {T, U}
+function solve(
+    i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
+    ::IteratedLagrangianRefinementAlgorithm,
+) where {T, U}
     # Approximately solve the following problem:
     #     \max_{x spanning tree} rewards x  s.t.  weights x >= budget
     # This algorithm provides a multiplicative approximation to this problem. If x* is the optimum solution and x~ the one
@@ -22,7 +35,8 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
     for e1 in edges(i.instance.graph)
         for e2 in edges(i.instance.graph)
             # (e1, e2) must be a pair of distinct edges.
-            if (src(e1) == src(e2) && dst(e1) == dst(e2)) || (src(e1) == dst(e2) && src(e1) == dst(e2))
+            if (src(e1) == src(e2) && dst(e1) == dst(e2)) ||
+               (src(e1) == dst(e2) && src(e1) == dst(e2))
                 continue
             end
 
@@ -44,7 +58,11 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
             # As e1 and e2 have the best reward (as they are really bumped), they must be in any optimum solution.
 
             # Solve this subproblem.
-            bsti = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, i.min_budget)
+            bsti = MinimumBudget(
+                SpanningTreeInstance(graph, rewards),
+                weights,
+                i.min_budget,
+            )
             sol = solve(bsti, LagrangianRefinementAlgorithm())
 
             # This subproblem is infeasible. Maybe it's because the overall problem is infeasible or just because too many
@@ -56,7 +74,7 @@ function solve(i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}, ::Iterate
             # Impossible to have a feasible solution with these two edges, probably because of the budget constraint.
             # Due to the direction of the budget constraint (>= budget), it is not possible to check for feasibility
             # before solving an instance.
-            if ! (e1 in sol.variables) || ! (e2 in sol.variables)
+            if !(e1 in sol.variables) || !(e2 in sol.variables)
                 continue
             end
 
