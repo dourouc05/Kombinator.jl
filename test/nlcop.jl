@@ -45,15 +45,16 @@
                 )
                 s = solve(nli, ExactNonlinearSolver(Gurobi.Optimizer))
 
+                obj_lin = sum(lw[e] for e in s.variables)
+                obj_nl = sqrt(sum(nlw[e] for e in s.variables))
+
                 # There is a unique way to represent the solution, as the LP 
                 # formulation ensures that 1 is the root of the tree. Thus, 
                 # check explicitly the solution.
                 @test s.instance == li
                 @test Set(s.variables) ==
                       Set([Edge(1, 2), Edge(2, 3), Edge(3, 4), Edge(4, 5)])
-                @test sum(lw[e] for e in s.variables) +
-                      sqrt(sum(nlw[e] for e in s.variables)) ≈ 15.47 atol =
-                    1.0e-2
+                @test obj_lin + obj_nl ≈ 15.47 atol = 1.0e-2
             end
 
             @testset "Basic: elementary path" begin
@@ -78,12 +79,13 @@
                 )
                 s = solve(nli, ExactNonlinearSolver(Gurobi.Optimizer))
 
+                obj_lin = sum(lw[e] for e in s.variables)
+                obj_nl = sqrt(sum(nlw[e] for e in s.variables))
+
                 @test s.instance == li
                 @test Set(s.variables) ==
                       Set([Edge(1, 2), Edge(2, 3), Edge(3, 4), Edge(4, 5)])
-                @test sum(lw[e] for e in s.variables) +
-                      sqrt(sum(nlw[e] for e in s.variables)) ≈ 18.36 atol =
-                    1.0e-2
+                @test obj_lin + obj_nl ≈ 18.36 atol = 1.0e-2
             end
         end
     end
@@ -135,9 +137,11 @@
             )
             s = solve(nli, ApproximateNonlinearSolver(DynamicProgramming()))
 
+            obj_lin = sum(lw[e] for e in s.variables)
+            obj_nl = sqrt(sum(nlw[e] for e in s.variables))
+
             @test s.instance == li
-            @test sum(lw[e] for e in s.variables) +
-                  sqrt(sum(nlw[e] for e in s.variables)) ≈ 15.47 atol = 1.0e-2
+            @test obj_lin + obj_nl ≈ 15.47 atol = 1.0e-2
         end
 
         @testset "Basic: elementary path" begin
@@ -160,11 +164,13 @@
             )
             s = solve(nli, ApproximateNonlinearSolver(DynamicProgramming()))
 
+            obj_lin = sum(lw[e] for e in s.variables)
+            obj_nl = sqrt(sum(nlw[e] for e in s.variables))
+
             @test s.instance == li
             @test Set(s.variables) ==
                   Set([Edge(1, 2), Edge(2, 3), Edge(3, 4), Edge(4, 5)])
-            @test sum(lw[e] for e in s.variables) +
-                  sqrt(sum(nlw[e] for e in s.variables)) ≈ 18.36 atol = 1.0e-2
+            @test obj_lin + obj_nl ≈ 18.36 atol = 1.0e-2
         end
     end
 end
