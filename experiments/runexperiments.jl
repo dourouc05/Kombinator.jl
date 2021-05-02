@@ -80,7 +80,7 @@ end
 # Spanning tree. 
 if run_st
     st = DataFrame(method=String[], algo=String[], name=String[], nonlinearity=String[], size=Int[], repetition=Int[], objective=Float64[], time_ms=Float64[])
-    st_sizes = [2, 5, 10, 20, 50, 100]
+    st_sizes = [2, 5, 10, 20, 50, 100, 200, 500]
     st_algos = ["Exact", "Approx: DP", "Approx: LP"]
 
     for repetition in 1:n_repetitions
@@ -112,8 +112,8 @@ if run_st
                 t1 = time_ns()
 
                 time_ms = (t1 - t0) / 1_000_000
-                obj_lin = sum(lw[e] for e in s.variables)
-                obj_nl = sum(nlw[e] for e in s.variables)
+                obj_lin = sum(e in keys(lw) ? lw[e] : lw[reverse(e)] for e in s.variables)
+                obj_nl = sum(e in keys(nlw) ? nlw[e] : nlw[reverse(e)] for e in s.variables)
                 obj = obj_lin + sqrt(obj_nl)
 
                 push!(st, Dict(:method => method, :algo => algo, :name => st_algo, :nonlinearity => "Square root", :size => size, :repetition => repetition, :objective => obj, :time_ms => time_ms))
