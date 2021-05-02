@@ -24,7 +24,7 @@
             d = solve(i, DynamicProgramming())
             l =
                 !is_travis &&
-                solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
+                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
 
             @test i.m == m
 
@@ -99,7 +99,7 @@
             d = solve(i, DynamicProgramming())
             l =
                 !is_travis &&
-                solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
+                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
 
             expected_items = Dict{Int, Vector{Int}}(
                 0 => [1, 2],
@@ -163,7 +163,7 @@
             d = solve(i, DynamicProgramming())
             l =
                 !is_travis &&
-                solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
+                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
 
             expected = Dict{Int, Float64}(
                 0 => 3 * b,
@@ -208,7 +208,7 @@
             d = solve(i, DynamicProgramming())
             l =
                 !is_travis &&
-                solve(i, DefaultLinearFormulation(), solver=Gurobi.Optimizer)
+                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
 
             a = 31.363416265137644
             b = 28.74979824304284

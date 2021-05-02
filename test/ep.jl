@@ -107,9 +107,8 @@
                     @testset "Linear programming" begin
                         s = solve(
                             i,
-                            DefaultLinearFormulation(),
-                            solver=Gurobi.Optimizer,
-                        ) # Cbc unsupported.
+                            DefaultLinearFormulation(Gurobi.Optimizer), # Cbc unsupported.
+                        )
                         @test s.instance == i
                         @test s.variables == [Edge(1, 2), Edge(2, 3)]
                     end
@@ -139,8 +138,7 @@
                     @testset "Linear programming" begin
                         s = solve(
                             i,
-                            DefaultLinearFormulation(),
-                            solver=Gurobi.Optimizer,
+                            DefaultLinearFormulation(Gurobi.Optimizer),
                         ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == [Edge(1, 3)]
@@ -198,8 +196,7 @@
                     @testset "Linear programming" begin
                         s = solve(
                             i,
-                            DefaultLinearFormulation(),
-                            solver=Gurobi.Optimizer,
+                            DefaultLinearFormulation(Gurobi.Optimizer),
                         ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == []
@@ -234,8 +231,7 @@
                     @testset "Linear programming" begin
                         s = solve(
                             i,
-                            DefaultLinearFormulation(),
-                            solver=Gurobi.Optimizer,
+                            DefaultLinearFormulation(Gurobi.Optimizer),
                         ) # Cbc unsupported.
                         @test s.instance == i
                         @test s.variables == [Edge(1, 3)]
@@ -300,8 +296,7 @@
                 @testset "Linear programming" begin
                     l = solve(
                         i,
-                        DefaultLinearFormulation(),
-                        solver=Gurobi.Optimizer,
+                        DefaultLinearFormulation(Gurobi.Optimizer),
                     ) # Cbc unsupported.
                     # All solutions have the same destination! Only paths from 1 to 3, unlike DP.
                     @test l.solutions[0] == [Edge(1, 2), Edge(2, 3)]

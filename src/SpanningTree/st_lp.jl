@@ -99,7 +99,7 @@ function solve(
     i::SpanningTreeInstance{Int, Maximise},
     f::DefaultLinearFormulation
 )
-    m, x = formulation(i, DefaultLinearFormulation(), solver=f.solver)
+    m, x = formulation(i, f)
     optimize!(m)
     return SpanningTreeSolution(i, _extract_lp_solution(i, x))
 end

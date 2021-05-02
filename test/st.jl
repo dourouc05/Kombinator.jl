@@ -95,7 +95,7 @@
             p = solve(i, PrimAlgorithm())
             g = solve(i, GreedyAlgorithm()) # Same as Prim.
             d = solve(i, DynamicProgramming())
-            l = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
 
             for s in [p, g, d, l]
                 @test s.instance == i
@@ -126,7 +126,7 @@
             p = solve(i, PrimAlgorithm())
             g = solve(i, GreedyAlgorithm()) # Same as Prim.
             d = solve(i, DynamicProgramming())
-            l = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
 
             for s in [p, g, d, l]
                 @test s.instance == i
@@ -259,7 +259,7 @@
 
             @testset "Linear programming" begin
                 # Mostly like the multiplicate approximation algorithm.
-                sol = solve(i, DefaultLinearFormulation(), solver=Cbc.Optimizer)
+                sol = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
                 @test sol !== nothing
                 @test sol.instance == i
                 s = sol.variables

@@ -2,7 +2,7 @@ function formulation(
     i::MinimumBudget{SpanningTreeInstance{Int, Maximise}, Int},
     f::DefaultLinearFormulation
 )
-    m, x = formulation(i.instance, DefaultLinearFormulation(), solver=f.solver)
+    m, x = formulation(i.instance, f)
     @constraint(
         m,
         c,
