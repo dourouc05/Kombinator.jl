@@ -1,9 +1,8 @@
 function formulation(
     i::MinimumBudget{SpanningTreeInstance{Int, Maximise}, Int},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
-    m, x = formulation(i.instance, DefaultLinearFormulation(), solver=solver)
+    m, x = formulation(i.instance, DefaultLinearFormulation(), solver=f.solver)
     @constraint(
         m,
         c,
@@ -15,10 +14,9 @@ end
 
 function solve(
     i::MinimumBudget{SpanningTreeInstance{Int, Maximise}, Int},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
-    model, x, c = formulation(i, DefaultLinearFormulation(), solver=solver)
+    model, x, c = formulation(i, f)
 
     budgets = if i.compute_all_values == false
         [i.min_budget]

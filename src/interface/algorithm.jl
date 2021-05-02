@@ -57,7 +57,9 @@ Use the default LP formulation to solve the instance. For problems where
 there are multiple common formulations, there should be no default formulation
 defined. 
 """
-struct DefaultLinearFormulation <: CombinatorialLinearFormulation end
+struct DefaultLinearFormulation <: CombinatorialLinearFormulation 
+    solver
+end
 
 # ===============================================================
 # = Then, the ones with a recognised name (think Bellman-Ford). =

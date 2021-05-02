@@ -16,11 +16,7 @@ function solve(
     @assert nli.combinatorial_structure.objective == Maximise()
 
     # Base formulation for the combinatorial problem.
-    m, x = formulation(
-        nli.combinatorial_structure,
-        nli.formulation,
-        solver=algo.solver,
-    )
+    m, x = formulation(nli.combinatorial_structure, nli.formulation)
 
     # Formulation for the nonlinear term. 
     dot_product = @variable(m, lower_bound = 0.0) # b^T x

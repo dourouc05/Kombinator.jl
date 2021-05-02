@@ -153,8 +153,7 @@ end
 
 function formulation(
     i::ElementaryPathInstance{Int, Maximise},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
     n = nv(i.graph)
 
@@ -168,7 +167,7 @@ function formulation(
     end)
 
     # Build the optimisation model behind solve_linear.
-    model = Model(solver)
+    model = Model(f.solver)
     set_silent(model)
 
     x = @variable(model, [e in edges(i.graph)], binary = true)
@@ -240,10 +239,9 @@ end
 
 function solve(
     i::ElementaryPathInstance{Int, Maximise},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
-    m, x = formulation(i, DefaultLinearFormulation(), solver=solver)
+    m, x = formulation(i, f)
     optimize!(m)
     return ElementaryPathSolution(i, _extract_lp_solution(i, x))
 end

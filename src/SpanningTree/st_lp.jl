@@ -1,7 +1,6 @@
 function formulation(
     i::SpanningTreeInstance{Int, Maximise},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
     # Input graph supposed to be undirected.
     n = nv(i.graph)
@@ -27,7 +26,7 @@ function formulation(
     # problem.
     # Based on Magnanti, T.L.; Wolsey, L. Optimal Trees, section Flow 
     # formulation (p. 38).
-    m = Model(solver)
+    m = Model(f.solver)
     set_silent(m)
 
     x = @variable(m, [e in edges(graph)], binary = true)
@@ -98,10 +97,9 @@ end
 
 function solve(
     i::SpanningTreeInstance{Int, Maximise},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
-    m, x = formulation(i, DefaultLinearFormulation(), solver=solver)
+    m, x = formulation(i, DefaultLinearFormulation(), solver=f.solver)
     optimize!(m)
     return SpanningTreeSolution(i, _extract_lp_solution(i, x))
 end

@@ -1,19 +1,17 @@
 function formulation(
     i::MinimumBudget{ElementaryPathInstance{Int, Maximise}, Int},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
-    m, x = formulation(i.instance, DefaultLinearFormulation(), solver=solver)
+    m, x = formulation(i.instance, f)
     @constraint(m, c, sum(x[e] * i.weights[e] for e in keys(i.weights)) >= 0)
     return m, x, c
 end
 
 function solve(
     i::MinimumBudget{ElementaryPathInstance{Int, Maximise}, Int},
-    ::DefaultLinearFormulation;
-    solver=nothing,
+    f::DefaultLinearFormulation
 )
-    model, x, c = formulation(i, DefaultLinearFormulation(), solver=solver)
+    model, x, c = formulation(i, f)
 
     budgets = if i.compute_all_values == false
         [i.min_budget]
