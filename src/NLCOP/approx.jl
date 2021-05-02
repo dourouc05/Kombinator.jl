@@ -90,13 +90,22 @@ function _round_coefficients(
     return Dict{K, Int}(k => round(Int, v / nli.ε) for (k, v) in x)
 end
 
+function _float_coefficients(x::Vector{T}) where {T}
+    return Float64.(x)
+end
+
+function _float_coefficients(x::Dict{K, T}) where {K, T}
+    return Dict{K, Float64}(k => v for (k, v) in x)
+end
+
 function _upper_bound_budget(nli::NonlinearCombinatorialInstance)
     # Make a linear instance to maximise the total weight.
-    li = copy(nli.combinatorial_structure, rewards=nli.nonlinear_coefficients)
+    nlw = _float_coefficients(_round_coefficients(nli.nonlinear_coefficients, nli))
+    li = copy(nli.combinatorial_structure, rewards=nlw)
     x = solve(li, nli.linear_algo).variables
     return Int(
         sum(
-            nli.nonlinear_coefficients[i] for
+            nlw[i] for
             i in eachindex(nli.nonlinear_coefficients) if i in x
         ),
     )
