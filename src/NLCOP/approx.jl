@@ -102,7 +102,13 @@ function _upper_bound_budget(nli::NonlinearCombinatorialInstance)
     # Make a linear instance to maximise the total weight.
     nlw = _float_coefficients(_round_coefficients(nli.nonlinear_coefficients, nli))
     li = copy(nli.combinatorial_structure, rewards=nlw)
-    x = solve(li, nli.linear_algo).variables
+
+    x = if fastest_exact(li) !== nothing
+        solve(li, fastest_exact(li)).variables
+    else
+        solve(li, nli.linear_algo).variables
+    end
+
     return Int(
         sum(
             nlw[i] for

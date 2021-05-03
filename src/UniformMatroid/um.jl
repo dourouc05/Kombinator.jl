@@ -46,6 +46,8 @@ function copy(
     return UniformMatroidInstance(rewards, m, objective)
 end
 
+fastest_exact(::UniformMatroidInstance) = GreedyAlgorithm()
+
 # Solution.
 
 struct UniformMatroidSolution{T <: Real, O <: CombinatorialObjective} <:
