@@ -13,6 +13,7 @@ import Kombinator:
     approximation_ratio,
     approximation_term,
     formulation,
+    fastest_exact,
     make_solution
 
 export SpanningTreeInstance,

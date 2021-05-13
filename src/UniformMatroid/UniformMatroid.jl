@@ -5,7 +5,7 @@ using Kombinator
 using JuMP
 
 import Base: copy
-import Kombinator: solve, dimension, value, values, formulation, make_solution
+import Kombinator: solve, dimension, value, values, formulation, fastest_exact, make_solution
 
 export UniformMatroidInstance,
     UniformMatroidSolution,

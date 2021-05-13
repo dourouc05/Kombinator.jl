@@ -33,6 +33,8 @@ function reward(i::SpanningTreeInstance{T}, e::Edge{T}) where {T}
     return i.rewards[reverse(e)]
 end
 
+fastest_exact(::SpanningTreeInstance) = PrimAlgorithm()
+
 # Solution.
 
 struct SpanningTreeSolution{T, O} <: CombinatorialSolution
