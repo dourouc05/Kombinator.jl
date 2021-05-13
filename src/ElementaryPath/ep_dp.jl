@@ -54,5 +54,5 @@ function solve(i::ElementaryPathInstance{T}, ::BellmanFordAlgorithm) where {T}
         end
     end
 
-    return ElementaryPathSolution(i, S[i.dst], V, S)
+    return ElementaryPathSolution(i, S[i.dst], S)
 end

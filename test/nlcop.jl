@@ -14,7 +14,7 @@
                     lw,
                     nlw,
                     SquareRoot,
-                    0.01,
+                    1.0,
                     DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
                     DefaultLinearFormulation(Gurobi.Optimizer),
@@ -38,7 +38,7 @@
                     lw,
                     nlw,
                     SquareRoot,
-                    0.01,
+                    1.0,
                     DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
                     DefaultLinearFormulation(Gurobi.Optimizer),
@@ -72,7 +72,7 @@
                     lw,
                     nlw,
                     SquareRoot,
-                    0.01,
+                    1.0,
                     DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
                     DefaultLinearFormulation(Gurobi.Optimizer),
@@ -147,7 +147,7 @@
                 e => min(src(e), dst(e)) for e in edges(graph)
             )
             nlw = Dict{Edge{Int}, Float64}(
-                e => ifelse(min(src(e), dst(e)) < 3, 1.0, 0.5) for e in edges(graph)
+                e => ne(graph) - min(src(e), dst(e)) for e in edges(graph)
             )
 
             li = SpanningTreeInstance(graph, lw, Maximise())
@@ -157,7 +157,7 @@
                 lw,
                 nlw,
                 SquareRoot,
-                0.5,
+                1.0,
                 DynamicProgramming(),
                 true,
                 DefaultLinearFormulation(nothing),
@@ -169,7 +169,7 @@
             obj_nl = sqrt(sum(nlw[e] for e in s.variables))
 
             @test s.instance == li
-            @test obj_lin + obj_nl ≈ 11.73 atol = 1.0e-2
+            @test obj_lin + obj_nl ≈ 15.47 atol = 1.0e-2
         end
 
         @testset "Basic: spanning tree, LP-based" begin
@@ -187,7 +187,7 @@
                 lw,
                 nlw,
                 SquareRoot,
-                0.01,
+                1.0,
                 DefaultLinearFormulation(Cbc.Optimizer),
                 true,
                 DefaultLinearFormulation(Cbc.Optimizer),
@@ -198,7 +198,7 @@
             obj_nl = sqrt(sum(e in keys(nlw) ? nlw[e] : lw[reverse(e)] for e in s.variables))
 
             @test s.instance == li
-            @test obj_lin + obj_nl ≈ 15.29 atol = 1.0e-2
+            @test obj_lin + obj_nl ≈ 15.47 atol = 1.0e-2
         end
 
         @testset "Basic: elementary path, DP-based" begin
@@ -214,7 +214,7 @@
                 lw,
                 nlw,
                 SquareRoot,
-                0.01,
+                1.0,
                 DynamicProgramming(),
                 true,
                 DefaultLinearFormulation(nothing),
@@ -244,7 +244,7 @@
                     lw,
                     nlw,
                     SquareRoot,
-                    0.01,
+                    1.0,
                     DefaultLinearFormulation(Gurobi.Optimizer),
                     true,
                     DefaultLinearFormulation(Gurobi.Optimizer),

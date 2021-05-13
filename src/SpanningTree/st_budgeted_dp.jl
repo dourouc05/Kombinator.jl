@@ -11,7 +11,7 @@ function solve(
         v = instance.weights[e]
         w = reward(instance.instance, e)
 
-        S = Dict{Int, Vector{Edge{T}}}(β => ifelse(w > β, Edge{T}[], [e]) for β in 0:(instance.min_budget))
+        S = Dict{Int, Vector{Edge{T}}}(β => ifelse(w < β, Edge{T}[], [e]) for β in 0:(instance.min_budget))
 
         return BudgetedSpanningTreeDynamicProgrammingSolution(
             instance,

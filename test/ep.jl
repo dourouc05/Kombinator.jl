@@ -21,23 +21,6 @@
 
         i = MinimumBudget(ElementaryPathInstance(g, rewards, 1, 3), weights, 4)
         path = [Edge(1, 3)]
-        states = Dict(
-            (1, 2) => 0.0,
-            (3, 1) => 2.0,
-            (1, 3) => 0.0,
-            (1, 4) => 0.0,
-            (3, 2) => 2.0,
-            (2, 0) => 1.0,
-            (3, 3) => 1.0,
-            (2, 1) => 1.0,
-            (3, 4) => 1.0,
-            (2, 2) => -Inf,
-            (2, 3) => -Inf,
-            (1, 0) => 0.0,
-            (2, 4) => -Inf,
-            (1, 1) => 0.0,
-            (3, 0) => 2.0,
-        )
         solutions = Dict{Int, Vector{Edge{Int}}}(
             0 => [Edge(1, 2), Edge(2, 3)],
             1 => [Edge(1, 2), Edge(2, 3)],
@@ -45,7 +28,7 @@
             3 => [Edge(1, 3)],
             4 => [Edge(1, 3)],
         )
-        d = BudgetedElementaryPathSolution(i, path, states, solutions)
+        d = BudgetedElementaryPathSolution(i, path, solutions)
 
         warn_msg = "The requested maximum budget 5 is higher than the instance's minimum budget 4. Therefore, some values have not been computed and are unavailable."
         @test_logs (:warn, warn_msg) Kombinator.paths_all_budgets_as_tuples(

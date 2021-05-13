@@ -60,7 +60,6 @@ function ElementaryPathSolution(
     return ElementaryPathSolution(
         instance,
         variables,
-        Dict{T, Float64}(),
         Dict{T, Vector{Edge{T}}}(),
     )
 end
