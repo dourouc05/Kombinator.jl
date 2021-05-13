@@ -147,20 +147,22 @@
                 e => min(src(e), dst(e)) for e in edges(graph)
             )
             nlw = Dict{Edge{Int}, Float64}(
-                e => ne(graph) - min(src(e), dst(e)) for e in edges(graph)
+                e => ifelse(min(src(e), dst(e)) < 3, 1.0, 0.5) for e in edges(graph)
             )
 
             li = SpanningTreeInstance(graph, lw, Maximise())
+            @test fastest_exact(li) !== nothing
             nli = NonlinearCombinatorialInstance(
                 li,
                 lw,
                 nlw,
                 SquareRoot,
-                0.01,
+                0.5,
                 DynamicProgramming(),
                 true,
                 DefaultLinearFormulation(nothing),
             )
+            @test fastest_exact(nli) === nothing
             s = solve(nli, ApproximateNonlinearSolver(DynamicProgramming()))
 
             obj_lin = sum(lw[e] for e in s.variables)

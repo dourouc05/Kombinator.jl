@@ -115,6 +115,8 @@ function solve(
 
                 g_no_src = copy(g_up_to_i)
                 rem_vertex!(g_no_src, src(edge)) # Changes indices!
+                @assert nv(g_no_src) < nv(g_up_to_i)
+                @assert ne(g_no_src) < ne(g_up_to_i)
                 map_index = (idx) -> ifelse(idx < src(edge), idx, idx - 1)
                 map_edge = (e) -> Edge(map_index(src(e)), map_index(dst(e)))
                 unmap_index = (idx) -> ifelse(idx < src(edge), idx, idx + 1)
@@ -139,6 +141,8 @@ function solve(
 
                 g_no_dst = copy(g_up_to_i)
                 rem_vertex!(g_no_dst, dst(edge)) # Changes indices!
+                @assert nv(g_no_dst) < nv(g_up_to_i)
+                @assert ne(g_no_dst) < ne(g_up_to_i)
                 map_index = (idx) -> ifelse(idx < dst(edge), idx, idx - 1)
                 map_edge = (e) -> Edge(map_index(src(e)), map_index(dst(e)))
                 unmap_index = (idx) -> ifelse(idx < dst(edge), idx, idx + 1)
@@ -173,8 +177,9 @@ function solve(
                     S[β, i] = t_no_dst
                     push!(S[β, i], edge)
 
-                    # No available data structure to copy, regenerate it from 
-                    # scratch.
+                    # No available data structure to copy, as this solution 
+                    # has not been built within the dynamic-programming 
+                    # mechanism, regenerate it from scratch.
                     for e in S[β, i]
                         visit_edge(LD[β, i], e)
                     end
