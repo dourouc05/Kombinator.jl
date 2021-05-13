@@ -4,6 +4,24 @@ function solve(
 ) where {T, U}
     # A dynamic-programming stance on Prim's algorithm.
 
+    # Base case: one edge, the solution is either to take it or not based 
+    # on the weight.
+    if ne(instance.instance.graph) == 1
+        e = collect(edges(instance.instance.graph))[1]
+        v = instance.weights[e]
+        w = reward(instance.instance, e)
+
+        V = Dict{Tuple{T, Int}, Float64}((β, 1) => ifelse(w > β, 0.0, v) for β in 0:(instance.min_budget))
+        S = Dict{Int, Vector{Edge{T}}}(β => ifelse(w > β, Edge{T}[], [e]) for β in 0:(instance.min_budget))
+
+        return BudgetedSpanningTreeDynamicProgrammingSolution(
+            instance,
+            S[instance.min_budget],
+            V,
+            S,
+        )
+    end
+
     # Get an indexed list of *all* edges, sorted by increasing value.
     sorted_edges = Tuple{Edge, Float64, Int}[]
     for e in edges(instance.instance.graph)
@@ -110,7 +128,7 @@ function solve(
                     remaining_budget,
                 )
                 s_no_src = solve(i_no_src, DynamicProgramming())
-                t_no_src = [unmap_edge(e) for e in s_no_src.variables]
+                t_no_src = Edge{T}[unmap_edge(e) for e in s_no_src.variables]
                 v_no_src =
                     _budgeted_spanning_tree_compute_value(instance, t_no_src)
 
@@ -134,7 +152,7 @@ function solve(
                     remaining_budget,
                 )
                 s_no_dst = solve(i_no_dst, DynamicProgramming())
-                t_no_dst = [unmap_edge(e) for e in s_no_dst.variables]
+                t_no_dst = Edge{T}[unmap_edge(e) for e in s_no_dst.variables]
                 v_no_dst =
                     _budgeted_spanning_tree_compute_value(instance, t_no_dst)
 

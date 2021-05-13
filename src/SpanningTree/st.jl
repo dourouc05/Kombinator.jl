@@ -91,7 +91,7 @@ struct BudgetedSpanningTreeDynamicProgrammingSolution{T, U} <:
     # Used to store important temporary results from dynamic programming.
     instance::MinimumBudget{SpanningTreeInstance{T, Maximise}, U}
     variables::Vector{Edge{T}}
-    states::Dict{Tuple{T, Int}, Float64}
+    states::Dict{Tuple{T, Int}, Float64} # TODO: refactor to only have a budget. 
     solutions::Dict{Int, Vector{Edge{T}}}
 end
 
