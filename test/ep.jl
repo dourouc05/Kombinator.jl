@@ -57,6 +57,36 @@
 
     @testset "Elementary paths" begin
         @testset "Interface" begin
+            @testset "Source not in graph" begin
+                g = path_digraph(3)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
+                @test_throws ErrorException ElementaryPathInstance(g, rewards, 50, 2)
+            end
+
+            @testset "Destination not in graph" begin
+                g = path_digraph(3)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
+                @test_throws ErrorException ElementaryPathInstance(g, rewards, 1, 50)
+            end
+
+            @testset "Source is destination" begin
+                g = path_digraph(3)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
+                @test_throws ErrorException ElementaryPathInstance(g, rewards, 1, 1)
+            end
+
+            @testset "Source is destination" begin
+                g = path_digraph(3)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
+                @test_throws ErrorException ElementaryPathInstance(g, rewards, 1, 1)
+            end
+
+            @testset "An edge has a reward but is not in the graph" begin
+                g = path_digraph(3)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0, Edge(1, 3) => 1.0)
+                @test_throws ErrorException ElementaryPathInstance(g, rewards, 1, 2)
+            end
+
             @testset "Positive-reward cycle" begin
                 g = path_digraph(3)
                 add_edge!(g, 2, 1)
@@ -133,20 +163,24 @@
 
     @testset "Budgeted elementary paths" begin
         @testset "Interface" begin
-            # TODO: these consistency checks cannot be performed within MinimumBudget...
-            g = path_digraph(3)
-            rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
-            weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1)
-            # @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 1), weights)
-            # @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 2), weights, -1)
+            @testset "More edges have rewards than weights" begin
+                g = path_digraph(4)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0, Edge(4, 1) => 1.0)
+                weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1)
+                @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 2), weights)
+            end
 
-            rewards[Edge(4, 1)] = 1.0
-            # @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 1), weights)
-            weights[Edge(4, 1)] = 1
-            weights[Edge(4, 2)] = 1
-            # @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 1), weights)
-            weights[Edge(4, 2)] = -1
-            # @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 1), weights)
+            @testset "Negative weight or budget" begin
+                g = path_digraph(3)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(2, 3) => 1.0)
+                weights = Dict(Edge(1, 2) => 1, Edge(2, 3) => 1)
+                @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 2), weights, -1)
+
+                weights[Edge(4, 2)] = 1
+                @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 2), weights)
+                weights[Edge(4, 2)] = -1
+                @test_throws ErrorException MinimumBudget(ElementaryPathInstance(g, rewards, 1, 2), weights)
+            end
         end
 
         @testset "Basic" begin

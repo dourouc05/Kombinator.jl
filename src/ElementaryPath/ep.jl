@@ -13,18 +13,28 @@ struct ElementaryPathInstance{T, O <: CombinatorialObjective} <:
         dst::T,
         objective::O=Maximise(),
     ) where {T <: Real, O <: CombinatorialObjective}
-        # Error checking.
+        # Source and destination vertices are allowable.
         if src < 0 || src > nv(graph)
             error("The requested source is not a vertex of the given graph.")
         end
 
         if dst < 0 || dst > nv(graph)
-            error(
-                "The requested destination is not a vertex of the given graph.",
-            )
+            error("The requested destination is not a vertex of the given " * 
+                  "graph.")
         end
 
-        # TODO: check values of rewards?
+        # Source is different from destination.
+        if dst == src
+            error("The requested source and destination are the same vertex.")
+        end
+
+        # Each reward is associated to an existing edge.
+        for e in keys(rewards)
+            if e ∉ edges(graph)
+                error("The edge $(e) has a reward, but is not present in the " * 
+                      "graph.")
+            end
+        end
 
         # Return a new instance.
         return new{T, O}(graph, rewards, src, dst, objective)

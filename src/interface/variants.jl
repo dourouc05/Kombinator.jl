@@ -17,6 +17,11 @@ struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <:
     # usually with the same time complexity as a single solve.
 
     function MinimumBudget(instance::CI, weights::Vector{T}, min_budget::T, compute_all_values::Bool) where {CI <: CombinatorialInstance, T <: Real}
+        # There should be as many weights as the inner instance has rewards.
+        if length(weights) != dimension(instance)
+            error("The MinimumBudget constraint has $(length(weights)) weights, but the combinatorial instance has dimension $(dimension(instance)).")
+        end
+
         # Ensure that important properties of the algorithms are respected.
         if any(weights .< zero(T))
             error("Some weights are negative, which is not allowed.")
@@ -29,6 +34,11 @@ struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <:
     end
 
     function MinimumBudget(instance::CI, weights::Dict{<:Any, T}, min_budget::T, compute_all_values::Bool) where {CI <: CombinatorialInstance, T <: Real}
+        # There should be as many weights as the inner instance has rewards.
+        if length(weights) != dimension(instance)
+            error("The MinimumBudget constraint has $(length(weights)) weights, but the combinatorial instance has dimension $(dimension(instance)).")
+        end
+
         # Ensure that important properties of the algorithms are respected.
         if any(values(weights) .< zero(T))
             error("Some weights are negative, which is not allowed.")
