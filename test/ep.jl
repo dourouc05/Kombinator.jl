@@ -275,18 +275,6 @@
 
                 @test d.variables == [Edge(1, 3)]
 
-                @test d.states[1, 0] == 0.0
-                @test d.states[2, 0] == 1.0
-                @test d.states[3, 0] == 2.0
-
-                @test d.states[1, 1] == 0.0
-                @test d.states[2, 1] == -1.0
-                @test d.states[3, 1] == 0.0
-
-                @test d.states[1, 2] == 0.0
-                @test d.states[2, 2] == -1.0
-                @test d.states[3, 2] == 0.0
-
                 @test d.solutions[0] == [Edge(1, 2), Edge(2, 3)]
                 @test d.solutions[1] == [Edge(1, 3)]
                 @test d.solutions[2] == [Edge(1, 3)]
@@ -302,9 +290,6 @@
                     @test l.solutions[0] == [Edge(1, 2), Edge(2, 3)]
                     @test l.solutions[1] == [Edge(1, 3)]
                     @test l.solutions[2] == [Edge(1, 3)]
-                    @test l.states[3, 0] == 2.0
-                    @test l.states[3, 1] == 0.0
-                    @test l.states[3, 2] == 0.0
                 end
             end
         end

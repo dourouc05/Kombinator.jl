@@ -169,7 +169,7 @@
             obj_nl = sqrt(sum(nlw[e] for e in s.variables))
 
             @test s.instance == li
-            @test obj_lin + obj_nl ≈ 15.47 atol = 1.0e-2
+            @test obj_lin + obj_nl ≈ 11.73 atol = 1.0e-2
         end
 
         @testset "Basic: spanning tree, LP-based" begin

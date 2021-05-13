@@ -50,7 +50,6 @@ struct ElementaryPathSolution{T, O <: CombinatorialObjective} <:
        CombinatorialInstance
     instance::ElementaryPathInstance{T, O}
     variables::Vector{Edge{T}}
-    states::Dict{T, Float64}
     solutions::Dict{T, Vector{Edge{T}}}
 end
 
@@ -85,7 +84,6 @@ end
 struct BudgetedElementaryPathSolution{T, O} <: MultipleMinBudgetedSolution
     instance::MinimumBudget{ElementaryPathInstance{T, O}, T}
     variables::Vector{Edge{T}}
-    states::Dict{Tuple{T, Int}, Float64}
     solutions::Dict{Int, Vector{Edge{T}}}
 end
 
@@ -96,7 +94,6 @@ function BudgetedElementaryPathSolution(
     return BudgetedElementaryPathSolution(
         instance,
         variables,
-        Dict{Tuple{T, Int}, Float64}(),
         Dict{Int, Vector{Edge{T}}}(),
     )
 end

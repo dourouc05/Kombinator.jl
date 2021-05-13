@@ -24,7 +24,6 @@ function solve(
         0:(i.min_budget)
     end
 
-    V = Dict{Tuple{Int, Int}, Float64}()
     S = Dict{Int, Vector{Edge{Int}}}()
 
     for budget in budgets
@@ -32,10 +31,8 @@ function solve(
         optimize!(model)
 
         if termination_status(model) == MOI.OPTIMAL
-            V[budget, dimension(i)] = objective_value(model)
             S[budget] = _extract_lp_solution(i, x)
         else
-            V[budget, dimension(i)] = -Inf
             S[budget] = Int[-1]
         end
     end
@@ -43,7 +40,6 @@ function solve(
     return BudgetedSpanningTreeDynamicProgrammingSolution(
         i,
         S[i.min_budget],
-        V,
         S,
     )
 end

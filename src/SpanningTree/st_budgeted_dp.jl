@@ -11,13 +11,11 @@ function solve(
         v = instance.weights[e]
         w = reward(instance.instance, e)
 
-        V = Dict{Tuple{T, Int}, Float64}((β, 1) => ifelse(w > β, -1.0, v) for β in 0:(instance.min_budget))
         S = Dict{Int, Vector{Edge{T}}}(β => ifelse(w > β, Edge{T}[], [e]) for β in 0:(instance.min_budget))
 
         return BudgetedSpanningTreeDynamicProgrammingSolution(
             instance,
             S[instance.min_budget],
-            V,
             S,
         )
     end
@@ -214,7 +212,6 @@ function solve(
     return BudgetedSpanningTreeDynamicProgrammingSolution(
         instance,
         S[instance.min_budget, dimension(instance)],
-        V,
         S_refined,
     )
 end

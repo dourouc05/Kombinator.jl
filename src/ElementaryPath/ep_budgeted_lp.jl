@@ -19,7 +19,6 @@ function solve(
         0:(i.min_budget)
     end
 
-    V = Dict{Tuple{Int, Int}, Float64}()
     S = Dict{Int, Vector{Edge{Int}}}()
 
     for budget in budgets
@@ -27,13 +26,11 @@ function solve(
         optimize!(model)
 
         if termination_status(model) == MOI.OPTIMAL
-            V[i.instance.dst, budget] = objective_value(model)
             S[budget] = _extract_lp_solution(i, x)
         else
-            V[i.instance.dst, budget] = -Inf
             S[budget] = Edge{Int}[]
         end
     end
 
-    return BudgetedElementaryPathSolution(i, S[i.min_budget], V, S)
+    return BudgetedElementaryPathSolution(i, S[i.min_budget], S)
 end

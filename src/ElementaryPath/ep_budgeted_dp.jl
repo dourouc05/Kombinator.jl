@@ -86,7 +86,6 @@ function solve(
     return BudgetedElementaryPathSolution(
         i,
         S[i.instance.dst, i.min_budget],
-        V,
         S_refined,
     )
 end
