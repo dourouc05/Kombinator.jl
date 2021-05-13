@@ -45,29 +45,32 @@
 
     @testset "Budgeted uniform matroid" begin
         @testset "Interface" begin
-            # Errors when building the UniformMatroidInstance.
-            @test_throws ErrorException MinimumBudget(
-                UniformMatroidInstance(Float64[5, 4, 3], -1),
-                Int[1, 1, 1],
-            )
-            @test_throws ErrorException MinimumBudget(
-                UniformMatroidInstance(Float64[5, 4, 3], 0),
-                Int[1, 1, 1],
-            )
+            @testset "Errors when building the UniformMatroidInstance should bubble up to MinimumBudget" begin
+                @test_throws ErrorException MinimumBudget(
+                    UniformMatroidInstance(Float64[5, 4, 3], -1),
+                    Int[1, 1, 1],
+                )
+                @test_throws ErrorException MinimumBudget(
+                    UniformMatroidInstance(Float64[5, 4, 3], 0),
+                    Int[1, 1, 1],
+                )
+            end
 
-            # TODO: these errors are no more caught after the refactor.
-            # @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, 1, 1], -1)
-            # @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, -1, 1])
+            @testset "Negative weight or budget" begin
+                @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, 1, 1], -1)
+                @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, -1, 1])
+            end
 
-            # Different number of items between the matroid and the new constraint.
-            @test_throws ErrorException MinimumBudget(
-                UniformMatroidInstance(Float64[5, 4, 3], 0),
-                Int[1, 1],
-            )
-            @test_throws ErrorException MinimumBudget(
-                UniformMatroidInstance(Float64[5, 4], 0),
-                Int[1, 1, 1],
-            )
+            @testset "Different number of items between the matroid and the new constraint" begin
+                @test_throws ErrorException MinimumBudget(
+                    UniformMatroidInstance(Float64[5, 4, 3], 0),
+                    Int[1, 1],
+                )
+                @test_throws ErrorException MinimumBudget(
+                    UniformMatroidInstance(Float64[5, 4], 0),
+                    Int[1, 1, 1],
+                )
+            end
         end
 
         function test_solution_at(

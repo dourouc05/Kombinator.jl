@@ -15,6 +15,30 @@ struct MinimumBudget{CI <: CombinatorialInstance, T <: Real} <:
     min_budget::T
     compute_all_values::Bool # Solutions will be output for all budget values, 
     # usually with the same time complexity as a single solve.
+
+    function MinimumBudget(instance::CI, weights::Vector{T}, min_budget::T, compute_all_values::Bool) where {CI <: CombinatorialInstance, T <: Real}
+        # Ensure that important properties of the algorithms are respected.
+        if any(weights .< zero(T))
+            error("Some weights are negative, which is not allowed.")
+        end
+        if min_budget < zero(T)
+            error("The minimum budget is negative, which is not allowed.")
+        end
+
+        return new{CI, T}(instance, weights, min_budget, compute_all_values)
+    end
+
+    function MinimumBudget(instance::CI, weights::Dict{<:Any, T}, min_budget::T, compute_all_values::Bool) where {CI <: CombinatorialInstance, T <: Real}
+        # Ensure that important properties of the algorithms are respected.
+        if any(values(weights) .< zero(T))
+            error("Some weights are negative, which is not allowed.")
+        end
+        if min_budget < zero(T)
+            error("The minimum budget is negative, which is not allowed.")
+        end
+
+        return new{CI, T}(instance, weights, min_budget, compute_all_values)
+    end
 end
 
 function MinimumBudget(
