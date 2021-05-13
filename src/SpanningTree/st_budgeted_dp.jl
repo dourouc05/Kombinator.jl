@@ -97,7 +97,7 @@ function solve(
                 remaining_budget = 0
             end
 
-            if V[remaining_budget, i - 1] == -1
+            if V[remaining_budget, i - 1] == -1 || length(S[remaining_budget, i - 1]) == 0
                 # Are the previous solutions infeasible (recursive call)? If so, 
                 # don't consider using it.
                 V[β, i] = V[β, i - 1]
