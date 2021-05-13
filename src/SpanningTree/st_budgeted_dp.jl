@@ -108,7 +108,12 @@ function solve(
                 # Rather, try to build solutions without one of the ends of i, 
                 # to ensure there will be no loop when combining. Use the 
                 # remaining budget 
-                g_no_src = copy(instance.instance.graph)
+                g_up_to_i = copy(instance.instance.graph)
+                for j in i:ne(instance.instance.graph)
+                    rem_edge!(g_up_to_i, sorted_edges[j][1])
+                end
+
+                g_no_src = copy(g_up_to_i)
                 rem_vertex!(g_no_src, src(edge)) # Changes indices!
                 map_index = (idx) -> ifelse(idx < src(edge), idx, idx - 1)
                 map_edge = (e) -> Edge(map_index(src(e)), map_index(dst(e)))
@@ -132,7 +137,7 @@ function solve(
                 v_no_src =
                     _budgeted_spanning_tree_compute_value(instance, t_no_src)
 
-                g_no_dst = copy(instance.instance.graph)
+                g_no_dst = copy(g_up_to_i)
                 rem_vertex!(g_no_dst, dst(edge)) # Changes indices!
                 map_index = (idx) -> ifelse(idx < dst(edge), idx, idx - 1)
                 map_edge = (e) -> Edge(map_index(src(e)), map_index(dst(e)))
