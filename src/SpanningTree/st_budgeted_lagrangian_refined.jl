@@ -2,7 +2,7 @@ function approximation_term(
     i::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},
     ::LagrangianRefinementAlgorithm,
 ) where {T, U}
-    return maximum(values(i.rewards))
+    return maximum(values(i.instance.rewards))
 end
 function approximation_ratio(
     ::MinimumBudget{SpanningTreeInstance{T, Maximise}, U},

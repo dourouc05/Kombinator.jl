@@ -102,6 +102,8 @@ of `i`).
 """
 abstract type MultipleMinBudgetedSolution <: MinBudgetedSolution end
 
+# TODO: weight interface for a solution (like value).
+
 # # Maximum budget.
 
 # """

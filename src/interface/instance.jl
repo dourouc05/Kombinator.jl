@@ -132,6 +132,10 @@ function reward(i::CombinatorialInstance, var)
     return i.rewards[var]
 end
 
+function reward(i::MinimumBudget, var)
+    return reward(i.instance, var)
+end
+
 """
     value(s::CombinatorialSolution)
 

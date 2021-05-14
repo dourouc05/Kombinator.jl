@@ -157,11 +157,84 @@
 
     @testset "Budgeted maximum spanning tree" begin
         @testset "Interface" begin
+            graph = complete_graph(3)
+            rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+            weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
+            i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+
+            @testset "Global interface" begin
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+                @test objective(i) == Maximise()
+            end
+
+            @testset "Copying" begin
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+                i2 = copy(i)
+                @test i.weights == i2.weights
+                @test i.min_budget == i2.min_budget
+                @test i.compute_all_values == i2.compute_all_values
+                @test i.instance.graph == i2.instance.graph
+                @test i.instance.rewards == i2.instance.rewards
+                @test i.instance.objective == i2.instance.objective
+            end
+
+            @testset "Reward accessor" begin
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+
+                @test reward(i, Edge(1, 2)) == reward(i, Edge(2, 1))
+            end
+
+            @testset "Approximation" begin
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+
+                @test approximation_ratio(i, DynamicProgramming()) == 1.0
+                @test approximation_term(i, DynamicProgramming()) == 0.0
+
+                @test approximation_ratio(i, DefaultLinearFormulation(Cbc.Optimizer)) == 1.0
+                @test approximation_term(i, DefaultLinearFormulation(Cbc.Optimizer)) == 0.0
+
+                @test isnan(approximation_ratio(i, LagrangianAlgorithm()))
+                @test isnan(approximation_term(i, LagrangianAlgorithm()))
+
+                @test isnan(approximation_ratio(i, LagrangianRefinementAlgorithm()))
+                @test approximation_term(i, LagrangianRefinementAlgorithm()) == 3.0 # Depends on the instance.
+
+                @test approximation_ratio(i, IteratedLagrangianRefinementAlgorithm()) == 0.5
+                @test isnan(approximation_term(i, IteratedLagrangianRefinementAlgorithm()))
+            end
+
+            @testset "Make solution" begin
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+                d = Dict(Edge(1, 2) => 0.8, Edge(1, 3) => 0.2, Edge(2, 3) => 1.0)
+                s = make_solution(i, d)
+
+                @test s.instance == i
+                @test length(s.variables) == 2
+                @test Edge(1, 2) ∈ s.variables
+                @test Edge(1, 3) ∉ s.variables
+                @test Edge(2, 3) ∈ s.variables
+
+                @test value(s) == 4.0
+            end
+
+            @testset "Solution helpers" begin
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+
+                # Infeasible solution.
+                s = SimpleBudgetedSpanningTreeSolution(i, Edge{Int}[])
+                @test value(s) == -Inf
+
+                # Valid solution.
+                d = Dict(Edge(1, 2) => 0.8, Edge(1, 3) => 0.2, Edge(2, 3) => 1.0)
+                s = make_solution(i, d)
+                @test value(s) == 4
+
+                # Valid solution with reversed edges.
+                s = SimpleBudgetedSpanningTreeSolution(i, [Edge(2, 1), Edge(3, 2)])
+                @test value(s) == 4
+            end
+
             @testset "Value of a tree" begin
-                graph = complete_graph(3)
-                rewards =
-                    Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-                weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
                 i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
         
                 @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
@@ -326,8 +399,6 @@
                 ) >= budget
             end
         end
-
-        # More advanced tests to ensure the algorithm works as expected.
 
         @testset "Conformity" begin
             graph = complete_graph(2)
