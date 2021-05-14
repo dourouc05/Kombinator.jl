@@ -12,6 +12,19 @@
                 @test_throws ErrorException UniformMatroidInstance(r, -1)
                 @test_throws ErrorException UniformMatroidInstance(r, 0)
             end
+
+            @testset "Approximation" begin
+                i = UniformMatroidInstance(r, 1)
+
+                @test approximation_ratio(i, GreedyAlgorithm()) == 1.0
+                @test approximation_term(i, GreedyAlgorithm()) == 0.0
+
+                @test approximation_ratio(i, DynamicProgramming()) == 1.0
+                @test approximation_term(i, DynamicProgramming()) == 0.0
+
+                @test approximation_ratio(i, DefaultLinearFormulation(Cbc.Optimizer)) == 1.0
+                @test approximation_term(i, DefaultLinearFormulation(Cbc.Optimizer)) == 0.0
+            end
         end
 
         @testset "Copy" begin
@@ -27,9 +40,7 @@
             i = UniformMatroidInstance(Float64[5, 4, 3], m)
             g = solve(i, GreedyAlgorithm())
             d = solve(i, DynamicProgramming())
-            l =
-                !is_travis &&
-                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
 
             @test i.m == m
 
@@ -113,9 +124,7 @@
                 compute_all_values=true,
             )
             d = solve(i, DynamicProgramming())
-            l =
-                !is_travis &&
-                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
 
             expected_items = Dict{Int, Vector{Int}}(
                 0 => [1, 2],
@@ -145,19 +154,17 @@
                 test_solution_at(d, expected)
             end
 
-            if !is_travis
-                @testset "Linear programming" begin
-                    @test l.instance == i
+            @testset "Linear programming" begin
+                @test l.instance == i
 
-                    for i in 0:3
-                        @test l.state[m, 0 + 1, i + 1] ≈
-                              d.state[m, 0 + 1, i + 1]
-                        @test l.solutions[i] == d.solutions[i]
-                    end
-
-                    test_items_at(l, expected_items)
-                    test_solution_at(l, expected)
+                for i in 0:3
+                    @test l.state[m, 0 + 1, i + 1] ≈
+                            d.state[m, 0 + 1, i + 1]
+                    @test l.solutions[i] == d.solutions[i]
                 end
+
+                test_items_at(l, expected_items)
+                test_solution_at(l, expected)
             end
         end
 
@@ -177,9 +184,7 @@
                 compute_all_values=true,
             )
             d = solve(i, DynamicProgramming())
-            l =
-                !is_travis &&
-                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
 
             expected = Dict{Int, Float64}(
                 0 => 3 * b,
@@ -192,10 +197,8 @@
                 test_solution_at(d, expected)
             end
 
-            if !is_travis
-                @testset "Linear programming" begin
-                    test_solution_at(l, expected)
-                end
+            @testset "Linear programming" begin
+                test_solution_at(l, expected)
             end
         end
 
@@ -222,9 +225,7 @@
                 compute_all_values=true,
             )
             d = solve(i, DynamicProgramming())
-            l =
-                !is_travis &&
-                solve(i, DefaultLinearFormulation(Gurobi.Optimizer))
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
 
             a = 31.363416265137644
             b = 28.74979824304284
@@ -255,10 +256,8 @@
                 test_solution_at(d, expected)
             end
 
-            if !is_travis
-                @testset "Linear programming" begin
-                    test_solution_at(l, expected)
-                end
+            @testset "Linear programming" begin
+                test_solution_at(l, expected)
             end
         end
     end
