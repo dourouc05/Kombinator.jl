@@ -57,7 +57,7 @@ end
 # Solution.
 
 struct ElementaryPathSolution{T, O <: CombinatorialObjective} <:
-       CombinatorialInstance
+       CombinatorialSolution
     instance::ElementaryPathInstance{T, O}
     variables::Vector{Edge{T}}
     solutions::Dict{T, Vector{Edge{T}}}
