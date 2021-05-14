@@ -26,6 +26,12 @@
                 @test i.objective == i2.objective
             end
 
+            @testset "Reward accessor" begin
+                i = SpanningTreeInstance(graph, rewards)
+
+                @test reward(i, Edge(1, 2)) == reward(i, Edge(2, 1))
+            end
+
             @testset "Approximation" begin
                 i = SpanningTreeInstance(graph, rewards)
 

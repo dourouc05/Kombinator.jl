@@ -42,14 +42,6 @@ struct SpanningTreeSolution{T, O} <: CombinatorialSolution
     variables::Vector{Edge{T}}
 end
 
-function value(s::SpanningTreeSolution{T, O}) where {T <: Real, O}
-    if -1 in s.variables || length(s.variables) == 0
-        return -Inf
-    end
-
-    return sum(s.instance.rewards[(e in keys(s.instance.rewards)) ? e : reverse(e)] for e in s.variables)
-end
-
 function make_solution(
     i::SpanningTreeInstance{T, O},
     tree::Dict{Edge{T}, Float64},

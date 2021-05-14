@@ -124,6 +124,15 @@ supplementary constraint encoded by the `CombinatorialVariation` on top fo the
 function formulation end # i::CombinatorialInstance, f::CombinatorialLinearFormulation; solver=nothing
 
 """
+    reward(i::CombinatorialInstance, variable)
+
+Returns the reward for the given `variable`.
+"""
+function reward(i::CombinatorialInstance, var)
+    return i.rewards[var]
+end
+
+"""
     value(s::CombinatorialSolution)
 
 Returns the value of a solution, i.e. its total reward. For a maximisation
@@ -136,12 +145,11 @@ function is likely to throw an error for `SingleMinBudgetedSolution`, but is
 ensured not to for `MultipleMinBudgetedSolution`.
 """
 function value(s::CombinatorialSolution)
-    # TODO: define the `reward` interface and implement this in terms of the new interface. This will generalised the ST implementation.
     if -1 in s.variables || length(s.variables) == 0
         return -Inf
     end
 
-    return sum(s.instance.rewards[i] for i in s.variables)
+    return sum(reward(s.instance, i) for i in s.variables)
 end
 
 """
