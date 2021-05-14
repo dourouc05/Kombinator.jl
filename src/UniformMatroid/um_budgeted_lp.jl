@@ -41,5 +41,5 @@ function solve(
         end
     end
 
-    return MinBudgetedUniformMatroidSolution(i, S[maximum(budgets)], V, S)
+    return MinBudgetedUniformMatroidSolution(i, S[maximum(budgets)], S)
 end

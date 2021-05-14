@@ -79,8 +79,7 @@ end
 struct MinBudgetedUniformMatroidSolution{T <: Real, U <: Real} <:
        MultipleMinBudgetedSolution
     instance::MinimumBudget{UniformMatroidInstance{T, Maximise}, U}
-    items::Vector{Int} # Indices to the chosen items for the min_budget.
-    state::Array{Float64, 3} # Data structure built by the dynamic-programming recursion.
+    variables::Vector{Int} # Indices to the chosen items for the min_budget.
     solutions::Dict{Int, Vector{Int}}
 end
 
@@ -91,12 +90,23 @@ function MinBudgetedUniformMatroidSolution(
     return MinBudgetedUniformMatroidSolution(
         instance,
         items,
-        zeros(0, 0, 0),
         Dict{Int, Vector{Int}}(),
     )
 end
 
+function _check_has_solution_for_each_budget(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
+    if length(s.solutions) == 0
+        error("The provided solution object does not have one solution " * 
+              "per value of the budget.")
+    end
+    return
+end
+
 function value(s::MinBudgetedUniformMatroidSolution{T, U}) where {T, U}
+    if -1 in s.variables || length(s.variables) == 0
+        return -Inf
+    end
+
     return sum(s.instance.instance.rewards[i] for i in s.variables)
 end
 
@@ -104,6 +114,7 @@ function items(
     s::MinBudgetedUniformMatroidSolution{T, U},
     budget::Int,
 ) where {T, U}
+    _check_has_solution_for_each_budget(s)
     return s.solutions[budget]
 end
 
@@ -111,6 +122,7 @@ function items_all_budgets(
     s::MinBudgetedUniformMatroidSolution{T, U},
     max_budget::Int,
 ) where {T, U}
+    _check_has_solution_for_each_budget(s)
     sol = Dict{Int, Vector{Int}}()
     m = s.instance.instance.m
     for budget in 0:max_budget
@@ -123,8 +135,10 @@ function value(
     s::MinBudgetedUniformMatroidSolution{T, U},
     budget::Int,
 ) where {T, U}
+    _check_has_solution_for_each_budget(s)
+
     its = items(s, budget)
-    if -1 in its
+    if -1 in its || length(its) == 0
         return -Inf
     end
     return sum(s.instance.instance.rewards[i] for i in its)

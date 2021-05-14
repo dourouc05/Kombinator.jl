@@ -1,8 +1,8 @@
 @testset "UniformMatroid" begin
     @testset "Uniform matroid" begin
-        @testset "Interface" begin
-            r = Float64[5, 4, 3]
+        r = Float64[5, 4, 3]
 
+        @testset "Interface" begin
             @testset "Global interface" begin
                 i = UniformMatroidInstance(r, 1)
                 @test objective(i) == Maximise()
@@ -11,6 +11,14 @@
             @testset "Invalid parameter" begin
                 @test_throws ErrorException UniformMatroidInstance(r, -1)
                 @test_throws ErrorException UniformMatroidInstance(r, 0)
+            end
+
+            @testset "Copy" begin
+                i = UniformMatroidInstance(Float64[5, 4, 3], 1)
+                i2 = copy(i)
+                @test i.m == i2.m
+                @test i.rewards == i2.rewards
+                @test i.objective == i2.objective
             end
 
             @testset "Approximation" begin
@@ -25,19 +33,31 @@
                 @test approximation_ratio(i, DefaultLinearFormulation(Cbc.Optimizer)) == 1.0
                 @test approximation_term(i, DefaultLinearFormulation(Cbc.Optimizer)) == 0.0
             end
-        end
 
-        @testset "Copy" begin
-            i = UniformMatroidInstance(Float64[5, 4, 3], 1)
-            i2 = copy(i)
-            @test i.m == i2.m
-            @test i.rewards == i2.rewards
-            @test i.objective == i2.objective
+            @testset "Make solution" begin
+                i = UniformMatroidInstance(r, 1)
+                d = Dict(1 => 0.4, 2 => 0.8, 3 => 0.7)
+                s = make_solution(i, d)
+
+                @test s.instance == i
+                @test length(s.variables) == 2
+                @test 1 ∉ s.variables
+                @test 2 ∈ s.variables
+                @test 3 ∈ s.variables
+            end
+
+            @testset "Solution helpers" begin
+                i = UniformMatroidInstance(r, 1)
+                d = Dict(1 => 0.4, 2 => 0.8, 3 => 0.7)
+                s = make_solution(i, d)
+
+                @test value(s) == 7
+            end
         end
 
         @testset "Basic" begin
             m = 2
-            i = UniformMatroidInstance(Float64[5, 4, 3], m)
+            i = UniformMatroidInstance(r, m)
             g = solve(i, GreedyAlgorithm())
             d = solve(i, DynamicProgramming())
             l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
@@ -95,6 +115,85 @@
                     w,
                 )
             end
+
+            @testset "Copy" begin
+                i = MinimumBudget(UniformMatroidInstance(r, 1), w, 1)
+                i2 = copy(i)
+
+                @test i.weights == i2.weights
+                @test i.min_budget == i2.min_budget
+                @test i.compute_all_values == i2.compute_all_values
+                @test i.instance.m == i2.instance.m
+                @test i.instance.rewards == i2.instance.rewards
+                @test i.instance.objective == i2.instance.objective
+            end
+
+            @testset "Approximation" begin
+                i = MinimumBudget(UniformMatroidInstance(r, 1), w, 1)
+
+                @test approximation_ratio(i, DynamicProgramming()) == 1.0
+                @test approximation_term(i, DynamicProgramming()) == 0.0
+
+                @test approximation_ratio(i, DefaultLinearFormulation(Cbc.Optimizer)) == 1.0
+                @test approximation_term(i, DefaultLinearFormulation(Cbc.Optimizer)) == 0.0
+            end
+
+            @testset "Make solution" begin
+                i = MinimumBudget(UniformMatroidInstance(r, 1), w, 1)
+                d = Dict(1 => 0.4, 2 => 0.8, 3 => 0.7)
+                s = make_solution(i, d)
+
+                @test s.instance == i
+                @test length(s.variables) == 2
+                @test 1 ∉ s.variables
+                @test 2 ∈ s.variables
+                @test 3 ∈ s.variables
+            end
+
+            @testset "Solution helpers" begin
+                i = MinimumBudget(UniformMatroidInstance(r, 1), w, 1)
+
+                # A first solution, with no per-budget information.
+                d = Dict(1 => 0.4, 2 => 0.8, 3 => 0.7)
+                s = make_solution(i, d)
+                @test value(s) == 7
+                @test_throws ErrorException items(s, 0)
+                @test_throws ErrorException items_all_budgets(s, 0)
+                @test_throws ErrorException value(s, 0)
+
+                # An infeasible solution.
+                s = MinBudgetedUniformMatroidSolution(
+                    i, 
+                    Int[], 
+                    Dict{Int, Vector{Int}}()
+                )
+                @test value(s) == -Inf
+                @test_throws ErrorException items(s, 0)
+                @test_throws ErrorException items_all_budgets(s, 0)
+                @test_throws ErrorException value(s, 0)
+
+                # A more complete solution.
+                d = Dict(0 => [1, 2], 1 => [1, 3], 2 => [2, 3], 3 => Int[])
+                s = MinBudgetedUniformMatroidSolution(
+                    i, 
+                    [2, 3], 
+                    d
+                )
+                @test value(s) == 7 # For the solution [2, 3].
+                @test items(s, 0) == [1, 2]
+                @test value(s, 0) == 9
+                @test items(s, 1) == [1, 3]
+                @test value(s, 1) == 8
+                @test items(s, 2) == [2, 3]
+                @test value(s, 2) == 7
+                @test items(s, 3) == Int[]
+                @test value(s, 3) == -Inf
+
+                @test items_all_budgets(s, 0) == Dict(0 => [1, 2])
+                @test items_all_budgets(s, 1) == Dict(0 => [1, 2], 1 => [1, 3])
+                @test items_all_budgets(s, 2) == Dict(0 => [1, 2], 1 => [1, 3], 2 => [2, 3])
+                @test items_all_budgets(s, 3) == Dict(0 => [1, 2], 1 => [1, 3], 2 => [2, 3], 3 => Int[])
+            end
         end
 
         function test_solution_at(
@@ -115,7 +214,7 @@
             end
         end
 
-        @testset "Basic" begin
+        @testset "Basic (all budget values)" begin
             m = 2
             i = MinimumBudget(
                 UniformMatroidInstance(Float64[5, 4, 3], m),
@@ -140,11 +239,6 @@
             @testset "Dynamic programming" begin
                 @test d.instance == i
 
-                @test d.state[m, 0 + 1, 0 + 1] == 9.0
-                @test d.state[m, 0 + 1, 1 + 1] == 9.0
-                @test d.state[m, 0 + 1, 2 + 1] == 9.0
-                @test d.state[m, 0 + 1, 3 + 1] == -Inf
-
                 @test d.solutions[0] == [1, 2]
                 @test d.solutions[1] == [1, 2]
                 @test d.solutions[2] == [1, 2]
@@ -158,10 +252,41 @@
                 @test l.instance == i
 
                 for i in 0:3
-                    @test l.state[m, 0 + 1, i + 1] ≈
-                            d.state[m, 0 + 1, i + 1]
                     @test l.solutions[i] == d.solutions[i]
                 end
+
+                test_items_at(l, expected_items)
+                test_solution_at(l, expected)
+            end
+        end
+
+        @testset "Basic (one budget value)" begin
+            m = 2
+            i = MinimumBudget(
+                UniformMatroidInstance(Float64[5, 4, 3], m),
+                Int[1, 1, 1],
+                3,
+                compute_all_values=false,
+            )
+            d = solve(i, DynamicProgramming())
+            l = solve(i, DefaultLinearFormulation(Cbc.Optimizer))
+
+            expected_items = Dict(3 => [-1])
+            expected = Dict{Int, Float64}(3 => -Inf)
+
+            @test i.instance.m == m
+
+            @testset "Dynamic programming" begin
+                @test d.instance == i
+                @test d.solutions[3] == [-1]
+
+                test_items_at(d, expected_items)
+                test_solution_at(d, expected)
+            end
+
+            @testset "Linear programming" begin
+                @test l.instance == i
+                @test d.solutions[3] == [-1]
 
                 test_items_at(l, expected_items)
                 test_solution_at(l, expected)

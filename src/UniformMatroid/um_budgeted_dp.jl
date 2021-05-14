@@ -107,7 +107,6 @@ function solve(
     return MinBudgetedUniformMatroidSolution(
         i,
         S[i.instance.m, 0, i.min_budget],
-        V,
         S_refined,
     )
 end
