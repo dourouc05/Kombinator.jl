@@ -102,6 +102,10 @@ of `i`).
 """
 abstract type MultipleMinBudgetedSolution <: MinBudgetedSolution end
 
+function reward(i::MinimumBudget, var)
+    return reward(i.instance, var)
+end
+
 # TODO: weight interface for a solution (like value).
 
 # # Maximum budget.
