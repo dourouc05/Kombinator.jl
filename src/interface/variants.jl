@@ -102,71 +102,71 @@ of `i`).
 """
 abstract type MultipleMinBudgetedSolution <: MinBudgetedSolution end
 
-# Maximum budget.
+# # Maximum budget.
 
-"""
-    struct MaximumBudget{CI <: CombinatorialInstance, T <: Real}
+# """
+#     struct MaximumBudget{CI <: CombinatorialInstance, T <: Real}
 
-Implement a maximum-budget constraint, i.e. a maximum quantity of a resource 
-that can be used.
+# Implement a maximum-budget constraint, i.e. a maximum quantity of a resource 
+# that can be used.
 
-``\\sum_i x_i \\times \\mathtt{weights}_i \\leq \\mathtt{max\\_budget}``
-"""
-struct MaximumBudget{CI <: CombinatorialInstance, T <: Real} <:
-       CombinatorialVariation
-    instance::CI
-    weights::Union{Vector{T}, Dict{<:Any, T}}
-    max_budget::T
-    compute_all_values::Bool
-end
+# ``\\sum_i x_i \\times \\mathtt{weights}_i \\leq \\mathtt{max\\_budget}``
+# """
+# struct MaximumBudget{CI <: CombinatorialInstance, T <: Real} <:
+#        CombinatorialVariation
+#     instance::CI
+#     weights::Union{Vector{T}, Dict{<:Any, T}}
+#     max_budget::T
+#     compute_all_values::Bool
+# end
 
-function MaximumBudget(
-    i::CI,
-    weights::Union{Vector{T}, Dict{<:Any, T}},
-    max_budget::T;
-    compute_all_values::Bool=false,
-) where {CI, T}
-    return MaximumBudget(i, weights, max_budget, compute_all_values)
-end
+# function MaximumBudget(
+#     i::CI,
+#     weights::Union{Vector{T}, Dict{<:Any, T}},
+#     max_budget::T;
+#     compute_all_values::Bool=false,
+# ) where {CI, T}
+#     return MaximumBudget(i, weights, max_budget, compute_all_values)
+# end
 
-function copy(
-    i::MaximumBudget;
-    instance::CI=i.instance,
-    weights::Union{Vector{T}, Dict{<:Any, T}}=i.weights,
-    max_budget::T=i.max_budget,
-    compute_all_values::Bool=i.compute_all_values,
-) where {CI <: CombinatorialInstance, T <: Real}
-    return MaximumBudget(ci, weights, max_budget, compute_all_values)
-end
+# function copy(
+#     i::MaximumBudget;
+#     instance::CI=i.instance,
+#     weights::Union{Vector{T}, Dict{<:Any, T}}=i.weights,
+#     max_budget::T=i.max_budget,
+#     compute_all_values::Bool=i.compute_all_values,
+# ) where {CI <: CombinatorialInstance, T <: Real}
+#     return MaximumBudget(ci, weights, max_budget, compute_all_values)
+# end
 
-"""
-    abstract type MaxBudgetedSolution
+# """
+#     abstract type MaxBudgetedSolution
 
-A type of solution that is specifically tailored for the maximum-budget 
-variant.
-"""
-abstract type MaxBudgetedSolution <: CombinatorialSolution end
+# A type of solution that is specifically tailored for the maximum-budget 
+# variant.
+# """
+# abstract type MaxBudgetedSolution <: CombinatorialSolution end
 
-"""
-    abstract type SingleMaxBudgetedSolution
+# """
+#     abstract type SingleMaxBudgetedSolution
 
-A type of `MaxBudgetedSolution` when only one solution is available, to the 
-single value of the budget that is defined in the related instance. Objects
-of this type do not have to implement more fields than any 
-`CombinatorialSolution`.
-"""
-abstract type SingleMaxBudgetedSolution <: MaxBudgetedSolution end
+# A type of `MaxBudgetedSolution` when only one solution is available, to the 
+# single value of the budget that is defined in the related instance. Objects
+# of this type do not have to implement more fields than any 
+# `CombinatorialSolution`.
+# """
+# abstract type SingleMaxBudgetedSolution <: MaxBudgetedSolution end
 
-"""
-    abstract type MultipleMaxBudgetedSolution
+# """
+#     abstract type MultipleMaxBudgetedSolution
 
-A type of `MaxBudgetedSolution` when several solutions are available, with 
-the several values of the budget that are specified by the combinatorial 
-instance (typically, from zero to a maximum value). 
+# A type of `MaxBudgetedSolution` when several solutions are available, with 
+# the several values of the budget that are specified by the combinatorial 
+# instance (typically, from zero to a maximum value). 
 
-Objects of this type have to implement the usual fields of 
-`CombinatorialSolution`, but also `solutions`, a mapping from a budget value
-to the corresponding solution (`solutions`[i]` corresponds to a maximum budget
-of `i`).
-"""
-abstract type MultipleMaxBudgetedSolution <: MaxBudgetedSolution end
+# Objects of this type have to implement the usual fields of 
+# `CombinatorialSolution`, but also `solutions`, a mapping from a budget value
+# to the corresponding solution (`solutions`[i]` corresponds to a maximum budget
+# of `i`).
+# """
+# abstract type MultipleMaxBudgetedSolution <: MaxBudgetedSolution end
