@@ -1,15 +1,20 @@
 @testset "UniformMatroid" begin
     @testset "Uniform matroid" begin
         @testset "Interface" begin
-            @test_throws ErrorException UniformMatroidInstance(
-                Float64[5, 4, 3],
-                -1,
-            )
-            @test_throws ErrorException UniformMatroidInstance(
-                Float64[5, 4, 3],
-                0,
-            )
+            r = Float64[5, 4, 3]
 
+            @testset "Global interface" begin
+                i = UniformMatroidInstance(r, 1)
+                @test objective(i) == Maximise()
+            end
+
+            @testset "Invalid parameter" begin
+                @test_throws ErrorException UniformMatroidInstance(r, -1)
+                @test_throws ErrorException UniformMatroidInstance(r, 0)
+            end
+        end
+
+        @testset "Copy" begin
             i = UniformMatroidInstance(Float64[5, 4, 3], 1)
             i2 = copy(i)
             @test i.m == i2.m
@@ -45,30 +50,38 @@
 
     @testset "Budgeted uniform matroid" begin
         @testset "Interface" begin
+            r = Float64[5, 4, 3]
+            w = Int[1, 1, 1]
+
+            @testset "Global interface" begin
+                i = MinimumBudget(UniformMatroidInstance(r, 1), w, 1)
+                @test objective(i) == Maximise()
+            end
+
             @testset "Errors when building the UniformMatroidInstance should bubble up to MinimumBudget" begin
                 @test_throws ErrorException MinimumBudget(
-                    UniformMatroidInstance(Float64[5, 4, 3], -1),
-                    Int[1, 1, 1],
+                    UniformMatroidInstance(r, -1),
+                    w,
                 )
                 @test_throws ErrorException MinimumBudget(
-                    UniformMatroidInstance(Float64[5, 4, 3], 0),
-                    Int[1, 1, 1],
+                    UniformMatroidInstance(r, 0),
+                    w,
                 )
             end
 
             @testset "Negative weight or budget" begin
-                @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, 1, 1], -1)
-                @test_throws ErrorException MinimumBudget(UniformMatroidInstance(Float64[5, 4, 3], 2), Int[1, -1, 1])
+                @test_throws ErrorException MinimumBudget(UniformMatroidInstance(r, 2), w, -1)
+                @test_throws ErrorException MinimumBudget(UniformMatroidInstance(r, 2), Int[1, -1, 1])
             end
 
             @testset "Different number of items between the matroid and the new constraint" begin
                 @test_throws ErrorException MinimumBudget(
-                    UniformMatroidInstance(Float64[5, 4, 3], 0),
-                    Int[1, 1],
+                    UniformMatroidInstance(r, 0),
+                    w[1:2],
                 )
                 @test_throws ErrorException MinimumBudget(
-                    UniformMatroidInstance(Float64[5, 4], 0),
-                    Int[1, 1, 1],
+                    UniformMatroidInstance(r[1:2], 0),
+                    w,
                 )
             end
         end
