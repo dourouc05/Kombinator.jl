@@ -48,6 +48,12 @@
 
             @testset "Solution helpers" begin
                 i = UniformMatroidInstance(r, 1)
+
+                # Infeasible solution.
+                s = UniformMatroidSolution(i, Int[])
+                @test value(s) == -Inf
+
+                # Valid solution.
                 d = Dict(1 => 0.4, 2 => 0.8, 3 => 0.7)
                 s = make_solution(i, d)
 

@@ -56,10 +56,6 @@ struct UniformMatroidSolution{T <: Real, O <: CombinatorialObjective} <:
     variables::Vector{Int} # Indices to the chosen items.
 end
 
-function value(s::UniformMatroidSolution{T, O}) where {T <: Real, O}
-    return sum(s.instance.rewards[i] for i in s.variables)
-end
-
 function make_solution(
     i::UniformMatroidInstance{T, O},
     item::Dict{Int, Float64},

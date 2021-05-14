@@ -126,7 +126,8 @@ function formulation end # i::CombinatorialInstance, f::CombinatorialLinearFormu
 """
     value(s::CombinatorialSolution)
 
-Returns the value of a solution, i.e. its total reward.
+Returns the value of a solution, i.e. its total reward. For a maximisation
+problem, an infeasible solution has a `value` of `-Inf`.
 
     value(s::MinBudgetedSolution, budget::Int)
 
@@ -134,7 +135,14 @@ Returns the value of the solution corresponding to the given budget. This
 function is likely to throw an error for `SingleMinBudgetedSolution`, but is 
 ensured not to for `MultipleMinBudgetedSolution`.
 """
-function value end
+function value(s::CombinatorialSolution)
+    # TODO: define the `reward` interface and implement this in terms of the new interface. This will generalised the ST implementation.
+    if -1 in s.variables || length(s.variables) == 0
+        return -Inf
+    end
+
+    return sum(s.instance.rewards[i] for i in s.variables)
+end
 
 """
     make_solution(::CombinatorialInstance, ::Dict{K, Float64}) where {K}

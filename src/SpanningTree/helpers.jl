@@ -8,10 +8,14 @@ function _budgeted_spanning_tree_compute_weight(
     return sum(i.weights[(e in keys(i.weights)) ? e : reverse(e)] for e in tree)
 end
 
+# Compute the value of a raw solution (array of edges). Different convention 
+# from the global `value` interface: return 0 for empty trees, not -Inf. Here, 
+# an empty tree is being built; there, an empty tree is an infeasible solution.
+
 function _budgeted_spanning_tree_compute_value(
     i::SpanningTreeInstance{T},
     tree::Vector{Edge{T}},
-) where {T, U}
+) where {T}
     if length(tree) == 0
         return 0
     end

@@ -10,21 +10,67 @@
 
     @testset "Maximum spanning tree" begin
         @testset "Interface" begin
+            graph = complete_graph(5)
+            rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+
+            @testset "Global interface" begin
+                i = SpanningTreeInstance(graph, rewards)
+                @test objective(i) == Maximise()
+            end
+
             @testset "Copying" begin
-                graph = complete_graph(5)
-                rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-        
                 i = SpanningTreeInstance(graph, rewards)
                 i2 = copy(i)
                 @test i.graph == i2.graph
                 @test i.rewards == i2.rewards
                 @test i.objective == i2.objective
             end
+
+            @testset "Approximation" begin
+                i = SpanningTreeInstance(graph, rewards)
+
+                @test approximation_ratio(i, PrimAlgorithm()) == 1.0
+                @test approximation_term(i, PrimAlgorithm()) == 0.0
+
+                @test approximation_ratio(i, DynamicProgramming()) == 1.0
+                @test approximation_term(i, DynamicProgramming()) == 0.0
+
+                @test approximation_ratio(i, DefaultLinearFormulation(Cbc.Optimizer)) == 1.0
+                @test approximation_term(i, DefaultLinearFormulation(Cbc.Optimizer)) == 0.0
+            end
+
+            @testset "Make solution" begin
+                i = SpanningTreeInstance(graph, rewards)
+                d = Dict(Edge(1, 2) => 0.8, Edge(1, 3) => 0.2, Edge(2, 3) => 1.0)
+                s = make_solution(i, d)
+
+                @test s.instance == i
+                @test length(s.variables) == 2
+                @test Edge(1, 2) ∈ s.variables
+                @test Edge(1, 3) ∉ s.variables
+                @test Edge(2, 3) ∈ s.variables
+
+                @test value(s) == 4.0
+            end
+
+            @testset "Solution helpers" begin
+                i = SpanningTreeInstance(graph, rewards)
+
+                # Infeasible solution.
+                s = SpanningTreeSolution(i, Edge{Int}[])
+                @test value(s) == -Inf
+
+                # Valid solution.
+                d = Dict(Edge(1, 2) => 0.8, Edge(1, 3) => 0.2, Edge(2, 3) => 1.0)
+                s = make_solution(i, d)
+                @test value(s) == 4
+
+                # Valid solution with reversed edges.
+                s = SpanningTreeSolution(i, [Edge(2, 1), Edge(3, 2)])
+                @test value(s) == 4
+            end
         
-            @testset "Value of a tree" begin
-                graph = complete_graph(5)
-                rewards =
-                    Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+            @testset "Value of a raw tree" begin
                 i = SpanningTreeInstance(graph, rewards)
         
                 @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
