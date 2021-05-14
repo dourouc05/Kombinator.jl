@@ -193,6 +193,9 @@
                 budget,
             )
 
+            @test dimension(SpanningTreeInstance(graph, rewards)) == 3
+            @test dimension(i) == 3
+
             @testset "Lagrangian relaxation" begin
                 lagrangian = solve(i, LagrangianAlgorithm(), ε=ε)
                 @test lagrangian.λ ≈ 0.25 atol = ε

@@ -121,11 +121,14 @@ function solve(
                 unmap_edge =
                     (e) -> Edge(unmap_index(src(e)), unmap_index(dst(e)))
                 r_no_src = Dict(
-                    map(map_edge, collect(keys(instance.instance.rewards))) .=> values(instance.instance.rewards),
+                    filter(map(map_edge, collect(keys(instance.instance.rewards))) .=> values(instance.instance.rewards)) do r
+                        r[1] ∈ edges(g_no_src)
+                    end
                 )
                 w_no_src = Dict(
-                    map(map_edge, collect(keys(instance.weights))) .=>
-                        values(instance.weights),
+                    filter(map(map_edge, collect(keys(instance.weights))) .=> values(instance.weights)) do r
+                        r[1] ∈ edges(g_no_src)
+                    end
                 )
                 i_no_src = MinimumBudget(
                     SpanningTreeInstance(g_no_src, r_no_src),
@@ -147,11 +150,14 @@ function solve(
                 unmap_edge =
                     (e) -> Edge(unmap_index(src(e)), unmap_index(dst(e)))
                 r_no_dst = Dict(
-                    map(map_edge, collect(keys(instance.instance.rewards))) .=> values(instance.instance.rewards),
+                    filter(map(map_edge, collect(keys(instance.instance.rewards))) .=> values(instance.instance.rewards)) do r
+                        r[1] ∈ edges(g_no_dst)
+                    end
                 )
                 w_no_dst = Dict(
-                    map(map_edge, collect(keys(instance.weights))) .=>
-                        values(instance.weights),
+                    filter(map(map_edge, collect(keys(instance.weights))) .=> values(instance.weights)) do r
+                        r[1] ∈ edges(g_no_dst)
+                    end
                 )
                 i_no_dst = MinimumBudget(
                     SpanningTreeInstance(g_no_dst, r_no_dst),
