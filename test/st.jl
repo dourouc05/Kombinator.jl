@@ -8,74 +8,40 @@
         @test res_b == [Edge(1, 4)] # Elements that are in b but not in a
     end
 
-    @testset "Copying" begin
-        graph = complete_graph(5)
-        rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-
-        i = SpanningTreeInstance(graph, rewards)
-        i2 = copy(i)
-        @test i.graph == i2.graph
-        @test i.rewards == i2.rewards
-        @test i.objective == i2.objective
-    end
-
-    @testset "Value of a tree" begin
-        @testset "Vanilla" begin
-            graph = complete_graph(5)
-            rewards =
-                Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-            i = SpanningTreeInstance(graph, rewards)
-
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
-                i,
-                Edge{Int}[],
-            ) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
-                i,
-                [Edge(1, 2)],
-            ) == 1.0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
-                i,
-                [Edge(1, 2), Edge(1, 3)],
-            ) == 1.5
-        end
-
-        @testset "Budgeted" begin
-            graph = complete_graph(3)
-            rewards =
-                Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
-            weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
-            i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
-
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
-                i,
-                Edge{Int}[],
-            ) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
-                i,
-                [Edge(1, 2)],
-            ) == 1.0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
-                i,
-                [Edge(1, 2), Edge(1, 3)],
-            ) == 1.5
-
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
-                i,
-                Edge{Int}[],
-            ) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
-                i,
-                [Edge(1, 2)],
-            ) == 0
-            @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
-                i,
-                [Edge(1, 2), Edge(1, 3)],
-            ) == 2
-        end
-    end
-
     @testset "Maximum spanning tree" begin
+        @testset "Interface" begin
+            @testset "Copying" begin
+                graph = complete_graph(5)
+                rewards = Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+        
+                i = SpanningTreeInstance(graph, rewards)
+                i2 = copy(i)
+                @test i.graph == i2.graph
+                @test i.rewards == i2.rewards
+                @test i.objective == i2.objective
+            end
+        
+            @testset "Value of a tree" begin
+                graph = complete_graph(5)
+                rewards =
+                    Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+                i = SpanningTreeInstance(graph, rewards)
+        
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                    i,
+                    Edge{Int}[],
+                ) == 0
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                    i,
+                    [Edge(1, 2)],
+                ) == 1.0
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                    i,
+                    [Edge(1, 2), Edge(1, 3)],
+                ) == 1.5
+            end
+        end
+
         @testset "Basic" begin
             graph = complete_graph(5)
             rewards = Dict(
@@ -139,6 +105,40 @@
 
     @testset "Budgeted maximum spanning tree" begin
         @testset "Interface" begin
+            @testset "Value of a tree" begin
+                graph = complete_graph(3)
+                rewards =
+                    Dict(Edge(1, 2) => 1.0, Edge(1, 3) => 0.5, Edge(2, 3) => 3.0)
+                weights = Dict(Edge(1, 2) => 0, Edge(1, 3) => 2, Edge(2, 3) => 0)
+                i = MinimumBudget(SpanningTreeInstance(graph, rewards), weights, 0)
+        
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                    i,
+                    Edge{Int}[],
+                ) == 0
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                    i,
+                    [Edge(1, 2)],
+                ) == 1.0
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_value(
+                    i,
+                    [Edge(1, 2), Edge(1, 3)],
+                ) == 1.5
+        
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    Edge{Int}[],
+                ) == 0
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    [Edge(1, 2)],
+                ) == 0
+                @test Kombinator.SpanningTree._budgeted_spanning_tree_compute_weight(
+                    i,
+                    [Edge(1, 2), Edge(1, 3)],
+                ) == 2
+            end
+
             @testset "Approximation: Lagrangian refinement" begin
                 graph = complete_graph(3)
                 rewards = Dict(
