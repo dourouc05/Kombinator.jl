@@ -12,6 +12,7 @@ import Kombinator:
     dimension,
     approximation_ratio,
     approximation_term,
+    value,
     formulation,
     fastest_exact,
     make_solution

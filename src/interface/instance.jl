@@ -124,6 +124,19 @@ supplementary constraint encoded by the `CombinatorialVariation` on top fo the
 function formulation end # i::CombinatorialInstance, f::CombinatorialLinearFormulation; solver=nothing
 
 """
+    value(s::CombinatorialSolution)
+
+Returns the value of a solution, i.e. its total reward.
+
+    value(s::MinBudgetedSolution, budget::Int)
+
+Returns the value of the solution corresponding to the given budget. This 
+function is likely to throw an error for `SingleMinBudgetedSolution`, but is 
+ensured not to for `MultipleMinBudgetedSolution`.
+"""
+function value end
+
+"""
     make_solution(::CombinatorialInstance, ::Dict{K, Float64}) where {K}
 
 Creates a solution object of the right type for the given combinatorial 
