@@ -1,0 +1,21 @@
+authors:
+  - family-names: Cuvelier
+    given-names: Thibaut
+cff-version: 1.2.0
+message: If you use this software, please cite it using these metadata.
+title: Kombinator.jl
+license: MIT
+keywords:
+  - "combinatorial optimization"
+  - research
+references:
+  - authors:
+    - family-names: Cuvelier
+      given-names: Thibaut
+    - family-names: Combes
+      given-names: Richard
+    - family-names: Gourdin
+      given-names: Éric
+    title: Statistically Efficient, Polynomial-Time Algorithms for Combinatorial Semi-Bandits
+    type: doi
+    value: 10.1145/3447387
